@@ -1,10 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingCart, MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, Store, Loader2 } from 'lucide-react';
-
-// Firebase Imports
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const PRODUCTS = [
   { id: 1, name: 'Strawberry', unit: 'Box (200g)', price: 100, icon: '🍓', desc: 'Sweet & Red' },
@@ -22,15 +17,8 @@ const DELIVERY_OPTIONS = [
 // Placeholder for the uploaded QR Code. 
 const QR_CODE_URL = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=paytm.s18fahk@pty&pn=KanhaFarmFresh"; 
 
-// PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+// YOUR GOOGLE APPS SCRIPT WEB APP URL
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4hqoeKuiVttVtnglcxvzYBLiH71Sm-mw3Kc65SH-VBsI-37_mb4RlyH6Y6ygFmAxH/exec"; 
-
-// --- Firebase Initialization ---
-const firebaseConfig = JSON.parse(__firebase_config);
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const storage = getStorage(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
 export default function App() {
   const [cart, setCart] = useState({});
@@ -44,22 +32,7 @@ export default function App() {
   const [paymentFile, setPaymentFile] = useState(null);
   const [showScrollCue, setShowScrollCue] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState(null);
-  const [uploadStatus, setUploadStatus] = useState(''); // 'uploading', 'success', 'error'
-
-  // --- Auth & Scroll Effects ---
-  useEffect(() => {
-    const initAuth = async () => {
-      if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-        await signInWithCustomToken(auth, __initial_auth_token);
-      } else {
-        await signInAnonymously(auth);
-      }
-    };
-    initAuth();
-    const unsubscribe = onAuthStateChanged(auth, setUser);
-    return () => unsubscribe();
-  }, []);
+  const [uploadStatus, setUploadStatus] = useState(''); 
 
   useEffect(() => {
     const handleScroll = () => {
@@ -73,7 +46,20 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // --- Cart & Logic ---
+  // --- Helpers ---
+  
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
 
   const updateQuantity = (id, change) => {
     setCart(prev => {
@@ -115,25 +101,15 @@ export default function App() {
       alert("Please upload the payment screenshot to confirm your order.");
       return;
     }
-    if (!user) {
-      alert("Connecting to secure server... please wait a moment and try again.");
-      return;
-    }
 
     setIsSubmitting(true);
     setUploadStatus('uploading');
 
     try {
-      // 1. Upload Image to Firebase Storage
-      const filename = `${Date.now()}_${paymentFile.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
-      const storageRef = ref(storage, `artifacts/${appId}/public/payment_proofs/${filename}`);
-      
-      const snapshot = await uploadBytes(storageRef, paymentFile);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      
-      setUploadStatus('success');
+      // 1. Convert Image to Base64 (Text)
+      const base64Image = await convertToBase64(paymentFile);
 
-      // 2. Prepare Data for Google Sheet (including the new URL)
+      // 2. Prepare Data 
       const itemsString = Object.entries(cart).map(([id, qty]) => {
         const product = PRODUCTS.find(p => p.id === parseInt(id));
         return `${product.name} (${qty})`;
@@ -146,10 +122,11 @@ export default function App() {
         aptNumber,
         items: itemsString,
         total: calculateTotal(),
-        paymentScreenshotUrl: downloadURL // Sending the cloud link
+        image: base64Image,       // Sending image data
+        imageName: paymentFile.name
       };
 
-      // 3. Send Data to Google Script
+      // 3. Send to Google Script
       await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors", 
@@ -158,6 +135,7 @@ export default function App() {
       });
 
       // 4. Success Handling
+      setUploadStatus('success');
       setOrderDate(new Date());
       setOrderPlaced(true);
       window.scrollTo(0, 0);
@@ -165,7 +143,7 @@ export default function App() {
     } catch (error) {
       console.error("Error submitting order", error);
       setUploadStatus('error');
-      alert(`Error: ${error.message || "Could not upload image or place order."}`);
+      alert("Error placing order. Please try a smaller image or check your connection.");
     } finally {
       setIsSubmitting(false);
     }
@@ -173,7 +151,13 @@ export default function App() {
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      setPaymentFile(e.target.files[0]);
+      // Basic size check (optional: warn if > 5MB)
+      const file = e.target.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File is too large. Please select an image under 5MB.");
+        return;
+      }
+      setPaymentFile(file);
     }
   };
 
@@ -261,7 +245,7 @@ export default function App() {
                 <>
                   <Loader2 className="animate-spin" size={20} />
                   <span>
-                    {uploadStatus === 'uploading' ? 'Uploading Image...' : 'Processing Order...'}
+                    {uploadStatus === 'uploading' ? 'Uploading...' : 'Processing...'}
                   </span>
                 </>
               ) : (
