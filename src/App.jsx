@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ShoppingCart, MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, Store, Loader2 } from 'lucide-react';
 
 const PRODUCTS = [
@@ -17,8 +17,8 @@ const DELIVERY_OPTIONS = [
 // Placeholder for the uploaded QR Code. 
 const QR_CODE_URL = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=paytm.s18fahk@pty&pn=KanhaFarmFresh"; 
 
-// YOUR GOOGLE APPS SCRIPT WEB APP URL
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4hqoeKuiVttVtnglcxvzYBLiH71Sm-mw3Kc65SH-VBsI-37_mb4RlyH6Y6ygFmAxH/exec"; 
+// --- IMPORTANT: REPLACE THIS WITH YOUR NEW FRESH URL ---
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7cz_Ykzim6EYILS0Fpo5_DJlcJiuO01mefnkqHUGqeui3zd6pRf95oTFJiit3tB6X/exec"; 
 
 export default function App() {
   const [cart, setCart] = useState({});
@@ -34,6 +34,11 @@ export default function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(''); 
 
+  // Refs for Auto-Scrolling
+  const productsRef = useRef(null);
+  const deliveryRef = useRef(null);
+  const infoRef = useRef(null);
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 100) {
@@ -48,16 +53,35 @@ export default function App() {
 
   // --- Helpers ---
   
-  const convertToBase64 = (file) => {
+  const compressImage = (file) => {
     return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-      fileReader.onload = () => {
-        resolve(fileReader.result);
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const scaleSize = MAX_WIDTH / img.width;
+          
+          if (img.width > MAX_WIDTH) {
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
+          } else {
+            canvas.width = img.width;
+            canvas.height = img.height;
+          }
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          // Compress to JPEG at 60% quality
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+          resolve(dataUrl);
+        };
+        img.onerror = (error) => reject(error);
       };
-      fileReader.onerror = (error) => {
-        reject(error);
-      };
+      reader.onerror = (error) => reject(error);
     });
   };
 
@@ -80,25 +104,63 @@ export default function App() {
     }, 0);
   };
 
-  const isFormValid = () => {
-    const hasItems = calculateTotal() > 0;
-    const hasContact = customerName.trim().length >= 2 && mobileNumber.length >= 10;
-    const hasDelivery = deliveryType !== '';
-    const hasAptIfNeeded = DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt ? aptNumber.trim().length > 0 : true;
-
-    return hasItems && hasContact && hasDelivery && hasAptIfNeeded;
-  };
-
-  const handleCheckout = () => {
-    if (isFormValid()) {
-      setShowPayment(true);
-      window.scrollTo(0, 0);
+  // Smart Action Handler
+  const handleSmartAction = () => {
+    const total = calculateTotal();
+    
+    // Step 1: Items
+    if (total === 0) {
+      productsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
     }
+
+    // Step 2: Delivery
+    if (!deliveryType) {
+      deliveryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    
+    const needsApt = DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt;
+    if (needsApt && aptNumber.trim().length === 0) {
+        deliveryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Ideally focus the input here, but scrolling brings it into view
+        return;
+    }
+
+    // Step 3: Info
+    if (customerName.trim().length < 2 || mobileNumber.length < 10) {
+      infoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // All Good -> Payment
+    setShowPayment(true);
+    window.scrollTo(0, 0);
   };
+
+  // Get Dynamic Button Text
+  const getButtonText = () => {
+     const total = calculateTotal();
+     if (total === 0) return { text: "Add Items", icon: <Plus size={20} /> };
+     
+     if (!deliveryType) return { text: "Choose Delivery", icon: <MapPin size={20} /> };
+     
+     const needsApt = DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt;
+     if (needsApt && !aptNumber) return { text: "Enter Apt #", icon: <MapPin size={20} /> };
+     
+     if (customerName.trim().length < 2 || mobileNumber.length < 10) return { text: "Enter Contact Info", icon: <User size={20} /> };
+     
+     return { text: "Proceed to Pay", icon: <ArrowRight size={20} /> };
+  }
 
   const handleFinalizeOrder = async () => {
     if (!paymentFile) {
       alert("Please upload the payment screenshot to confirm your order.");
+      return;
+    }
+    
+    if (GOOGLE_SCRIPT_URL.includes("REPLACE_THIS")) {
+      alert("Please update the GOOGLE_SCRIPT_URL in the code with your actual Web App URL.");
       return;
     }
 
@@ -106,10 +168,9 @@ export default function App() {
     setUploadStatus('uploading');
 
     try {
-      // 1. Convert Image to Base64 (Text)
-      const base64Image = await convertToBase64(paymentFile);
-
-      // 2. Prepare Data 
+      console.log("Starting compression...");
+      const base64Image = await compressImage(paymentFile);
+      
       const itemsString = Object.entries(cart).map(([id, qty]) => {
         const product = PRODUCTS.find(p => p.id === parseInt(id));
         return `${product.name} (${qty})`;
@@ -122,28 +183,26 @@ export default function App() {
         aptNumber,
         items: itemsString,
         total: calculateTotal(),
-        image: base64Image,       // Sending image data
+        image: base64Image,
         imageName: paymentFile.name
       };
 
-      // 3. Send to Google Script
       await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors", 
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/plain" }, 
         body: JSON.stringify(orderData),
       });
-
-      // 4. Success Handling
+      
       setUploadStatus('success');
       setOrderDate(new Date());
       setOrderPlaced(true);
       window.scrollTo(0, 0);
 
     } catch (error) {
-      console.error("Error submitting order", error);
+      console.error("Error submitting order:", error);
       setUploadStatus('error');
-      alert("Error placing order. Please try a smaller image or check your connection.");
+      alert("Error placing order. Check console for details.");
     } finally {
       setIsSubmitting(false);
     }
@@ -151,13 +210,7 @@ export default function App() {
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      // Basic size check (optional: warn if > 5MB)
-      const file = e.target.files[0];
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File is too large. Please select an image under 5MB.");
-        return;
-      }
-      setPaymentFile(file);
+      setPaymentFile(e.target.files[0]);
     }
   };
 
@@ -262,7 +315,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 font-sans pb-24 relative selection:bg-emerald-100">
+    <div className="min-h-screen bg-stone-50 font-sans pb-28 relative selection:bg-emerald-100">
       {/* Header */}
       <div className="bg-emerald-700 text-white p-6 rounded-b-3xl shadow-lg relative z-10">
         <div className="flex items-center justify-between mb-2">
@@ -282,8 +335,9 @@ export default function App() {
       <div className="max-w-md mx-auto px-4 -mt-4 relative z-20">
         
         {/* Products Section */}
-        <div className="space-y-4 pt-6">
+        <div ref={productsRef} className="space-y-4 pt-6 scroll-mt-24">
           <h3 className="text-stone-800 font-bold text-lg ml-1 flex items-center">
+            <span className="bg-emerald-100 text-emerald-800 w-6 h-6 rounded-full text-xs flex items-center justify-center mr-2">1</span>
             Fresh Produce 
             <span className="ml-2 h-px bg-stone-300 flex-grow"></span>
           </h3>
@@ -326,8 +380,9 @@ export default function App() {
         </div>
 
         {/* Delivery Section */}
-        <div className="mt-8 space-y-4">
+        <div ref={deliveryRef} className="mt-8 space-y-4 scroll-mt-24">
           <h3 className="text-stone-800 font-bold text-lg ml-1 flex items-center">
+            <span className="bg-emerald-100 text-emerald-800 w-6 h-6 rounded-full text-xs flex items-center justify-center mr-2">2</span>
             Delivery Details
             <span className="ml-2 h-px bg-stone-300 flex-grow"></span>
           </h3>
@@ -382,8 +437,9 @@ export default function App() {
         </div>
 
         {/* Customer Details */}
-        <div className="mt-8 space-y-4 mb-24">
+        <div ref={infoRef} className="mt-8 space-y-4 mb-8 scroll-mt-24">
           <h3 className="text-stone-800 font-bold text-lg ml-1 flex items-center">
+            <span className="bg-emerald-100 text-emerald-800 w-6 h-6 rounded-full text-xs flex items-center justify-center mr-2">3</span>
             Your Info
             <span className="ml-2 h-px bg-stone-300 flex-grow"></span>
           </h3>
@@ -424,23 +480,23 @@ export default function App() {
         </div>
       )}
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-4 shadow-lg z-30">
+      {/* Smart Sticky Footer */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-30">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div>
             <p className="text-xs text-stone-500 font-medium uppercase">Total</p>
             <p className="text-2xl font-bold text-emerald-800">₹{calculateTotal()}</p>
           </div>
           <button 
-            onClick={handleCheckout}
-            disabled={!isFormValid()}
-            className={`px-8 py-3 rounded-xl font-bold flex items-center space-x-2 transition-all shadow-lg ${
-              isFormValid() 
-                ? 'bg-emerald-600 text-white shadow-emerald-200 hover:bg-emerald-700 active:transform active:scale-95' 
-                : 'bg-stone-300 text-stone-500 cursor-not-allowed'
+            onClick={handleSmartAction}
+            className={`px-6 py-3 rounded-xl font-bold flex items-center space-x-2 transition-all shadow-lg text-sm md:text-base ${
+              calculateTotal() > 0 
+                ? 'bg-emerald-600 text-white shadow-emerald-200 hover:bg-emerald-700 active:scale-95' 
+                : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
             }`}
           >
-            <span>Checkout</span>
-            <ShoppingCart size={20} />
+            <span>{getButtonText().text}</span>
+            {getButtonText().icon}
           </button>
         </div>
       </div>
