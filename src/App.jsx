@@ -435,7 +435,7 @@ export default function App() {
 
               {DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt && (
                 <div className="space-y-1 animate-fade-in">
-                  <label className="text-xs font-bold text-stone-500 uppercase tracking-wide">Apartment Number</label>
+                  <label className="text-xs font-bold text-stone-500 uppercase tracking-wide">Block & Flat Number</label>
                   <input 
                     type="text" 
                     placeholder="e.g. A-101"
