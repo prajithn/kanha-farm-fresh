@@ -1,11 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ShoppingCart, MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, Store, Loader2 } from 'lucide-react';
 
+// Custom Green Coconut Icon for "Tender Coconut"
+const TenderCoconutIcon = () => (
+  <svg viewBox="0 0 100 100" className="w-10 h-10 overflow-visible">
+    {/* Main Green Body */}
+    <path d="M50 95 C25 95 10 75 10 50 C10 25 25 10 50 10 C75 10 90 25 90 50 C90 75 75 95 50 95 Z" fill="#4ade80" stroke="#166534" strokeWidth="2"/>
+    {/* Top Cut/Stem area */}
+    <path d="M35 15 L50 2 L65 15 Z" fill="#dcfce7" stroke="#166534" strokeWidth="2"/>
+    {/* Shine/Highlight */}
+    <path d="M30 30 Q 40 20 60 30" fill="none" stroke="#dcfce7" strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+  </svg>
+);
+
 const PRODUCTS = [
-  { id: 1, name: 'Strawberry', unit: 'Box (200g)', price: 100, icon: '🍓', desc: 'Sweet & Red' },
-  { id: 2, name: 'Tender Coconut', unit: 'Piece', price: 80, icon: '🥥', desc: 'Refreshing' },
-  { id: 3, name: 'Coriander Leaves', unit: 'Bunch (300g)', price: 50, icon: '🌿', desc: 'Aromatic' },
-  { id: 4, name: 'Lettuce', unit: 'Bunch (300g)', price: 100, icon: '🥬', desc: 'Crunchy' },
+  { id: 1, name: 'Strawberry', unit: 'Box (200g)', price: 100, icon: <span className="text-4xl">🍓</span>, desc: 'Sweet & Red' },
+  // Updated with custom component
+  { id: 2, name: 'Tender Coconut', unit: 'Piece', price: 80, icon: <TenderCoconutIcon />, desc: 'Refreshing' },
+  { id: 3, name: 'Coriander Leaves', unit: 'Bunch (300g)', price: 50, icon: <span className="text-4xl">🌿</span>, desc: 'Aromatic' },
+  { id: 4, name: 'Lettuce', unit: 'Bunch (300g)', price: 100, icon: <span className="text-4xl">🥬</span>, desc: 'Crunchy' },
 ];
 
 const DELIVERY_OPTIONS = [
@@ -329,7 +342,7 @@ export default function App() {
             </div>
           </div>
         </div>
-        <p className="mt-4 text-emerald-100 text-sm">Organic goodness delivered to your doorstep.</p>
+        <p className="mt-4 text-emerald-100 text-sm">Natural goodness delivered to your doorstep.</p>
       </div>
 
       <div className="max-w-md mx-auto px-4 -mt-4 relative z-20">
@@ -437,7 +450,7 @@ export default function App() {
         </div>
 
         {/* Customer Details */}
-        <div ref={infoRef} className="mt-8 space-y-4 mb-8 scroll-mt-24">
+        <div ref={infoRef} className="mt-8 space-y-4 mb-4 scroll-mt-24">
           <h3 className="text-stone-800 font-bold text-lg ml-1 flex items-center">
             <span className="bg-emerald-100 text-emerald-800 w-6 h-6 rounded-full text-xs flex items-center justify-center mr-2">3</span>
             Your Info
@@ -469,6 +482,12 @@ export default function App() {
               />
             </div>
           </div>
+        </div>
+
+        {/* Contact / Footer Info */}
+        <div className="text-center pb-8 pt-4">
+           <p className="text-stone-400 text-xs uppercase tracking-widest mb-1">For Enquiries</p>
+           <p className="text-emerald-800 font-bold">Mani - 81790 68821</p>
         </div>
 
       </div>
