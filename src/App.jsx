@@ -290,7 +290,7 @@ export default function App() {
                 <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Upload size={24} />
                 </div>
-                <span className="text-emerald-800 font-medium block">Upload Screenshot</span>
+                <span className="text-emerald-800 font-medium block">Upload UPI Payment Screenshot</span>
                 <span className="text-stone-500 text-xs block mt-1">{paymentFile ? paymentFile.name : "Tap to select image"}</span>
                 <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
               </label>
