@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ShoppingCart, MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, Store, Loader2, Lock, Search, Calendar, Check, X, AlertCircle } from 'lucide-react';
+import { ShoppingCart, MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, Store, Loader2, Lock, Search, Calendar, Check, X, AlertCircle, Filter } from 'lucide-react';
 
 // --- CONFIGURATION ---
 const SHOW_HARVESTING_SCREEN = false; 
@@ -109,6 +109,7 @@ export default function App() {
   const [adminLoading, setAdminLoading] = useState(false);
   const [adminFilterType, setAdminFilterType] = useState('');
   const [adminSearchName, setAdminSearchName] = useState('');
+  const [adminFilterStatus, setAdminFilterStatus] = useState('Pending'); // Default to Pending
 
   const productsRef = useRef(null);
   const deliveryRef = useRef(null);
@@ -227,7 +228,8 @@ export default function App() {
         customerName,
         mobileNumber,
         deliveryType: DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label,
-        aptNumber,
+        // FIX: Prepend single quote to force text format in Google Sheets (prevents date conversion)
+        aptNumber: aptNumber ? `'${aptNumber}` : '', 
         items: itemsString,
         total: calculateTotal(),
         image: base64Image,
@@ -371,12 +373,18 @@ export default function App() {
   if (view === 'admin-dashboard') {
     // --- UPDATED SEARCH FILTER LOGIC ---
     const filteredOrders = adminOrders.filter(order => {
-      // 1. Filter by Delivery Location
+      // 1. Filter by Status (Pending, Done, All)
+      if (adminFilterStatus !== 'All') {
+        const status = order.status || 'Pending';
+        if (status !== adminFilterStatus) return false;
+      }
+
+      // 2. Filter by Delivery Location
       if (adminFilterType) {
         if (!order.deliveryType || !order.deliveryType.includes(adminFilterType)) return false;
       }
       
-      // 2. Search by Name OR Apartment
+      // 3. Search by Name OR Apartment
       if (adminSearchName) {
         const search = adminSearchName.toLowerCase();
         const name = (order.customerName || '').toLowerCase();
@@ -404,9 +412,29 @@ export default function App() {
 
         <div className="max-w-4xl mx-auto p-4 space-y-6">
           <div className="bg-white p-4 rounded-xl shadow-sm border border-stone-100 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              
+              {/* STATUS FILTER */}
               <div>
-                <label className="block text-xs font-bold text-stone-500 uppercase mb-1">1. Select Delivery Location</label>
+                <label className="block text-xs font-bold text-stone-500 uppercase mb-1">Status</label>
+                <div className="relative">
+                  <Filter className="absolute left-3 top-3 text-stone-400" size={18} />
+                  <select 
+                    value={adminFilterStatus}
+                    onChange={(e) => setAdminFilterStatus(e.target.value)}
+                    className="w-full pl-10 p-3 bg-stone-50 border border-stone-200 rounded-lg appearance-none outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+                  >
+                    <option value="Pending">Pending Orders</option>
+                    <option value="Done">Completed Orders</option>
+                    <option value="All">All Orders</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-3.5 text-stone-400 pointer-events-none" size={16} />
+                </div>
+              </div>
+
+              {/* LOCATION FILTER */}
+              <div>
+                <label className="block text-xs font-bold text-stone-500 uppercase mb-1">Delivery Location</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-3 text-stone-400" size={18} />
                   <select 
@@ -419,15 +447,18 @@ export default function App() {
                       <option key={opt.id} value={opt.label}>{opt.label}</option>
                     ))}
                   </select>
+                  <ChevronDown className="absolute right-3 top-3.5 text-stone-400 pointer-events-none" size={16} />
                 </div>
               </div>
+
+              {/* SEARCH FILTER */}
               <div>
-                <label className="block text-xs font-bold text-stone-500 uppercase mb-1">2. Search Name or Apt</label>
+                <label className="block text-xs font-bold text-stone-500 uppercase mb-1">Search Name or Apt</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-3 text-stone-400" size={18} />
                   <input 
                     type="text" 
-                    placeholder="Search Name or Apt..." 
+                    placeholder="Search..." 
                     value={adminSearchName}
                     onChange={(e) => setAdminSearchName(e.target.value)}
                     className="w-full pl-10 p-3 bg-stone-50 border border-stone-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 text-base"
@@ -465,7 +496,8 @@ export default function App() {
                         <MapPin size={14} className="flex-shrink-0 mt-0.5" /> 
                         <span className="break-words">
                           {order.deliveryType} 
-                          {order.aptNumber && <span className="text-stone-800 font-medium"> • {order.aptNumber}</span>}
+                          {/* FIX: Cleanly display apt number by removing quote if present */}
+                          {order.aptNumber && <span className="text-stone-800 font-medium"> • {order.aptNumber.toString().replace(/^'/, '')}</span>}
                         </span>
                       </p>
                     </div>
