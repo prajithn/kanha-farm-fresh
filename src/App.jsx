@@ -75,6 +75,7 @@ const PRODUCTS = [
 const DELIVERY_OPTIONS = [
   { id: 'vihanga', label: 'My Home Vihanga', requiresApt: true },
   { id: 'krishe', label: 'My Home Krishe', requiresApt: true },
+  { id: 'vajrajs', label: 'Vajras Jasmine County', requiresApt: true },
   { id: 'pickup', label: 'Store pick up (Malabar Natives)', requiresApt: false },
 ];
 
