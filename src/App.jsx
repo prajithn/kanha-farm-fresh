@@ -70,6 +70,7 @@ const PRODUCTS = [
   { id: 2, name: 'Tender Coconut', unit: 'Piece', price: 80, icon: <TenderCoconutIcon />, desc: 'Refreshing' },
   { id: 3, name: 'Coriander Leaves', unit: 'Bunch (300g)', price: 50, icon: <span className="text-4xl">🌿</span>, desc: 'Aromatic' },
   { id: 4, name: 'Lettuce', unit: 'Bunch (300g)', price: 100, icon: <span className="text-4xl">🥬</span>, desc: 'Crunchy' },
+  { id: 5, name: 'Curry Leaves', unit: 'Bunch (300g)', price: 50, icon: <span className="text-4xl">🍃</span>, desc: 'Fresh' },
 ];
 
 const DELIVERY_OPTIONS = [
