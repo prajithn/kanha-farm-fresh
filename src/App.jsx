@@ -1,10 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ShoppingCart, MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, Store, Loader2, Lock, Search, Calendar, Check, X, AlertCircle, Filter } from 'lucide-react';
+import { ShoppingCart, MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, Store, Loader2, Lock, Search, Calendar, Check, X, AlertCircle, Filter, Sparkles } from 'lucide-react';
 
 // --- CONFIGURATION ---
 const SHOW_HARVESTING_SCREEN = false; 
 const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'kanha@123';
+
+// --- GEMINI API HELPERS ---
+const apiKey = ""; // API Key provided by execution environment
+
+const callGemini = async (prompt) => {
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      }
+    );
+    const data = await response.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate that right now.";
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+    return "Connection error. Please try again.";
+  }
+};
 
 // --- COMPONENTS ---
 
@@ -18,47 +41,88 @@ const TenderCoconutIcon = () => (
 );
 
 // 2. Custom Modal (Replaces native alert/confirm)
-const Modal = ({ isOpen, type, message, onClose, onConfirm }) => {
+const Modal = ({ isOpen, type, message, title, onClose, onConfirm, isLoading }) => {
   if (!isOpen) return null;
+  
+  const isAi = type === 'ai';
+  
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in">
-      <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl transform transition-all scale-100">
-        <div className="flex items-center gap-3 mb-4">
-          {type === 'confirm' ? (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in backdrop-blur-sm">
+      <div className={`bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl transform transition-all scale-100 ${isAi ? 'border-2 border-purple-100' : ''}`}>
+        
+        {/* Header */}
+        <div className="flex items-start gap-3 mb-4">
+          {isLoading ? (
+            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 animate-pulse">
+              <Sparkles size={24} className="animate-spin-slow" />
+            </div>
+          ) : type === 'confirm' ? (
             <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
               <AlertCircle size={24} />
+            </div>
+          ) : isAi ? (
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white shadow-lg">
+              <Sparkles size={20} />
             </div>
           ) : (
             <div className="w-10 h-10 bg-stone-100 rounded-full flex items-center justify-center text-stone-600">
               <AlertCircle size={24} />
             </div>
           )}
-          <h3 className="text-lg font-bold text-stone-800">
-            {type === 'confirm' ? 'Confirmation' : 'Notice'}
-          </h3>
-        </div>
-        
-        <p className="text-stone-600 mb-8 leading-relaxed">{message}</p>
-        
-        <div className="flex justify-end gap-3">
-          {type === 'confirm' && (
-            <button 
-              onClick={onClose} 
-              className="px-5 py-2.5 text-stone-500 font-medium hover:bg-stone-50 rounded-xl transition-colors"
-            >
-              Cancel
+          
+          <div className="flex-1">
+            <h3 className={`text-lg font-bold ${isAi ? 'text-purple-900' : 'text-stone-800'}`}>
+              {isLoading ? 'Consulting Gemini...' : title || (type === 'confirm' ? 'Confirmation' : isAi ? 'Gemini Says' : 'Notice')}
+            </h3>
+            {isAi && !isLoading && <p className="text-xs text-purple-400 font-medium">✨ AI Generated Insight</p>}
+          </div>
+          
+          {!isLoading && (
+            <button onClick={onClose} className="text-stone-400 hover:text-stone-600">
+              <X size={20} />
             </button>
           )}
-          <button 
-            onClick={() => {
-              if (type === 'confirm' && onConfirm) onConfirm();
-              onClose();
-            }}
-            className="px-6 py-2.5 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition-all active:scale-95"
-          >
-            {type === 'confirm' ? 'Yes, Proceed' : 'Okay'}
-          </button>
         </div>
+        
+        {/* Content */}
+        <div className="mb-6 leading-relaxed text-stone-600 max-h-[60vh] overflow-y-auto custom-scrollbar">
+          {isLoading ? (
+            <div className="space-y-3 py-2">
+              <div className="h-4 bg-purple-50 rounded w-3/4 animate-pulse"></div>
+              <div className="h-4 bg-purple-50 rounded w-full animate-pulse"></div>
+              <div className="h-4 bg-purple-50 rounded w-5/6 animate-pulse"></div>
+            </div>
+          ) : (
+            <div className="whitespace-pre-line text-sm">{message}</div>
+          )}
+        </div>
+        
+        {/* Actions */}
+        {!isLoading && (
+          <div className="flex justify-end gap-3">
+            {type === 'confirm' && (
+              <button 
+                onClick={onClose} 
+                className="px-5 py-2.5 text-stone-500 font-medium hover:bg-stone-50 rounded-xl transition-colors"
+              >
+                Cancel
+              </button>
+            )}
+            <button 
+              onClick={() => {
+                if (type === 'confirm' && onConfirm) onConfirm();
+                onClose();
+              }}
+              className={`px-6 py-2.5 font-medium rounded-xl shadow-lg transition-all active:scale-95 ${
+                isAi 
+                  ? 'bg-purple-600 text-white hover:bg-purple-700 shadow-purple-200' 
+                  : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-200'
+              }`}
+            >
+              {type === 'confirm' ? 'Yes, Proceed' : 'Awesome!'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -87,7 +151,7 @@ export default function App() {
   const [view, setView] = useState('home'); 
 
   // --- MODAL STATE ---
-  const [modal, setModal] = useState({ isOpen: false, type: 'alert', message: '', onConfirm: null });
+  const [modal, setModal] = useState({ isOpen: false, type: 'alert', message: '', title: '', onConfirm: null, isLoading: false });
 
   // --- CUSTOMER STATES ---
   const [cart, setCart] = useState({});
@@ -127,16 +191,33 @@ export default function App() {
   }, []);
 
   // --- MODAL HELPERS ---
-  const showAlert = (message) => {
-    setModal({ isOpen: true, type: 'alert', message, onConfirm: null });
+  const showAlert = (message, title = 'Notice') => {
+    setModal({ isOpen: true, type: 'alert', message, title, onConfirm: null });
   };
 
   const showConfirm = (message, onConfirm) => {
     setModal({ isOpen: true, type: 'confirm', message, onConfirm });
   };
 
+  const showAiLoading = (title) => {
+    setModal({ isOpen: true, type: 'ai', message: '', title, isLoading: true });
+  }
+
+  const showAiResult = (message, title) => {
+    setModal({ isOpen: true, type: 'ai', message, title, isLoading: false });
+  }
+
   const closeModal = () => {
     setModal({ ...modal, isOpen: false });
+  };
+
+  // --- AI FEATURES ---
+
+  const handleProductTip = async (productName) => {
+    showAiLoading(`Tips for ${productName}`);
+    const prompt = `Give me one interesting health benefit and one quick storage tip for ${productName}. Keep it short, fun, and use emojis. Max 2 sentences.`;
+    const result = await callGemini(prompt);
+    showAiResult(result, `Tips for ${productName}`);
   };
 
   // --- LOGIC ---
@@ -660,64 +741,68 @@ export default function App() {
         </div>
       ) : (
         <>
-          <div className="bg-emerald-700 text-white p-6 rounded-b-3xl shadow-lg relative z-10">
-            <div className="flex items-center justify-between mb-2">
+          <div className="bg-emerald-700 text-white p-4 pb-6 rounded-b-3xl shadow-lg relative z-10">
+            <div className="flex items-center justify-between mb-1">
               <div className="flex items-center space-x-2">
-                <div className="bg-white text-emerald-700 p-2 rounded-lg">
-                  <Leaf size={24} fill="currentColor" />
+                <div className="bg-white text-emerald-700 p-1.5 rounded-lg">
+                  <Leaf size={20} fill="currentColor" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold leading-none">Kanha</h1>
-                  <span className="text-emerald-200 text-sm font-light tracking-widest">FARM FRESH</span>
+                  <h1 className="text-xl font-bold leading-none">Kanha</h1>
+                  <span className="text-emerald-200 text-xs font-light tracking-widest">FARM FRESH</span>
                 </div>
               </div>
             </div>
-            <p className="mt-4 text-emerald-100 text-sm">Natural goodness delivered to your doorstep.</p>
+            <p className="mt-2 text-emerald-100 text-xs">Natural goodness delivered to your doorstep.</p>
           </div>
 
           <div className="max-w-md mx-auto px-4 -mt-4 relative z-20">
-            <div ref={productsRef} className="space-y-4 pt-6 scroll-mt-24">
-              <h3 className="text-stone-800 font-bold text-lg ml-1 flex items-center">
+            {/* Increased top padding from pt-4 to pt-10 for more space */}
+            <div ref={productsRef} className="pt-10 scroll-mt-24">
+              <h3 className="text-stone-800 font-bold text-lg ml-1 flex items-center mb-3">
                 <span className="bg-emerald-100 text-emerald-800 w-6 h-6 rounded-full text-xs flex items-center justify-center mr-2">1</span>
                 Fresh Produce 
                 <span className="ml-2 h-px bg-stone-300 flex-grow"></span>
               </h3>
               
-              {PRODUCTS.map(product => (
-                <div key={product.id} className="bg-white rounded-xl p-4 shadow-sm border border-stone-100 flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="text-4xl w-16 h-16 bg-stone-50 rounded-lg flex items-center justify-center border border-stone-200">
-                      {product.icon}
+              <div className="space-y-3">
+                {PRODUCTS.map(product => (
+                  <div key={product.id} className="bg-white rounded-xl p-3 shadow-sm border border-stone-100 flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="text-3xl w-12 h-12 bg-stone-50 rounded-lg flex items-center justify-center border border-stone-200 relative group">
+                        {product.icon}
+                        {/* AI Tip Trigger Button Removed */}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-stone-800 text-base">{product.name}</h4>
+                        <p className="text-[10px] text-stone-500 mb-0.5">{product.desc} • {product.unit}</p>
+                        <p className="text-emerald-700 font-bold text-sm">₹{product.price}/-</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-stone-800 text-lg">{product.name}</h4>
-                      <p className="text-xs text-stone-500 mb-1">{product.desc} • {product.unit}</p>
-                      <p className="text-emerald-700 font-bold">₹{product.price}/-</p>
+                    
+                    <div className="flex flex-col items-center bg-stone-50 rounded-lg p-0.5 border border-stone-200">
+                      <button 
+                        onClick={() => updateQuantity(product.id, 1)}
+                        className="w-6 h-6 flex items-center justify-center bg-emerald-600 text-white rounded shadow-sm active:scale-95 transition-transform"
+                      >
+                        <Plus size={14} />
+                      </button>
+                      <span className="font-bold text-stone-800 py-0.5 w-6 text-center text-xs">
+                        {cart[product.id] || 0}
+                      </span>
+                      <button 
+                        onClick={() => updateQuantity(product.id, -1)}
+                        className={`w-6 h-6 flex items-center justify-center rounded transition-colors ${
+                          !cart[product.id] ? 'bg-stone-200 text-stone-400' : 'bg-white text-emerald-700 border border-emerald-200 active:scale-95'
+                        }`}
+                        disabled={!cart[product.id]}
+                      >
+                        <Minus size={14} />
+                      </button>
                     </div>
                   </div>
-                  
-                  <div className="flex flex-col items-center bg-stone-50 rounded-lg p-1 border border-stone-200">
-                    <button 
-                      onClick={() => updateQuantity(product.id, 1)}
-                      className="w-8 h-8 flex items-center justify-center bg-emerald-600 text-white rounded-md shadow-sm active:scale-95 transition-transform"
-                    >
-                      <Plus size={16} />
-                    </button>
-                    <span className="font-bold text-stone-800 py-1 w-8 text-center text-sm">
-                      {cart[product.id] || 0}
-                    </span>
-                    <button 
-                      onClick={() => updateQuantity(product.id, -1)}
-                      className={`w-8 h-8 flex items-center justify-center rounded-md transition-colors ${
-                        !cart[product.id] ? 'bg-stone-200 text-stone-400' : 'bg-white text-emerald-700 border border-emerald-200 active:scale-95'
-                      }`}
-                      disabled={!cart[product.id]}
-                    >
-                      <Minus size={16} />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             <div ref={deliveryRef} className="mt-8 space-y-4 scroll-mt-24">
@@ -829,7 +914,9 @@ export default function App() {
             <div className="max-w-md mx-auto flex items-center justify-between">
               <div>
                 <p className="text-xs text-stone-500 font-medium uppercase">Total</p>
-                <p className="text-2xl font-bold text-emerald-800">₹{calculateTotal()}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-2xl font-bold text-emerald-800">₹{calculateTotal()}</p>
+                </div>
               </div>
               <button 
                 onClick={handleSmartAction}
