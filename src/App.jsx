@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ShoppingCart, MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, Store, Loader2, Lock, Search, Calendar, Check, X, AlertCircle, Filter, Sparkles } from 'lucide-react';
+import { MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, Store, Loader2, Lock, Search, X, AlertCircle, Filter, Sparkles } from 'lucide-react';
 
 // --- CONFIGURATION ---
 const SHOW_HARVESTING_SCREEN = false; 
@@ -47,14 +47,14 @@ const Modal = ({ isOpen, type, message, title, onClose, onConfirm, isLoading }) 
   const isAi = type === 'ai';
   
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 transition-all duration-300">
       <div className={`bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl transform transition-all scale-100 ${isAi ? 'border-2 border-purple-100' : ''}`}>
         
         {/* Header */}
         <div className="flex items-start gap-3 mb-4">
           {isLoading ? (
-            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 animate-pulse">
-              <Sparkles size={24} className="animate-spin-slow" />
+            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
+              <Loader2 size={24} className="animate-spin" />
             </div>
           ) : type === 'confirm' ? (
             <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
@@ -85,7 +85,7 @@ const Modal = ({ isOpen, type, message, title, onClose, onConfirm, isLoading }) 
         </div>
         
         {/* Content */}
-        <div className="mb-6 leading-relaxed text-stone-600 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <div className="mb-6 leading-relaxed text-stone-600 max-h-[60vh] overflow-y-auto">
           {isLoading ? (
             <div className="space-y-3 py-2">
               <div className="h-4 bg-purple-50 rounded w-3/4 animate-pulse"></div>
@@ -135,6 +135,8 @@ const PRODUCTS = [
   { id: 3, name: 'Coriander Leaves', unit: 'Bunch (300g)', price: 50, icon: <span className="text-4xl">🌿</span>, desc: 'Aromatic' },
   { id: 4, name: 'Lettuce', unit: 'Bunch (300g)', price: 100, icon: <span className="text-4xl">🥬</span>, desc: 'Crunchy' },
   { id: 5, name: 'Curry Leaves', unit: 'Bunch (300g)', price: 50, icon: <span className="text-4xl">🍃</span>, desc: 'Fresh' },
+  { id: 6, name: 'Beetroot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span className="text-4xl">🌿</span>, desc: 'Nutritious' },
+  { id: 7, name: 'Palak', unit: 'Bunch (300g)', price: 50, icon: <span className="text-4xl">🥬</span>, desc: 'Iron Rich' },
 ];
 
 const DELIVERY_OPTIONS = [
@@ -414,7 +416,7 @@ export default function App() {
     return (
       <div className="min-h-screen bg-stone-100 flex items-center justify-center p-4">
         <Modal {...modal} onClose={closeModal} />
-        <div className="bg-white p-8 rounded-2xl shadow-lg max-w-sm w-full animate-fade-in-up">
+        <div className="bg-white p-8 rounded-2xl shadow-lg max-w-sm w-full transition-all duration-300 transform scale-100">
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 bg-stone-200 rounded-full flex items-center justify-center">
               <Lock className="text-stone-500" size={32} />
@@ -629,12 +631,12 @@ export default function App() {
 
   // --- MAIN APP RENDER ---
   return (
-    <div className="min-h-screen bg-stone-50 font-sans pb-28 relative selection:bg-emerald-100">
+    <div className="min-h-screen bg-stone-50 font-sans pb-28 relative">
       <Modal {...modal} onClose={closeModal} />
       
       {SHOW_HARVESTING_SCREEN ? (
         <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center">
-          <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full animate-fade-in-up">
+          <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full transition-all duration-300 transform scale-100">
             <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Leaf size={40} className="text-emerald-600" />
             </div>
@@ -653,7 +655,7 @@ export default function App() {
         </div>
       ) : orderPlaced ? (
         <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center">
-          <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full animate-fade-in-up">
+          <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full transition-all duration-300 transform scale-100">
             <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle size={40} className="text-emerald-600" />
             </div>
@@ -693,7 +695,7 @@ export default function App() {
                 <p className="text-4xl font-bold text-emerald-800">₹{calculateTotal()}</p>
               </div>
 
-              <div className="bg-blue-500 p-4 rounded-xl shadow-inner mb-6 w-full max-w-[280px] flex flex-col items-center">
+              <div className="bg-blue-500 p-4 rounded-xl shadow-inner mb-6 w-full max-w-xs flex flex-col items-center">
                 <div className="bg-white p-2 rounded-lg w-full aspect-square flex items-center justify-center relative">
                    <img src={QR_CODE_URL} alt="Payment QR Code" className="w-full h-full object-contain mix-blend-multiply" />
                 </div>
@@ -771,7 +773,15 @@ export default function App() {
                     <div className="flex items-center space-x-3">
                       <div className="text-3xl w-12 h-12 bg-stone-50 rounded-lg flex items-center justify-center border border-stone-200 relative group">
                         {product.icon}
-                        {/* AI Tip Trigger Button Removed */}
+                        
+                        {/* --- AI TIP TRIGGER --- */}
+                        <button 
+                          onClick={() => handleProductTip(product.name)}
+                          className="absolute -top-1.5 -right-1.5 bg-white rounded-full p-1 shadow-md text-purple-500 hover:text-purple-700 hover:scale-110 transition-all border border-purple-100"
+                          title={`Gemini Tip: ${product.name}`}
+                        >
+                          <Sparkles size={12} fill="currentColor" className="opacity-80" />
+                        </button>
                       </div>
                       <div>
                         <h4 className="font-bold text-stone-800 text-base">{product.name}</h4>
@@ -845,7 +855,7 @@ export default function App() {
                   </div>
 
                   {DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt && (
-                    <div className="space-y-1 animate-fade-in">
+                    <div className="space-y-1 transition-all duration-300">
                       <label className="text-xs font-bold text-stone-500 uppercase tracking-wide">Block & Flat Number</label>
                       <input 
                         type="text" 
@@ -910,7 +920,7 @@ export default function App() {
             </div>
           )}
 
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-30">
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-4 shadow-lg z-30">
             <div className="max-w-md mx-auto flex items-center justify-between">
               <div>
                 <p className="text-xs text-stone-500 font-medium uppercase">Total</p>
