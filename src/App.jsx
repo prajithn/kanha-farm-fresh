@@ -6,29 +6,6 @@ const SHOW_HARVESTING_SCREEN = false;
 const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'kanha@123';
 
-// --- GEMINI API HELPERS ---
-const apiKey = ""; // API Key provided by execution environment
-
-const callGemini = async (prompt) => {
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }]
-        })
-      }
-    );
-    const data = await response.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate that right now.";
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Connection error. Please try again.";
-  }
-};
-
 // --- COMPONENTS ---
 
 // 1. Custom Icon
@@ -143,7 +120,7 @@ const DELIVERY_OPTIONS = [
   { id: 'vihanga', label: 'My Home Vihanga', requiresApt: true },
   { id: 'krishe', label: 'My Home Krishe', requiresApt: true },
   { id: 'vajrajs', label: 'Vajras Jasmine County', requiresApt: true },
-  { id: 'pickup', label: 'Store pick up (Malabar Natives)', requiresApt: false },
+  // { id: 'pickup', label: 'Store pick up (Malabar Natives)', requiresApt: false },
 ];
 
 const QR_CODE_URL = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=paytm.s18fahk@pty&pn=KanhaFarmFresh"; 
@@ -211,15 +188,6 @@ export default function App() {
 
   const closeModal = () => {
     setModal({ ...modal, isOpen: false });
-  };
-
-  // --- AI FEATURES ---
-
-  const handleProductTip = async (productName) => {
-    showAiLoading(`Tips for ${productName}`);
-    const prompt = `Give me one interesting health benefit and one quick storage tip for ${productName}. Keep it short, fun, and use emojis. Max 2 sentences.`;
-    const result = await callGemini(prompt);
-    showAiResult(result, `Tips for ${productName}`);
   };
 
   // --- LOGIC ---
@@ -773,15 +741,6 @@ export default function App() {
                     <div className="flex items-center space-x-3">
                       <div className="text-3xl w-12 h-12 bg-stone-50 rounded-lg flex items-center justify-center border border-stone-200 relative group">
                         {product.icon}
-                        
-                        {/* --- AI TIP TRIGGER --- */}
-                        <button 
-                          onClick={() => handleProductTip(product.name)}
-                          className="absolute -top-1.5 -right-1.5 bg-white rounded-full p-1 shadow-md text-purple-500 hover:text-purple-700 hover:scale-110 transition-all border border-purple-100"
-                          title={`Gemini Tip: ${product.name}`}
-                        >
-                          <Sparkles size={12} fill="currentColor" className="opacity-80" />
-                        </button>
                       </div>
                       <div>
                         <h4 className="font-bold text-stone-800 text-base">{product.name}</h4>
