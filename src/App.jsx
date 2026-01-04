@@ -114,6 +114,7 @@ const PRODUCTS = [
   { id: 5, name: 'Curry Leaves', unit: 'Bunch (300g)', price: 50, icon: <span className="text-4xl">🍃</span>, desc: 'Fresh' },
   { id: 6, name: 'Beetroot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span className="text-4xl">🌿</span>, desc: 'Nutritious' },
   { id: 7, name: 'Palak', unit: 'Bunch (300g)', price: 50, icon: <span className="text-4xl">🥬</span>, desc: 'Iron Rich' },
+  { id: 8, name: 'Mint', unit: 'Bunch (300g)', price: 50, icon: <span className="text-4xl">🌿</span>, desc: 'Fresh & Cooling' },
 ];
 
 const DELIVERY_OPTIONS = [
