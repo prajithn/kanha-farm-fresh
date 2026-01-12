@@ -300,12 +300,15 @@ const PRODUCTS = [
   { id: 9, name: 'Mint', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Fresh & Cooling' },
   { id: 10, name: 'Carrot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🍃</span>, desc: 'Fresh' },
   { id: 11, name: 'Beetroot', unit: '500gm', price: 35, icon: <BeetrootIcon />, desc: 'Earthy Root' },
+  { id: 12, name: 'Methi Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
+
 ];
 
 const DELIVERY_OPTIONS = [
   { id: 'vihanga', label: 'My Home Vihanga', requiresApt: true },
   { id: 'krishe', label: 'My Home Krishe', requiresApt: true },
   { id: 'phf', label: 'Prestige High Fields', requiresApt: true },
+  { id: 'gc', label: 'Gachibowli Meditation Centre', requiresApt: true },
   { id: 'vajrajs', label: 'Vajras Jasmine County', requiresApt: true },
   { id: 'pickup', label: 'Store pick up (Malabar Natives)', requiresApt: false },
 ];
