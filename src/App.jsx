@@ -42,7 +42,7 @@ const s = {
     color: 'white',
     padding: '1.5rem 1rem 2.5rem',
     borderRadius: '0 0 24px 24px',
-    position: 'relative', // Changed from sticky to relative so it scrolls away
+    position: 'relative', 
     zIndex: 10,
     display: 'flex',
     alignItems: 'center',
@@ -301,14 +301,13 @@ const PRODUCTS = [
   { id: 10, name: 'Carrot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🍃</span>, desc: 'Fresh' },
   { id: 11, name: 'Beetroot', unit: '500gm', price: 35, icon: <BeetrootIcon />, desc: 'Earthy Root' },
   { id: 12, name: 'Methi Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
-
 ];
 
 const DELIVERY_OPTIONS = [
   { id: 'vihanga', label: 'My Home Vihanga', requiresApt: true },
   { id: 'krishe', label: 'My Home Krishe', requiresApt: true },
   { id: 'phf', label: 'Prestige High Fields', requiresApt: true },
-  { id: 'gc', label: 'Gachibowli Meditation Centre', requiresApt: true },
+  { id: 'gc', label: 'Pick up (Gachibowli Meditation Centre)', requiresApt: false },
   { id: 'vajrajs', label: 'Vajras Jasmine County', requiresApt: true },
   { id: 'pickup', label: 'Store pick up (Malabar Natives)', requiresApt: false },
 ];
@@ -411,7 +410,8 @@ export default function SmartGrocerApp() {
      if (total === 0) return { text: "Add Items", icon: <Plus size={20} /> };
      if (!deliveryType) return { text: "Choose Delivery", icon: <MapPin size={20} /> };
      const needsApt = DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt;
-     if (needsApt && !aptNumber) return { text: "Enter Apt #", icon: <MapPin size={20} /> };
+     // FIX: Validation logic matched to handleSmartAction to prevent confusing user
+     if (needsApt && aptNumber.trim().length === 0) return { text: "Enter Apt #", icon: <MapPin size={20} /> };
      if (customerName.trim().length < 2 || mobileNumber.length < 10) return { text: "Enter Contact Info", icon: <User size={20} /> };
      return { text: "Proceed to Pay", icon: <ArrowRight size={20} /> };
   }
@@ -443,6 +443,12 @@ export default function SmartGrocerApp() {
       setUploadStatus('error');
       setModal({ isOpen: true, type: 'alert', message: "Error placing order." });
     } finally { setIsSubmitting(false); }
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setPaymentFile(e.target.files[0]);
+    }
   };
 
   const fetchAdminOrders = async () => {
