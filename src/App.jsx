@@ -1,102 +1,285 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, Store, Loader2, Lock, Search, X, AlertCircle, Filter, Sparkles } from 'lucide-react';
+import { MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, Loader2, Lock, Search, X, AlertCircle, Sparkles } from 'lucide-react';
+
+// --- GLOBAL SHIM ---
+// Prevents environment crashes by mocking the tailwind object immediately
+(function() {
+  try {
+    if (typeof window !== 'undefined') {
+      window.tailwind = window.tailwind || { config: {}, theme: {} };
+    }
+  } catch (e) {}
+})();
 
 // --- CONFIGURATION ---
 const SHOW_HARVESTING_SCREEN = false; 
 const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'kanha@123';
 
-// --- COMPONENTS ---
+// --- STYLES (STRICT INLINE - NO CLASSES) ---
+const s = {
+  container: {
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    backgroundColor: '#fafaf9',
+    color: '#1c1917',
+    minHeight: '100vh',
+    paddingBottom: '8rem',
+    position: 'relative',
+    maxWidth: '600px',
+    margin: '0 auto',
+    boxSizing: 'border-box'
+  },
+  centerFlex: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100vh',
+    padding: '2rem'
+  },
+  header: {
+    backgroundColor: '#047857',
+    color: 'white',
+    padding: '1.5rem 1rem 2.5rem',
+    borderRadius: '0 0 24px 24px',
+    position: 'relative', // Changed from sticky to relative so it scrolls away
+    zIndex: 10,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem'
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    border: '1px solid #e7e5e4',
+    borderRadius: '12px',
+    padding: '1rem',
+    marginBottom: '1rem',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+  },
+  btn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.5rem',
+    padding: '0.75rem 1.5rem',
+    borderRadius: '12px',
+    border: 'none',
+    fontWeight: '700',
+    cursor: 'pointer',
+    width: '100%',
+    fontSize: '1rem',
+    marginTop: '1rem',
+    transition: 'opacity 0.2s, transform 0.1s'
+  },
+  btnPrimary: {
+    backgroundColor: '#059669',
+    color: 'white'
+  },
+  btnOutline: {
+    backgroundColor: 'transparent',
+    border: '1px solid #e7e5e4',
+    color: '#78716c'
+  },
+  inputGroup: {
+    position: 'relative',
+    marginBottom: '1rem'
+  },
+  input: {
+    width: '100%',
+    padding: '0.75rem 1rem 0.75rem 2.5rem',
+    border: '1px solid #e7e5e4',
+    borderRadius: '12px',
+    fontSize: '1rem',
+    boxSizing: 'border-box',
+    outline: 'none',
+    backgroundColor: 'white'
+  },
+  iconPrefix: {
+    position: 'absolute',
+    left: '0.8rem',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    color: '#78716c'
+  },
+  productRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '0.75rem',
+    backgroundColor: 'white',
+    border: '1px solid #e7e5e4',
+    borderRadius: '12px',
+    marginBottom: '0.75rem'
+  },
+  qtyWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '0.25rem',
+    backgroundColor: '#fafaf9',
+    padding: '0.25rem',
+    borderRadius: '8px'
+  },
+  qtyBtn: {
+    width: '24px',
+    height: '24px',
+    border: 'none',
+    borderRadius: '4px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer'
+  },
+  deliveryOption: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '0.75rem',
+    border: '2px solid transparent',
+    borderRadius: '12px',
+    cursor: 'pointer',
+    backgroundColor: '#fafaf9',
+    marginBottom: '0.5rem'
+  },
+  bottomBar: {
+    position: 'fixed',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    padding: '1rem',
+    borderTop: '1px solid #e7e5e4',
+    zIndex: 50
+  },
+  modalOverlay: {
+    position: 'fixed',
+    inset: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 100,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '1rem'
+  },
+  modal: {
+    backgroundColor: 'white',
+    width: '100%',
+    maxWidth: '320px',
+    padding: '1.5rem',
+    borderRadius: '16px',
+    boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
+  },
+  modalIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0
+  }
+};
 
-// 1. Custom Icon
+// --- HELPER COMPONENTS ---
+
 const TenderCoconutIcon = () => (
-  <svg viewBox="0 0 100 100" className="w-10 h-10 overflow-visible">
+  <svg viewBox="0 0 100 100" style={{ width: 40, height: 40, overflow: 'visible' }}>
     <path d="M50 95 C25 95 10 75 10 50 C10 25 25 10 50 10 C75 10 90 25 90 50 C90 75 75 95 50 95 Z" fill="#4ade80" stroke="#166534" strokeWidth="2"/>
     <path d="M35 15 L50 2 L65 15 Z" fill="#dcfce7" stroke="#166534" strokeWidth="2"/>
     <path d="M30 30 Q 40 20 60 30" fill="none" stroke="#dcfce7" strokeWidth="3" strokeLinecap="round" opacity="0.6" />
   </svg>
 );
 
-// 2. Custom Modal (Replaces native alert/confirm)
+const BeetrootIcon = () => (
+  <svg viewBox="0 0 100 100" style={{ width: 40, height: 40, overflow: 'visible' }}>
+    <path d="M50 30 Q 30 0 20 15 Z" fill="#22c55e" stroke="#15803d" strokeWidth="1" />
+    <path d="M50 30 Q 70 0 80 15 Z" fill="#22c55e" stroke="#15803d" strokeWidth="1" />
+    <circle cx="50" cy="65" r="32" fill="#be185d" />
+    <path d="M50 97 L 50 110" stroke="#be185d" strokeWidth="3" />
+  </svg>
+);
+
+const SpinLoader = () => (
+  <>
+    <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+    <Loader2 size={24} style={{ animation: 'spin 1s linear infinite' }} />
+  </>
+);
+
 const Modal = ({ isOpen, type, message, title, onClose, onConfirm, isLoading }) => {
   if (!isOpen) return null;
   
   const isAi = type === 'ai';
-  
+  let iconBg = '#f5f5f4';
+  let iconColor = '#57534e';
+  let IconComp = AlertCircle;
+
+  if (isLoading) {
+    iconBg = '#f3e8ff';
+    iconColor = '#9333ea';
+    IconComp = SpinLoader;
+  } else if (type === 'confirm') {
+    iconBg = '#d1fae5';
+    iconColor = '#059669';
+  } else if (isAi) {
+    iconBg = 'linear-gradient(135deg, #a855f7, #4f46e5)';
+    iconColor = 'white';
+    IconComp = Sparkles;
+  }
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 transition-all duration-300">
-      <div className={`bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl transform transition-all scale-100 ${isAi ? 'border-2 border-purple-100' : ''}`}>
+    <div style={s.modalOverlay}>
+      <div style={{ ...s.modal, ...(isAi ? { border: '2px solid #f3e8ff' } : {}) }}>
         
         {/* Header */}
-        <div className="flex items-start gap-3 mb-4">
-          {isLoading ? (
-            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
-              <Loader2 size={24} className="animate-spin" />
-            </div>
-          ) : type === 'confirm' ? (
-            <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
-              <AlertCircle size={24} />
-            </div>
-          ) : isAi ? (
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white shadow-lg">
-              <Sparkles size={20} />
-            </div>
-          ) : (
-            <div className="w-10 h-10 bg-stone-100 rounded-full flex items-center justify-center text-stone-600">
-              <AlertCircle size={24} />
-            </div>
-          )}
-          
-          <div className="flex-1">
-            <h3 className={`text-lg font-bold ${isAi ? 'text-purple-900' : 'text-stone-800'}`}>
-              {isLoading ? 'Consulting Gemini...' : title || (type === 'confirm' ? 'Confirmation' : isAi ? 'Gemini Says' : 'Notice')}
-            </h3>
-            {isAi && !isLoading && <p className="text-xs text-purple-400 font-medium">✨ AI Generated Insight</p>}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1rem' }}>
+          <div style={{ ...s.modalIcon, background: iconBg, color: iconColor }}>
+            {isLoading ? <SpinLoader /> : <IconComp size={20} />}
           </div>
-          
+          <div style={{ flex: 1 }}>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: isAi ? '#581c87' : '#1c1917' }}>
+              {isLoading ? 'Processing...' : title || (type === 'confirm' ? 'Confirmation' : isAi ? 'Gemini Says' : 'Notice')}
+            </h3>
+            {isAi && !isLoading && <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: '#a855f7', fontWeight: 500 }}>✨ AI Generated Insight</p>}
+          </div>
           {!isLoading && (
-            <button onClick={onClose} className="text-stone-400 hover:text-stone-600">
+            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#a8a29e' }}>
               <X size={20} />
             </button>
           )}
         </div>
         
         {/* Content */}
-        <div className="mb-6 leading-relaxed text-stone-600 max-h-[60vh] overflow-y-auto">
+        <div style={{ marginBottom: '1.5rem', maxHeight: '60vh', overflowY: 'auto', fontSize: '0.9rem', color: '#57534e', whiteSpace: 'pre-line' }}>
           {isLoading ? (
-            <div className="space-y-3 py-2">
-              <div className="h-4 bg-purple-50 rounded w-3/4 animate-pulse"></div>
-              <div className="h-4 bg-purple-50 rounded w-full animate-pulse"></div>
-              <div className="h-4 bg-purple-50 rounded w-5/6 animate-pulse"></div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ height: '1rem', backgroundColor: '#f3e8ff', borderRadius: '4px', width: '75%', animation: 'pulse 1.5s infinite' }}></div>
+              <div style={{ height: '1rem', backgroundColor: '#f3e8ff', borderRadius: '4px', width: '100%', animation: 'pulse 1.5s infinite' }}></div>
+              <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }`}</style>
             </div>
           ) : (
-            <div className="whitespace-pre-line text-sm">{message}</div>
+            message
           )}
         </div>
         
         {/* Actions */}
         {!isLoading && (
-          <div className="flex justify-end gap-3">
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
             {type === 'confirm' && (
               <button 
                 onClick={onClose} 
-                className="px-5 py-2.5 text-stone-500 font-medium hover:bg-stone-50 rounded-xl transition-colors"
+                style={{ ...s.btn, ...s.btnOutline, width: 'auto', marginTop: 0, padding: '0.5rem 1rem' }}
               >
                 Cancel
               </button>
             )}
             <button 
-              onClick={() => {
-                if (type === 'confirm' && onConfirm) onConfirm();
-                onClose();
+              onClick={() => { if (type === 'confirm' && onConfirm) onConfirm(); onClose(); }}
+              style={{ 
+                ...s.btn, ...s.btnPrimary, width: 'auto', marginTop: 0, padding: '0.5rem 1.25rem',
+                backgroundColor: isAi ? '#9333ea' : '#059669'
               }}
-              className={`px-6 py-2.5 font-medium rounded-xl shadow-lg transition-all active:scale-95 ${
-                isAi 
-                  ? 'bg-purple-600 text-white hover:bg-purple-700 shadow-purple-200' 
-                  : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-200'
-              }`}
             >
-              {type === 'confirm' ? 'Yes, Proceed' : 'Awesome!'}
+              {type === 'confirm' ? 'Yes, Proceed' : 'Okay'}
             </button>
           </div>
         )}
@@ -107,33 +290,34 @@ const Modal = ({ isOpen, type, message, title, onClose, onConfirm, isLoading }) 
 
 // --- DATA ---
 const PRODUCTS = [
-  { id: 1, name: 'Strawberry', unit: 'Box (200g)', price: 100, icon: <span className="text-4xl">🍓</span>, desc: 'Sweet & Red' },
+  { id: 1, name: 'Strawberry', unit: 'Box (200g)', price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 2, name: 'Tender Coconut', unit: 'Piece', price: 80, icon: <TenderCoconutIcon />, desc: 'Refreshing' },
-  { id: 3, name: 'Coriander Leaves', unit: 'Bunch (300g)', price: 50, icon: <span className="text-4xl">🌿</span>, desc: 'Aromatic' },
-  { id: 4, name: 'Lettuce', unit: 'Bunch (300g)', price: 100, icon: <span className="text-4xl">🥬</span>, desc: 'Crunchy' },
-  { id: 5, name: 'Curry Leaves', unit: 'Bunch (300g)', price: 50, icon: <span className="text-4xl">🍃</span>, desc: 'Fresh' },
-  { id: 6, name: 'Beetroot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span className="text-4xl">🌿</span>, desc: 'Nutritious' },
-  { id: 7, name: 'Palak', unit: 'Bunch (300g)', price: 50, icon: <span className="text-4xl">🥬</span>, desc: 'Iron Rich' },
-  { id: 8, name: 'Mint', unit: 'Bunch (300g)', price: 50, icon: <span className="text-4xl">🌿</span>, desc: 'Fresh & Cooling' },
+  { id: 3, name: 'Coriander Leaves', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
+  { id: 4, name: 'Lettuce', unit: 'Bunch (300g)', price: 100, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Crunchy' },
+  { id: 5, name: 'Curry Leaves', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🍃</span>, desc: 'Fresh' },
+  { id: 7, name: 'Beetroot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
+  { id: 8, name: 'Palak', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
+  { id: 9, name: 'Mint', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Fresh & Cooling' },
+  { id: 10, name: 'Carrot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🍃</span>, desc: 'Fresh' },
+  { id: 11, name: 'Beetroot', unit: '500gm', price: 35, icon: <BeetrootIcon />, desc: 'Earthy Root' },
 ];
 
 const DELIVERY_OPTIONS = [
   { id: 'vihanga', label: 'My Home Vihanga', requiresApt: true },
   { id: 'krishe', label: 'My Home Krishe', requiresApt: true },
+  { id: 'phf', label: 'Prestige High Fields', requiresApt: true },
   { id: 'vajrajs', label: 'Vajras Jasmine County', requiresApt: true },
-  // { id: 'pickup', label: 'Store pick up (Malabar Natives)', requiresApt: false },
+  { id: 'pickup', label: 'Store pick up (Malabar Natives)', requiresApt: false },
 ];
 
 const QR_CODE_URL = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=paytm.s18fahk@pty&pn=KanhaFarmFresh"; 
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7cz_Ykzim6EYILS0Fpo5_DJlcJiuO01mefnkqHUGqeui3zd6pRf95oTFJiit3tB6X/exec"; 
 
-export default function App() {
+export default function SmartGrocerApp() {
   const [view, setView] = useState('home'); 
-
-  // --- MODAL STATE ---
   const [modal, setModal] = useState({ isOpen: false, type: 'alert', message: '', title: '', onConfirm: null, isLoading: false });
 
-  // --- CUSTOMER STATES ---
+  // Customer State
   const [cart, setCart] = useState({});
   const [deliveryType, setDeliveryType] = useState('');
   const [aptNumber, setAptNumber] = useState('');
@@ -147,7 +331,7 @@ export default function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(''); 
 
-  // --- ADMIN STATES ---
+  // Admin State
   const [adminUser, setAdminUser] = useState('');
   const [adminPass, setAdminPass] = useState('');
   const [adminError, setAdminError] = useState('');
@@ -155,7 +339,7 @@ export default function App() {
   const [adminLoading, setAdminLoading] = useState(false);
   const [adminFilterType, setAdminFilterType] = useState('');
   const [adminSearchName, setAdminSearchName] = useState('');
-  const [adminFilterStatus, setAdminFilterStatus] = useState('Pending'); // Default to Pending
+  const [adminFilterStatus, setAdminFilterStatus] = useState('Pending');
 
   const productsRef = useRef(null);
   const deliveryRef = useRef(null);
@@ -170,29 +354,7 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // --- MODAL HELPERS ---
-  const showAlert = (message, title = 'Notice') => {
-    setModal({ isOpen: true, type: 'alert', message, title, onConfirm: null });
-  };
-
-  const showConfirm = (message, onConfirm) => {
-    setModal({ isOpen: true, type: 'confirm', message, onConfirm });
-  };
-
-  const showAiLoading = (title) => {
-    setModal({ isOpen: true, type: 'ai', message: '', title, isLoading: true });
-  }
-
-  const showAiResult = (message, title) => {
-    setModal({ isOpen: true, type: 'ai', message, title, isLoading: false });
-  }
-
-  const closeModal = () => {
-    setModal({ ...modal, isOpen: false });
-  };
-
   // --- LOGIC ---
-  
   const compressImage = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -204,23 +366,15 @@ export default function App() {
           const canvas = document.createElement('canvas');
           const MAX_WIDTH = 800;
           const scaleSize = MAX_WIDTH / img.width;
-          
-          if (img.width > MAX_WIDTH) {
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleSize;
-          } else {
-            canvas.width = img.width;
-            canvas.height = img.height;
-          }
-
+          if (img.width > MAX_WIDTH) { canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize; } 
+          else { canvas.width = img.width; canvas.height = img.height; }
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-          resolve(dataUrl);
+          resolve(canvas.toDataURL('image/jpeg', 0.6));
         };
-        img.onerror = (error) => reject(error);
+        img.onerror = reject;
       };
-      reader.onerror = (error) => reject(error);
+      reader.onerror = reject;
     });
   };
 
@@ -228,20 +382,15 @@ export default function App() {
     setCart(prev => {
       const current = prev[id] || 0;
       const next = Math.max(0, current + change);
-      if (next === 0) {
-        const { [id]: _, ...rest } = prev;
-        return rest;
-      }
+      if (next === 0) { const { [id]: _, ...rest } = prev; return rest; }
       return { ...prev, [id]: next };
     });
   };
 
-  const calculateTotal = () => {
-    return Object.entries(cart).reduce((total, [id, qty]) => {
-      const product = PRODUCTS.find(p => p.id === parseInt(id));
-      return total + (product ? product.price * qty : 0);
-    }, 0);
-  };
+  const calculateTotal = () => Object.entries(cart).reduce((total, [id, qty]) => {
+    const product = PRODUCTS.find(p => p.id === parseInt(id));
+    return total + (product ? product.price * qty : 0);
+  }, 0);
 
   const handleSmartAction = () => {
     const total = calculateTotal();
@@ -265,69 +414,32 @@ export default function App() {
   }
 
   const handleFinalizeOrder = async () => {
-    if (!paymentFile) { showAlert("Please upload the payment screenshot to confirm your order."); return; }
-    
+    if (!paymentFile) { setModal({ isOpen: true, type: 'alert', message: "Please upload the payment screenshot." }); return; }
     setIsSubmitting(true);
     setUploadStatus('uploading');
-
     try {
       const base64Image = await compressImage(paymentFile);
-      const itemsString = Object.entries(cart).map(([id, qty]) => {
-        const product = PRODUCTS.find(p => p.id === parseInt(id));
-        return `${product.name} (${qty})`;
-      }).join(", ");
-
+      const itemsString = Object.entries(cart).map(([id, qty]) => `${PRODUCTS.find(p => p.id === parseInt(id)).name} (${qty})`).join(", ");
       const orderData = {
         action: 'create',
         customerName,
         mobileNumber,
         deliveryType: DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label,
-        // FIX: Prepend single quote to force text format in Google Sheets (prevents date conversion)
-        aptNumber: aptNumber ? `'${aptNumber}` : '', 
+        aptNumber: aptNumber ? "'" + aptNumber : '', 
         items: itemsString,
         total: calculateTotal(),
         image: base64Image,
         imageName: paymentFile.name
       };
-
-      await fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors", 
-        headers: { "Content-Type": "text/plain" }, 
-        body: JSON.stringify(orderData),
-      });
-      
+      await fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(orderData) });
       setUploadStatus('success');
       setOrderDate(new Date());
       setOrderPlaced(true);
       window.scrollTo(0, 0);
-
     } catch (error) {
-      console.error("Error submitting order:", error);
       setUploadStatus('error');
-      showAlert("Error placing order. Check console for details.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setPaymentFile(e.target.files[0]);
-    }
-  };
-
-  // --- ADMIN FUNCTIONS ---
-
-  const handleAdminLogin = (e) => {
-    e.preventDefault();
-    if (adminUser === ADMIN_USER && adminPass === ADMIN_PASS) {
-      setView('admin-dashboard');
-      fetchAdminOrders();
-      setAdminError('');
-    } else {
-      setAdminError('Invalid credentials');
-    }
+      setModal({ isOpen: true, type: 'alert', message: "Error placing order." });
+    } finally { setIsSubmitting(false); }
   };
 
   const fetchAdminOrders = async () => {
@@ -336,568 +448,280 @@ export default function App() {
       const response = await fetch(`${GOOGLE_SCRIPT_URL}?v=${new Date().getTime()}`, { credentials: 'omit' }); 
       const data = await response.json();
       setAdminOrders(Array.isArray(data) ? data.reverse() : []);
-    } catch (error) {
-      console.error("Failed to fetch orders:", error);
-      showAlert("Failed to load orders. Please try again in 30 seconds.");
-    } finally {
-      setAdminLoading(false);
-    }
+    } catch (error) { setModal({ isOpen: true, type: 'alert', message: "Failed to load orders." }); } 
+    finally { setAdminLoading(false); }
   };
 
   const markAsDelivered = (order) => {
-    if (!order.rowIndex) {
-      showAlert("Error: Missing Row Index. Refresh and try again.");
-      return;
-    }
-
-    // Replace native confirm with custom modal logic
-    showConfirm(`Mark delivery done for ${order.customerName}?`, async () => {
-      // 1. Optimistic Update
-      setAdminOrders(prev => prev.map(o => 
-        o.rowIndex === order.rowIndex 
-          ? { ...o, status: 'Updating...', deliveryDate: new Date().toISOString() } 
-          : o
-      ));
-
+    if (!order.rowIndex) return;
+    setModal({ isOpen: true, type: 'confirm', message: `Mark delivery done for ${order.customerName}?`, onConfirm: async () => {
+      setAdminOrders(prev => prev.map(o => o.rowIndex === order.rowIndex ? { ...o, status: 'Updating...', deliveryDate: new Date().toISOString() } : o));
       try {
-        const updateUrl = `${GOOGLE_SCRIPT_URL}?action=mark_delivered&rowIndex=${order.rowIndex}&cb=${Math.floor(Math.random()*1000)}`;
-        const response = await fetch(updateUrl, { credentials: 'omit' });
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=mark_delivered&rowIndex=${order.rowIndex}&cb=${Date.now()}`, { credentials: 'omit' });
         const result = await response.json();
-
-        if (result.result === 'success') {
-          showAlert("✅ Delivery Status Updated Successfully!");
-          fetchAdminOrders(); 
-        } else {
-          throw new Error(result.error || "Unknown server error");
-        }
-        
-      } catch (error) {
-        console.error("Error updating order:", error);
-        showAlert("❌ Failed to update: " + error.message);
-        fetchAdminOrders(); // Revert
-      }
-    });
+        if (result.result === 'success') { fetchAdminOrders(); } else { throw new Error(); }
+      } catch (error) { fetchAdminOrders(); }
+    }});
   };
 
   // --- VIEWS ---
 
   if (view === 'admin-login') {
     return (
-      <div className="min-h-screen bg-stone-100 flex items-center justify-center p-4">
-        <Modal {...modal} onClose={closeModal} />
-        <div className="bg-white p-8 rounded-2xl shadow-lg max-w-sm w-full transition-all duration-300 transform scale-100">
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-stone-200 rounded-full flex items-center justify-center">
-              <Lock className="text-stone-500" size={32} />
-            </div>
+      <div style={{ ...s.centerFlex, backgroundColor: '#fafaf9' }}>
+        <Modal {...modal} onClose={() => setModal({ ...modal, isOpen: false })} />
+        <div style={{ ...s.card, width: '100%', maxWidth: 360, padding: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+             <div style={{ background: '#e7e5e4', padding: '1rem', borderRadius: '50%' }}><Lock size={32} color="#78716c"/></div>
           </div>
-          <h2 className="text-2xl font-bold text-center text-stone-800 mb-6">Admin Login</h2>
-          <form onSubmit={handleAdminLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-stone-500 uppercase mb-1">Username</label>
-              <input 
-                type="text" 
-                value={adminUser}
-                onChange={e => setAdminUser(e.target.value)}
-                className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-base"
-              />
+          <h2 style={{ textAlign: 'center', fontWeight: 700, fontSize: '1.5rem', marginBottom: '1.5rem', marginTop: 0 }}>Admin Login</h2>
+          <form onSubmit={(e) => { e.preventDefault(); if(adminUser===ADMIN_USER && adminPass===ADMIN_PASS){ setView('admin-dashboard'); fetchAdminOrders(); setAdminError(''); } else { setAdminError('Invalid credentials'); } }}>
+            <div style={s.inputGroup}>
+              <input type="text" placeholder="Username" value={adminUser} onChange={e => setAdminUser(e.target.value)} style={s.input} />
             </div>
-            <div>
-              <label className="block text-xs font-bold text-stone-500 uppercase mb-1">Password</label>
-              <input 
-                type="password" 
-                value={adminPass}
-                onChange={e => setAdminPass(e.target.value)}
-                className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-base"
-              />
+            <div style={s.inputGroup}>
+              <input type="password" placeholder="Password" value={adminPass} onChange={e => setAdminPass(e.target.value)} style={s.input} />
             </div>
-            {adminError && <p className="text-red-500 text-sm text-center">{adminError}</p>}
-            <button type="submit" className="w-full py-3 bg-emerald-700 text-white rounded-xl font-bold hover:bg-emerald-800 transition">
-              Login
-            </button>
+            {adminError && <p style={{ color: 'red', textAlign: 'center', fontSize: '0.875rem' }}>{adminError}</p>}
+            <button type="submit" style={{ ...s.btn, ...s.btnPrimary }}>Login</button>
           </form>
-          <button onClick={() => setView('home')} className="w-full mt-4 text-sm text-stone-500 hover:text-stone-800">
-            Back to Home
-          </button>
+          <button onClick={() => setView('home')} style={{ width: '100%', marginTop: '1rem', background: 'none', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>Back to Home</button>
         </div>
       </div>
     );
   }
 
   if (view === 'admin-dashboard') {
-    // --- UPDATED SEARCH FILTER LOGIC ---
     const filteredOrders = adminOrders.filter(order => {
-      // 1. Filter by Status (Pending, Done, All)
-      if (adminFilterStatus !== 'All') {
-        const status = order.status || 'Pending';
-        if (status !== adminFilterStatus) return false;
-      }
-
-      // 2. Filter by Delivery Location
-      if (adminFilterType) {
-        if (!order.deliveryType || !order.deliveryType.includes(adminFilterType)) return false;
-      }
-      
-      // 3. Search by Name OR Apartment
+      if (adminFilterStatus !== 'All' && (order.status || 'Pending') !== adminFilterStatus) return false;
+      if (adminFilterType && (!order.deliveryType || !order.deliveryType.includes(adminFilterType))) return false;
       if (adminSearchName) {
-        const search = adminSearchName.toLowerCase();
-        const name = (order.customerName || '').toLowerCase();
-        const apt = (order.aptNumber || '').toLowerCase();
-        
-        // Return true if EITHER name matches OR apartment matches
-        if (!name.includes(search) && !apt.includes(search)) return false;
+        const str = adminSearchName.toLowerCase();
+        if (!(order.customerName||'').toLowerCase().includes(str) && !(order.aptNumber||'').toLowerCase().includes(str)) return false;
       }
       return true;
     });
 
     return (
-      <div className="min-h-screen bg-stone-50 pb-12">
-        <Modal {...modal} onClose={closeModal} />
-        <div className="bg-emerald-800 text-white p-4 shadow-md sticky top-0 z-20">
-          <div className="flex justify-between items-center max-w-4xl mx-auto">
-            <h1 className="font-bold text-lg flex items-center gap-2">
-              <Lock size={18} /> Admin Dashboard
-            </h1>
-            <button onClick={() => setView('home')} className="text-xs bg-emerald-900 px-3 py-1 rounded hover:bg-emerald-700">
-              Logout
-            </button>
-          </div>
+      <div style={{ ...s.container, paddingBottom: '2rem' }}>
+        <Modal {...modal} onClose={() => setModal({ ...modal, isOpen: false })} />
+        <div style={{ background: '#064e3b', color: 'white', padding: '1rem', position: 'sticky', top: 0, zIndex: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h1 style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, fontSize: '1.1rem' }}><Lock size={18} /> Admin Dashboard</h1>
+          <button onClick={() => setView('home')} style={{ fontSize: '0.75rem', background: 'rgba(0,0,0,0.2)', color: 'white', border: 'none', padding: '4px 8px', borderRadius: 4, cursor: 'pointer' }}>Logout</button>
         </div>
-
-        <div className="max-w-4xl mx-auto p-4 space-y-6">
-          <div className="bg-white p-4 rounded-xl shadow-sm border border-stone-100 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              
-              {/* STATUS FILTER */}
-              <div>
-                <label className="block text-xs font-bold text-stone-500 uppercase mb-1">Status</label>
-                <div className="relative">
-                  <Filter className="absolute left-3 top-3 text-stone-400" size={18} />
-                  <select 
-                    value={adminFilterStatus}
-                    onChange={(e) => setAdminFilterStatus(e.target.value)}
-                    className="w-full pl-10 p-3 bg-stone-50 border border-stone-200 rounded-lg appearance-none outline-none focus:ring-2 focus:ring-emerald-500 text-base"
-                  >
-                    <option value="Pending">Pending Orders</option>
-                    <option value="Done">Completed Orders</option>
-                    <option value="All">All Orders</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-3.5 text-stone-400 pointer-events-none" size={16} />
-                </div>
-              </div>
-
-              {/* LOCATION FILTER */}
-              <div>
-                <label className="block text-xs font-bold text-stone-500 uppercase mb-1">Delivery Location</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 text-stone-400" size={18} />
-                  <select 
-                    value={adminFilterType}
-                    onChange={(e) => setAdminFilterType(e.target.value)}
-                    className="w-full pl-10 p-3 bg-stone-50 border border-stone-200 rounded-lg appearance-none outline-none focus:ring-2 focus:ring-emerald-500 text-base"
-                  >
-                    <option value="">All Locations</option>
-                    {DELIVERY_OPTIONS.map(opt => (
-                      <option key={opt.id} value={opt.label}>{opt.label}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-3.5 text-stone-400 pointer-events-none" size={16} />
-                </div>
-              </div>
-
-              {/* SEARCH FILTER */}
-              <div>
-                <label className="block text-xs font-bold text-stone-500 uppercase mb-1">Search Name or Apt</label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 text-stone-400" size={18} />
-                  <input 
-                    type="text" 
-                    placeholder="Search..." 
-                    value={adminSearchName}
-                    onChange={(e) => setAdminSearchName(e.target.value)}
-                    className="w-full pl-10 p-3 bg-stone-50 border border-stone-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 text-base"
-                  />
-                </div>
-              </div>
+        
+        <div style={{ padding: '1rem' }}>
+          <div style={s.card}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <select value={adminFilterStatus} onChange={e => setAdminFilterStatus(e.target.value)} style={s.input}>
+                <option value="Pending">Pending</option><option value="Done">Completed</option><option value="All">All</option>
+              </select>
+              <select value={adminFilterType} onChange={e => setAdminFilterType(e.target.value)} style={s.input}>
+                <option value="">All Locations</option>
+                {DELIVERY_OPTIONS.map(opt => <option key={opt.id} value={opt.label}>{opt.label}</option>)}
+              </select>
             </div>
-            
-            <div className="flex justify-between items-center pt-2">
-              <p className="text-sm text-stone-500">
-                Found <strong>{filteredOrders.length}</strong> orders
-              </p>
-              <button onClick={fetchAdminOrders} className="text-emerald-600 text-sm font-medium hover:underline">
-                Refresh Data
-              </button>
+            <div style={{ ...s.inputGroup, marginBottom: 0 }}>
+              <Search style={s.iconPrefix} size={18} />
+              <input type="text" placeholder="Search Name/Apt..." value={adminSearchName} onChange={e => setAdminSearchName(e.target.value)} style={s.input} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', fontSize: '0.875rem', color: '#78716c' }}>
+              <span>Found <strong>{filteredOrders.length}</strong> orders</span>
+              <button onClick={fetchAdminOrders} style={{ color: '#059669', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Refresh</button>
             </div>
           </div>
 
-          <div className="space-y-4 pb-20"> 
-            {adminLoading ? (
-              <div className="flex justify-center py-12 text-stone-400">
-                <Loader2 className="animate-spin mr-2" /> Loading orders...
-              </div>
-            ) : filteredOrders.length === 0 ? (
-              <div className="text-center py-12 text-stone-400 bg-white rounded-xl border border-stone-100">
-                No matching orders found.
-              </div>
-            ) : (
-              filteredOrders.map((order, idx) => (
-                <div key={idx} className={`bg-white rounded-xl p-4 shadow-sm border ${order.status === 'Done' ? 'border-l-4 border-l-emerald-500' : 'border-stone-100'}`}>
-                  <div className="flex justify-between items-start gap-4 mb-3">
-                    <div className="min-w-0 flex-grow">
-                      <h3 className="font-bold text-stone-800 text-lg leading-tight break-words">{order.customerName}</h3>
-                      <p className="text-sm text-stone-500 flex items-start gap-1 mt-1">
-                        <MapPin size={14} className="flex-shrink-0 mt-0.5" /> 
-                        <span className="break-words">
-                          {order.deliveryType} 
-                          {/* FIX: Cleanly display apt number by removing quote if present */}
-                          {order.aptNumber && <span className="text-stone-800 font-medium"> • {order.aptNumber.toString().replace(/^'/, '')}</span>}
-                        </span>
-                      </p>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                       <span className={`inline-block px-2 py-1 rounded text-xs font-bold uppercase ${order.status === 'Done' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                         {order.status || 'Pending'}
-                       </span>
-                       <p className="text-xs text-stone-400 mt-1">
-                         {new Date(order.date).toLocaleDateString()}
-                       </p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-stone-50 p-3 rounded-lg text-sm text-stone-700 mb-3">
-                    <p className="font-medium text-stone-900 mb-1">Items:</p>
-                    <p className="break-words leading-relaxed">{order.items}</p>
-                    <div className="mt-2 pt-2 border-t border-stone-200 flex justify-between font-bold">
-                       <span>Total:</span>
-                       <span>₹{order.total}</span>
-                    </div>
-                  </div>
-
-                  {order.status !== 'Done' && (
-                    <button 
-                      onClick={() => markAsDelivered(order)}
-                      disabled={order.status === 'Updating...'}
-                      className="w-full py-3.5 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 flex items-center justify-center gap-2 active:bg-emerald-800 transition-colors touch-manipulation disabled:bg-stone-300"
-                    >
-                      {order.status === 'Updating...' ? <Loader2 className="animate-spin" size={20} /> : <CheckCircle size={20} />}
-                      {order.status === 'Updating...' ? 'Updating...' : 'Mark Delivery Done'}
-                    </button>
-                  )}
-                  {order.status === 'Done' && order.deliveryDate && (
-                    <p className="text-center text-xs text-stone-400 flex items-center justify-center gap-1">
-                      <Check size={12} /> Delivered on {new Date(order.deliveryDate).toLocaleString()}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {adminLoading ? <div style={{ textAlign: 'center', padding: '2rem', color: '#a8a29e' }}><SpinLoader /> Loading...</div> : 
+             filteredOrders.map((order, idx) => (
+              <div key={idx} style={{ ...s.card, borderLeft: order.status === 'Done' ? '4px solid #10b981' : '1px solid #e7e5e4' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.1rem' }}>{order.customerName}</h3>
+                    <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: '#78716c', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                       <MapPin size={14}/> {order.deliveryType} {order.aptNumber && <span>• {order.aptNumber.replace(/^'/, '')}</span>}
                     </p>
-                  )}
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ 
+                      padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase',
+                      backgroundColor: order.status === 'Done' ? '#d1fae5' : '#fef3c7',
+                      color: order.status === 'Done' ? '#047857' : '#b45309'
+                    }}>{order.status || 'Pending'}</span>
+                    <p style={{ fontSize: '0.75rem', color: '#a8a29e', margin: '0.25rem 0 0' }}>{new Date(order.date).toLocaleDateString()}</p>
+                  </div>
                 </div>
-              ))
-            )}
+                <div style={{ backgroundColor: '#fafaf9', padding: '0.75rem', borderRadius: 8, fontSize: '0.875rem' }}>
+                  <p style={{ margin: '0 0 0.25rem', fontWeight: 700 }}>Items:</p>
+                  <p style={{ margin: 0 }}>{order.items}</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid #e7e5e4', fontWeight: 700 }}>
+                    <span>Total:</span><span>₹{order.total}</span>
+                  </div>
+                </div>
+                {order.status !== 'Done' && (
+                  <button onClick={() => markAsDelivered(order)} disabled={order.status === 'Updating...'} style={{ ...s.btn, ...s.btnPrimary, marginTop: '1rem' }}>
+                    {order.status === 'Updating...' ? <SpinLoader /> : <CheckCircle size={20} />}
+                    Mark Delivered
+                  </button>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
     );
   }
 
-  // --- MAIN APP RENDER ---
   return (
-    <div className="min-h-screen bg-stone-50 font-sans pb-28 relative">
-      <Modal {...modal} onClose={closeModal} />
+    <div style={s.container}>
+      <Modal {...modal} onClose={() => setModal({ ...modal, isOpen: false })} />
       
       {SHOW_HARVESTING_SCREEN ? (
-        <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center">
-          <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full transition-all duration-300 transform scale-100">
-            <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Leaf size={40} className="text-emerald-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-emerald-900 mb-4">Harvesting in Progress</h2>
-            <p className="text-stone-600 mb-8 leading-relaxed">
-              We are currently waiting for the harvesting. Ordering will be enabled once the fresh produce is ready.
-            </p>
-             <div className="border-t border-stone-100 pt-6">
-                <p className="text-stone-400 text-xs uppercase tracking-widest mb-1">For Enquiries</p>
-                <p className="text-emerald-800 font-bold">Mani - 81790 68821</p>
-            </div>
-            <button onClick={() => setView('admin-login')} className="mt-8 text-xs text-stone-300 hover:text-stone-500">
-              Admin
-            </button>
-          </div>
+        <div style={s.centerFlex}>
+          <Leaf size={64} color="#059669" style={{ marginBottom: '1rem' }} />
+          <h2 style={{ fontWeight: 700, fontSize: '1.5rem', color: '#064e3b', margin: 0 }}>Harvesting in Progress</h2>
+          <p style={{ textAlign: 'center', color: '#78716c', marginTop: '1rem' }}>We are currently waiting for the harvesting. Ordering will be enabled soon.</p>
+          <button onClick={() => setView('admin-login')} style={{ marginTop: '2rem', background: 'none', border: 'none', color: '#d6d3d1' }}>Admin</button>
         </div>
       ) : orderPlaced ? (
-        <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center">
-          <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full transition-all duration-300 transform scale-100">
-            <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle size={40} className="text-emerald-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-emerald-900 mb-2">Order Received!</h2>
-            <p className="text-stone-600 mb-6">Thank you, {customerName}. We have received your order and payment proof.</p>
-            
-            <div className="bg-stone-50 rounded-lg p-4 text-left text-sm text-stone-700 mb-6">
-              <p className="mb-2 border-b border-stone-200 pb-2">
-                <strong className="text-emerald-800">Placed On:</strong><br/> 
-                {orderDate?.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
-              </p>
-              <p><strong>Total:</strong> ₹{calculateTotal()}/-</p>
-              <p><strong>Delivery:</strong> {DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label}</p>
-            </div>
-
-            <button 
-              onClick={() => window.location.reload()}
-              className="w-full py-3 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200"
-            >
-              Place Another Order
-            </button>
+        <div style={s.centerFlex}>
+          <CheckCircle size={64} color="#059669" style={{ marginBottom: '1rem' }} />
+          <h2 style={{ fontWeight: 700, fontSize: '1.5rem', color: '#064e3b', margin: 0 }}>Order Received!</h2>
+          <p style={{ textAlign: 'center', color: '#78716c', marginBottom: '1.5rem' }}>Thank you, {customerName}.</p>
+          <div style={{ ...s.card, width: '100%' }}>
+            <p style={{ margin: '0 0 0.5rem' }}><strong>Total:</strong> ₹{calculateTotal()}/-</p>
+            <p style={{ margin: 0 }}><strong>Location:</strong> {DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label}</p>
           </div>
+          <button onClick={() => window.location.reload()} style={{ ...s.btn, ...s.btnPrimary }}>Place Another Order</button>
         </div>
       ) : showPayment ? (
-        <div className="flex flex-col p-4 max-w-md mx-auto min-h-screen">
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden flex-grow flex flex-col">
-            <div className="bg-emerald-600 p-4 text-white flex items-center">
-              <button onClick={() => setShowPayment(false)} className="mr-3 p-1 hover:bg-emerald-500 rounded-full">
-                <ArrowRight className="transform rotate-180" size={24} />
-              </button>
-              <h2 className="text-xl font-bold">Payment</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <div style={s.header}>
+            <button onClick={() => setShowPayment(false)} style={{ background: 'none', border: 'none', color: 'white', marginRight: '1rem', cursor: 'pointer' }}><ArrowRight style={{ transform: 'rotate(180deg)' }} /></button>
+            <h2 style={{ fontWeight: 700, fontSize: '1.25rem', margin: 0 }}>Payment</h2>
+          </div>
+          <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+            <p style={{ fontSize: '0.875rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', margin: 0 }}>Total Amount</p>
+            <p style={{ fontSize: '2.5rem', fontWeight: 800, color: '#065f46', margin: '0.5rem 0 2rem' }}>₹{calculateTotal()}</p>
+            
+            <div style={{ background: '#3b82f6', padding: '1rem', borderRadius: 16, marginBottom: '2rem', width: '100%', maxWidth: 280 }}>
+               <div style={{ background: 'white', padding: '0.5rem', borderRadius: 8, display: 'flex', justifyContent: 'center' }}>
+                 <img src={QR_CODE_URL} alt="QR" style={{ width: '100%', mixBlendMode: 'multiply' }} />
+               </div>
+               <p style={{ textAlign: 'center', color: 'white', fontWeight: 700, marginTop: '0.5rem', fontSize: '0.875rem' }}>Scan to pay via UPI</p>
             </div>
 
-            <div className="p-6 flex flex-col items-center flex-grow overflow-y-auto">
-              <div className="text-center mb-6">
-                <p className="text-stone-500 text-sm uppercase tracking-wide font-semibold mb-1">Total Amount</p>
-                <p className="text-4xl font-bold text-emerald-800">₹{calculateTotal()}</p>
-              </div>
-
-              <div className="bg-blue-500 p-4 rounded-xl shadow-inner mb-6 w-full max-w-xs flex flex-col items-center">
-                <div className="bg-white p-2 rounded-lg w-full aspect-square flex items-center justify-center relative">
-                   <img src={QR_CODE_URL} alt="Payment QR Code" className="w-full h-full object-contain mix-blend-multiply" />
-                </div>
-                <p className="text-white text-center mt-3 text-sm font-medium">Scan to pay via UPI</p>
-              </div>
-
-              <div className="w-full bg-stone-50 border-2 border-dashed border-emerald-200 rounded-xl p-6 text-center mb-6">
-                <label className="cursor-pointer block">
-                  <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Upload size={24} />
-                  </div>
-                  <span className="text-emerald-800 font-medium block">Upload UPI Payment Screenshot</span>
-                  <span className="text-stone-500 text-xs block mt-1">{paymentFile ? paymentFile.name : "Tap to select image"}</span>
-                  <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-                </label>
-              </div>
-            </div>
-
-            <div className="p-4 bg-white border-t border-stone-100">
-              <button 
-                onClick={handleFinalizeOrder}
-                disabled={!paymentFile || isSubmitting}
-                className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center space-x-2 transition-all ${
-                  paymentFile && !isSubmitting
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200 hover:bg-emerald-700' 
-                    : 'bg-stone-300 text-stone-500 cursor-not-allowed'
-                }`}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="animate-spin" size={20} />
-                    <span>
-                      {uploadStatus === 'uploading' ? 'Uploading...' : 'Processing...'}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <span>Confirm Order</span>
-                    <CheckCircle size={20} />
-                  </>
-                )}
-              </button>
-            </div>
+            <label style={{ width: '100%', border: '2px dashed #a7f3d0', borderRadius: 16, padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', backgroundColor: '#f0fdf4' }}>
+               <div style={{ backgroundColor: '#d1fae5', padding: '1rem', borderRadius: '50%', marginBottom: '1rem', color: '#059669' }}><Upload /></div>
+               <span style={{ color: '#065f46', fontWeight: 600 }}>Upload Payment Screenshot</span>
+               <span style={{ fontSize: '0.75rem', color: '#78716c', marginTop: '0.5rem' }}>{paymentFile ? paymentFile.name : 'Tap to select'}</span>
+               <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+            </label>
+          </div>
+          <div style={{ padding: '1rem', backgroundColor: 'white', borderTop: '1px solid #e7e5e4' }}>
+             <button onClick={handleFinalizeOrder} disabled={!paymentFile || isSubmitting} style={{ ...s.btn, ...s.btnPrimary, marginTop: 0 }}>
+               {isSubmitting ? <SpinLoader /> : <CheckCircle />} Confirm Order
+             </button>
           </div>
         </div>
       ) : (
         <>
-          <div className="bg-emerald-700 text-white p-4 pb-6 rounded-b-3xl shadow-lg relative z-10">
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center space-x-2">
-                <div className="bg-white text-emerald-700 p-1.5 rounded-lg">
-                  <Leaf size={20} fill="currentColor" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold leading-none">Kanha</h1>
-                  <span className="text-emerald-200 text-xs font-light tracking-widest">FARM FRESH</span>
-                </div>
-              </div>
+          <div style={s.header}>
+            <div style={{ backgroundColor: 'white', color: '#059669', padding: '0.4rem', borderRadius: '8px', display: 'flex' }}><Leaf size={20} fill="currentColor" /></div>
+            <div>
+              <h1 style={{ margin: 0, fontSize: '1.25rem', lineHeight: 1 }}>Kanha</h1>
+              <span style={{ fontSize: '0.7rem', opacity: 0.9, letterSpacing: '1px' }}>FARM FRESH</span>
             </div>
-            <p className="mt-2 text-emerald-100 text-xs">Natural goodness delivered to your doorstep.</p>
           </div>
-
-          <div className="max-w-md mx-auto px-4 -mt-4 relative z-20">
-            {/* Increased top padding from pt-4 to pt-10 for more space */}
-            <div ref={productsRef} className="pt-10 scroll-mt-24">
-              <h3 className="text-stone-800 font-bold text-lg ml-1 flex items-center mb-3">
-                <span className="bg-emerald-100 text-emerald-800 w-6 h-6 rounded-full text-xs flex items-center justify-center mr-2">1</span>
-                Fresh Produce 
-                <span className="ml-2 h-px bg-stone-300 flex-grow"></span>
-              </h3>
-              
-              <div className="space-y-3">
+          
+          <div style={{ padding: '0 1rem', marginTop: '-1.5rem', position: 'relative', zIndex: 20 }}>
+            <div style={{ backgroundColor: '#047857', height: '2rem', marginBottom: '-2rem' }}></div> 
+            
+            {/* Products */}
+            <div ref={productsRef} style={{ paddingTop: '2rem' }}>
+              <h3 style={s.sectionTitle}><span style={s.step}>1</span> Fresh Produce</h3>
+              <div>
                 {PRODUCTS.map(product => (
-                  <div key={product.id} className="bg-white rounded-xl p-3 shadow-sm border border-stone-100 flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="text-3xl w-12 h-12 bg-stone-50 rounded-lg flex items-center justify-center border border-stone-200 relative group">
-                        {product.icon}
-                      </div>
+                  <div key={product.id} style={s.productRow}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <div style={{ fontSize: '2rem', backgroundColor: '#fafaf9', width: '3rem', height: '3rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px' }}>{product.icon}</div>
                       <div>
-                        <h4 className="font-bold text-stone-800 text-base">{product.name}</h4>
-                        <p className="text-[10px] text-stone-500 mb-0.5">{product.desc} • {product.unit}</p>
-                        <p className="text-emerald-700 font-bold text-sm">₹{product.price}/-</p>
+                        <h4 style={{ margin: 0, fontSize: '1rem' }}>{product.name}</h4>
+                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#78716c' }}>{product.desc} • {product.unit}</p>
+                        <span style={{ fontWeight: 700, color: '#047857', marginTop: '0.25rem', display: 'block' }}>₹{product.price}/-</span>
                       </div>
                     </div>
-                    
-                    <div className="flex flex-col items-center bg-stone-50 rounded-lg p-0.5 border border-stone-200">
-                      <button 
-                        onClick={() => updateQuantity(product.id, 1)}
-                        className="w-6 h-6 flex items-center justify-center bg-emerald-600 text-white rounded shadow-sm active:scale-95 transition-transform"
-                      >
-                        <Plus size={14} />
-                      </button>
-                      <span className="font-bold text-stone-800 py-0.5 w-6 text-center text-xs">
-                        {cart[product.id] || 0}
-                      </span>
-                      <button 
-                        onClick={() => updateQuantity(product.id, -1)}
-                        className={`w-6 h-6 flex items-center justify-center rounded transition-colors ${
-                          !cart[product.id] ? 'bg-stone-200 text-stone-400' : 'bg-white text-emerald-700 border border-emerald-200 active:scale-95'
-                        }`}
-                        disabled={!cart[product.id]}
-                      >
-                        <Minus size={14} />
-                      </button>
+                    <div style={s.qtyWrapper}>
+                      <button style={{ ...s.qtyBtn, backgroundColor: '#059669', color: 'white' }} onClick={() => updateQuantity(product.id, 1)}><Plus size={14}/></button>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 700, margin: '2px 0' }}>{cart[product.id] || 0}</span>
+                      <button style={{ ...s.qtyBtn, backgroundColor: 'white', border: '1px solid #e7e5e4', color: '#059669' }} onClick={() => updateQuantity(product.id, -1)} disabled={!cart[product.id]}><Minus size={14}/></button>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div ref={deliveryRef} className="mt-8 space-y-4 scroll-mt-24">
-              <h3 className="text-stone-800 font-bold text-lg ml-1 flex items-center">
-                <span className="bg-emerald-100 text-emerald-800 w-6 h-6 rounded-full text-xs flex items-center justify-center mr-2">2</span>
-                Delivery Details
-                <span className="ml-2 h-px bg-stone-300 flex-grow"></span>
-              </h3>
-              
-              <div className="bg-white rounded-xl shadow-sm border border-stone-100 overflow-hidden">
-                <div className="p-4 space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-stone-500 uppercase tracking-wide">Select Location</label>
-                    <div className="space-y-2">
-                      {DELIVERY_OPTIONS.map(option => (
-                        <label 
-                          key={option.id} 
-                          className={`flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                            deliveryType === option.id 
-                              ? 'border-emerald-500 bg-emerald-50' 
-                              : 'border-transparent bg-stone-50 hover:bg-stone-100'
-                          }`}
-                        >
-                          <input 
-                            type="radio" 
-                            name="delivery" 
-                            value={option.id}
-                            checked={deliveryType === option.id}
-                            onChange={(e) => setDeliveryType(e.target.value)}
-                            className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 border-gray-300"
-                          />
-                          <span className={`ml-3 text-sm font-medium ${deliveryType === option.id ? 'text-emerald-900' : 'text-stone-700'}`}>
-                            {option.label}
-                          </span>
-                          {option.id === 'pickup' && <Store size={16} className="ml-auto text-stone-400" />}
-                          {option.requiresApt && <MapPin size={16} className="ml-auto text-stone-400" />}
-                        </label>
-                      ))}
+            {/* Delivery */}
+            <div ref={deliveryRef}>
+              <h3 style={s.sectionTitle}><span style={s.step}>2</span> Delivery Details</h3>
+              <div style={s.card}>
+                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', marginBottom: '1rem' }}>Select Location</p>
+                {DELIVERY_OPTIONS.map(option => (
+                  <div key={option.id} style={{ ...s.deliveryOption, backgroundColor: deliveryType === option.id ? '#ecfdf5' : '#fafaf9', borderColor: deliveryType === option.id ? '#059669' : 'transparent' }} onClick={() => setDeliveryType(option.id)}>
+                    <div style={{ width: '1.2rem', height: '1.2rem', borderRadius: '50%', border: '2px solid #e7e5e4', marginRight: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderColor: deliveryType === option.id ? '#059669' : '#e7e5e4' }}>
+                      {deliveryType === option.id && <div style={{ width: '0.6rem', height: '0.6rem', backgroundColor: '#059669', borderRadius: '50%' }}></div>}
                     </div>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 500, color: deliveryType === option.id ? '#064e3b' : '#44403c' }}>{option.label}</span>
+                    {option.requiresApt && <MapPin size={16} style={{ marginLeft: 'auto', color: '#a8a29e' }} />}
                   </div>
+                ))}
+                
+                {DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt && (
+                  <div style={{ marginTop: '1rem' }}>
+                     <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Block & Flat Number</p>
+                     <input type="text" placeholder="e.g. A-101" value={aptNumber} onChange={e => setAptNumber(e.target.value)} style={s.input} />
+                  </div>
+                )}
+              </div>
+            </div>
 
-                  {DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt && (
-                    <div className="space-y-1 transition-all duration-300">
-                      <label className="text-xs font-bold text-stone-500 uppercase tracking-wide">Block & Flat Number</label>
-                      <input 
-                        type="text" 
-                        placeholder="e.g. A-101"
-                        value={aptNumber}
-                        onChange={(e) => setAptNumber(e.target.value)}
-                        className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-stone-800"
-                      />
-                    </div>
-                  )}
+            {/* Info */}
+            <div ref={infoRef}>
+              <h3 style={s.sectionTitle}><span style={s.step}>3</span> Your Info</h3>
+              <div style={s.card}>
+                <div style={s.inputGroup}>
+                  <User style={s.iconPrefix} size={18} />
+                  <input type="text" placeholder="Full Name" value={customerName} onChange={e => setCustomerName(e.target.value)} style={s.input} />
+                </div>
+                <div style={{ ...s.inputGroup, marginBottom: 0 }}>
+                  <Phone style={s.iconPrefix} size={18} />
+                  <input type="tel" placeholder="Mobile Number" value={mobileNumber} onChange={e => { if(/^\d*$/.test(e.target.value)) setMobileNumber(e.target.value) }} style={s.input} />
                 </div>
               </div>
             </div>
 
-            <div ref={infoRef} className="mt-8 space-y-4 mb-4 scroll-mt-24">
-              <h3 className="text-stone-800 font-bold text-lg ml-1 flex items-center">
-                <span className="bg-emerald-100 text-emerald-800 w-6 h-6 rounded-full text-xs flex items-center justify-center mr-2">3</span>
-                Your Info
-                <span className="ml-2 h-px bg-stone-300 flex-grow"></span>
-              </h3>
-              
-              <div className="bg-white rounded-xl shadow-sm border border-stone-100 p-4 space-y-4">
-                <div className="relative">
-                  <User className="absolute top-3.5 left-3 text-stone-400" size={18} />
-                  <input 
-                    type="text" 
-                    placeholder="Full Name"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    className="w-full pl-10 p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-stone-800"
-                  />
-                </div>
-                <div className="relative">
-                  <Phone className="absolute top-3.5 left-3 text-stone-400" size={18} />
-                  <input 
-                    type="tel" 
-                    placeholder="Mobile Number"
-                    value={mobileNumber}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (/^\d*$/.test(val)) setMobileNumber(val);
-                    }}
-                    className="w-full pl-10 p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-stone-800"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="text-center pb-8 pt-4">
-               <p className="text-stone-400 text-xs uppercase tracking-widest mb-1">For Enquiries</p>
-               <p className="text-emerald-800 font-bold">Mani - 81790 68821</p>
-               <button onClick={() => setView('admin-login')} className="mt-4 text-xs text-stone-300 hover:text-stone-500">
-                 Admin
-               </button>
+            <div style={{ textAlign: 'center', paddingBottom: '2rem', marginTop: '2rem' }}>
+               <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', margin: 0 }}>For Enquiries</p>
+               <p style={{ fontWeight: 700, color: '#065f46', margin: '0.25rem 0 0' }}>Mani - 81790 68821</p>
+               <button onClick={() => setView('admin-login')} style={{ marginTop: '1rem', fontSize: '0.75rem', color: '#d6d3d1', background: 'none', border: 'none', cursor: 'pointer' }}>Admin</button>
             </div>
           </div>
 
           {showScrollCue && (
-            <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 flex flex-col items-center pointer-events-none animate-bounce z-0 opacity-70">
-              <span className="text-xs text-stone-500 font-medium mb-1">Scroll Down</span>
-              <ChevronDown className="text-stone-400" />
+            <div style={{ position: 'fixed', bottom: '6rem', left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: 0.6, pointerEvents: 'none' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c' }}>Scroll Down</span>
+              <ChevronDown color="#78716c" />
             </div>
           )}
 
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-4 shadow-lg z-30">
-            <div className="max-w-md mx-auto flex items-center justify-between">
+          <div style={s.bottomBar}>
+            <div style={{ maxWidth: '600px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <p className="text-xs text-stone-500 font-medium uppercase">Total</p>
-                <div className="flex items-center gap-2">
-                  <p className="text-2xl font-bold text-emerald-800">₹{calculateTotal()}</p>
-                </div>
+                <p style={{ fontSize: '0.75rem', color: '#78716c', textTransform: 'uppercase', fontWeight: 700, margin: 0 }}>Total</p>
+                <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#064e3b', margin: 0 }}>₹{calculateTotal()}</p>
               </div>
-              <button 
-                onClick={handleSmartAction}
-                className={`px-6 py-3 rounded-xl font-bold flex items-center space-x-2 transition-all shadow-lg text-sm md:text-base ${
-                  calculateTotal() > 0 
-                    ? 'bg-emerald-600 text-white shadow-emerald-200 hover:bg-emerald-700 active:scale-95' 
-                    : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                }`}
-              >
-                <span>{getButtonText().text}</span>
-                {getButtonText().icon}
+              <button onClick={handleSmartAction} style={{ ...s.btn, ...s.btnPrimary, width: 'auto', paddingLeft: '2rem', paddingRight: '2rem', marginTop: 0 }}>
+                {getButtonText().text} {getButtonText().icon}
               </button>
             </div>
           </div>
