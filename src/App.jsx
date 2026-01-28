@@ -296,11 +296,11 @@ const PRODUCTS = [
  // { id: 4, name: 'Lettuce', unit: 'Bunch (300g)', price: 100, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Crunchy' },
   { id: 5, name: 'Curry Leaves', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🍃</span>, desc: 'Fresh' },
   { id: 7, name: 'Beetroot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
- // { id: 8, name: 'Palak', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
+  { id: 8, name: 'Palak', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
   { id: 9, name: 'Mint', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Fresh & Cooling' },
   { id: 10, name: 'Carrot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🍃</span>, desc: 'Fresh' },
   { id: 11, name: 'Beetroot', unit: '500gm', price: 35, icon: <BeetrootIcon />, desc: 'Earthy Root' },
-  { id: 12, name: 'Methi Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
+ // { id: 12, name: 'Methi Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
 ];
 
 const DELIVERY_OPTIONS = [
