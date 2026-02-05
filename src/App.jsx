@@ -307,7 +307,7 @@ const DELIVERY_OPTIONS = [
   { id: 'vihanga', label: 'My Home Vihanga', requiresApt: true },
   { id: 'krishe', label: 'My Home Krishe', requiresApt: true },
   { id: 'phf', label: 'Prestige High Fields', requiresApt: true },
-  { id: 'phf', label: 'Rajapushpa Atria', requiresApt: true },
+  { id: 'atria', label: 'Rajapushpa Atria', requiresApt: true },
   { id: 'pbel', label: 'PBEL City', requiresApt: true },
   { id: 'pickup', label: 'Store pick up (Malabar Natives)', requiresApt: false },
 //  { id: 'gc', label: 'Pick up (Gachibowli Meditation Centre)', requiresApt: false },
