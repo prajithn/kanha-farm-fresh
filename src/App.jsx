@@ -307,9 +307,10 @@ const DELIVERY_OPTIONS = [
   { id: 'vihanga', label: 'My Home Vihanga', requiresApt: true },
   { id: 'krishe', label: 'My Home Krishe', requiresApt: true },
   { id: 'phf', label: 'Prestige High Fields', requiresApt: true },
-  { id: 'gc', label: 'Pick up (Gachibowli Meditation Centre)', requiresApt: false },
-  { id: 'vajrajs', label: 'Vajras Jasmine County', requiresApt: true },
+  { id: 'phf', label: 'Rajapushpa Atria', requiresApt: true },
+  { id: 'pbel', label: 'PBEL City', requiresApt: true },
   { id: 'pickup', label: 'Store pick up (Malabar Natives)', requiresApt: false },
+  { id: 'gc', label: 'Pick up (Gachibowli Meditation Centre)', requiresApt: false },
 ];
 
 const QR_CODE_URL = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=paytm.s18fahk@pty&pn=KanhaFarmFresh"; 
