@@ -290,9 +290,9 @@ const Modal = ({ isOpen, type, message, title, onClose, onConfirm, isLoading }) 
 
 // --- DATA ---
 const PRODUCTS = [
-  { id: 1, name: 'Strawberry', unit: 'Box (200g)', price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
-  { id: 2, name: 'Strawberry', unit: 'Box (500g)', price: 225, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
-  { id: 3, name: 'Strawberry', unit: 'Box (1Kg)', price: 400, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
+  { id: 1, name: 'Strawberry - 200gm', unit: 'Box (200g)', price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
+  { id: 2, name: 'Strawberry - 500gm', unit: 'Box (500g)', price: 225, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
+  { id: 3, name: 'Strawberry - 1Kg', unit: 'Box (1Kg)', price: 400, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
 
   { id: 4, name: 'Tender Coconut', unit: 'Piece', price: 80, icon: <TenderCoconutIcon />, desc: 'Refreshing' },
  // { id: 3, name: 'Coriander Leaves', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
