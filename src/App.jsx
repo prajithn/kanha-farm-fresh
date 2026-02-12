@@ -198,6 +198,28 @@ const BeetrootIcon = () => (
   </svg>
 );
 
+
+const GoldenBerryIcon = () => (
+  <svg viewBox="0 0 100 100" style={{ width: 40, height: 40, overflow: 'visible' }}>
+    {/* The Husk (Back Leaves) */}
+    <path d="M20 50 Q 10 70 30 90 Q 50 95 70 90 Q 90 70 80 50" fill="#d4a373" stroke="#8b5e34" strokeWidth="1" />
+    
+    {/* The Berry (Main Fruit) */}
+    <circle cx="50" cy="55" r="30" fill="#fbbf24" stroke="#d97706" strokeWidth="1" />
+    <path d="M45 35 Q 55 30 65 40" fill="none" stroke="#ffffff" strokeWidth="2" opacity="0.4" strokeLinecap="round" />
+    
+    {/* The Stem (Top) */}
+    <path d="M50 30 Q 52 15 48 5" fill="none" stroke="#78350f" strokeWidth="3" strokeLinecap="round" />
+    
+    {/* The Husk (Front Leaves/Petals) */}
+    <path d="M15 45 Q 25 75 50 95 Q 75 75 85 45 L 75 60 Q 50 85 25 60 Z" fill="#e9c46a" stroke="#8b5e34" strokeWidth="1" />
+    
+    {/* Leaf Detail Lines */}
+    <path d="M30 75 L 40 85 M 70 75 L 60 85" stroke="#8b5e34" strokeWidth="0.5" />
+  </svg>
+);
+
+
 const SpinLoader = () => (
   <>
     <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
@@ -293,17 +315,21 @@ const PRODUCTS = [
   { id: 1, name: 'Strawberry - 200gm', unit: 'Box (200g)', price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 2, name: 'Strawberry - 500gm', unit: 'Box (500g)', price: 225, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 3, name: 'Strawberry - 1Kg', unit: 'Box (1Kg)', price: 400, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
-
-  { id: 4, name: 'Tender Coconut', unit: 'Piece', price: 80, icon: <TenderCoconutIcon />, desc: 'Refreshing' },
- // { id: 3, name: 'Coriander Leaves', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
- // { id: 4, name: 'Lettuce', unit: 'Bunch (300g)', price: 100, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Crunchy' },
-  { id: 5, name: 'Curry Leaves', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🍃</span>, desc: 'Fresh' },
+  { id: 4, name: 'Goldenberry', unit: '250gm', price: 200, icon: <GoldenBerryIcon />, desc: 'Natural' },
+  { id: 5, name: 'Tender Coconut', unit: 'Piece', price: 80, icon: <TenderCoconutIcon />, desc: 'Refreshing' },
+  { id: 6, name: 'Beetroot', unit: '500gm', price: 35, icon: <BeetrootIcon />, desc: 'Earthy Root' },
   { id: 7, name: 'Beetroot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
- // { id: 8, name: 'Palak', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
-  { id: 9, name: 'Mint', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Fresh & Cooling' },
+  { id: 8, name: 'Mint', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Fresh & Cooling' },
+  { id: 9, name: 'Curry Leaves', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🍃</span>, desc: 'Fresh' },
   { id: 10, name: 'Carrot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🍃</span>, desc: 'Fresh' },
-  { id: 11, name: 'Beetroot', unit: '500gm', price: 35, icon: <BeetrootIcon />, desc: 'Earthy Root' },
- // { id: 12, name: 'Methi Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
+
+  // { id: 12, name: 'Methi Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
+ // { id: 8, name: 'Palak', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
+
+  // { id: 3, name: 'Coriander Leaves', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
+ // { id: 4, name: 'Lettuce', unit: 'Bunch (300g)', price: 100, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Crunchy' },
+
+
 ];
 
 const DELIVERY_OPTIONS = [
