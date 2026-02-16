@@ -198,6 +198,25 @@ const BeetrootIcon = () => (
   </svg>
 );
 
+const AmaranthusIcon = () => (
+  <svg viewBox="0 0 100 100" style={{ width: 40, height: 40, overflow: 'visible' }}>
+    {/* Main Stem */}
+    <path d="M50 95 L 50 25" stroke="#15803d" strokeWidth="4" strokeLinecap="round" />
+    
+    {/* Bottom Large Leaves */}
+    <path d="M50 80 Q 15 75 10 55 Q 15 35 50 50 Z" fill="#22c55e" stroke="#15803d" strokeWidth="1.5" />
+    <path d="M50 80 Q 85 75 90 55 Q 85 35 50 50 Z" fill="#22c55e" stroke="#15803d" strokeWidth="1.5" />
+    
+    {/* Middle Leaves */}
+    <path d="M50 60 Q 25 55 20 40 Q 25 25 50 35 Z" fill="#4ade80" stroke="#15803d" strokeWidth="1.5" />
+    <path d="M50 60 Q 75 55 80 40 Q 75 25 50 35 Z" fill="#4ade80" stroke="#15803d" strokeWidth="1.5" />
+    
+    {/* Top Small Budding Leaves */}
+    <path d="M50 35 Q 35 30 40 15 Q 50 10 50 25 Z" fill="#86efac" stroke="#166534" strokeWidth="1" />
+    <path d="M50 35 Q 65 30 60 15 Q 50 10 50 25 Z" fill="#86efac" stroke="#166534" strokeWidth="1" />
+  </svg>
+);
+
 
 const GoldenBerryIcon = () => (
   <svg viewBox="0 0 100 100" style={{ width: 40, height: 40, overflow: 'visible' }}>
@@ -315,18 +334,18 @@ const PRODUCTS = [
   { id: 1, name: 'Strawberry - 200gm', unit: 'Box (200g)', price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 2, name: 'Strawberry - 500gm', unit: 'Box (500g)', price: 225, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 3, name: 'Strawberry - 1Kg', unit: 'Box (1Kg)', price: 400, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
- // { id: 4, name: 'Goldenberry', unit: '250gm', price: 200, icon: <GoldenBerryIcon />, desc: 'Natural' },
-  { id: 5, name: 'Tender Coconut', unit: 'Piece', price: 80, icon: <TenderCoconutIcon />, desc: 'Refreshing' },
+  { id: 5, name: 'Tender Coconut', unit: 'Piece', price: 50, icon: <TenderCoconutIcon />, desc: 'Refreshing' },
   { id: 6, name: 'Beetroot', unit: '500gm', price: 35, icon: <BeetrootIcon />, desc: 'Earthy Root' },
+
+
+  //  { id: 7, name: 'Methi Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
+ // { id: 8, name: 'Palak', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
+//  { id: 4, name: 'Goldenberry', unit: '250gm', price: 200, icon: <GoldenBerryIcon />, desc: 'Natural' },
  // { id: 7, name: 'Beetroot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
  // { id: 8, name: 'Mint', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Fresh & Cooling' },
  // { id: 9, name: 'Curry Leaves', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🍃</span>, desc: 'Fresh' },
  // { id: 10, name: 'Carrot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🍃</span>, desc: 'Fresh' },
-
-  // { id: 12, name: 'Methi Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
- // { id: 8, name: 'Palak', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
-
-  // { id: 3, name: 'Coriander Leaves', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
+ // { id: 3, name: 'Coriander Leaves', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
  // { id: 4, name: 'Lettuce', unit: 'Bunch (300g)', price: 100, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Crunchy' },
 
 
