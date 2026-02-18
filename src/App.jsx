@@ -383,7 +383,8 @@ const PRODUCTS = [
   { id: 7, name: 'Palak', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
   { id: 8, name: 'Goldenberry', unit: '250gm', price: 200, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 9, name: 'Ridge Gourd', unit: '500gm', price: 40, icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
-
+  { id: 10, name: 'Plain Paneer', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
+  { id: 11, name: 'Plain Tofu', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
 
   
 
