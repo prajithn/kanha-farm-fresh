@@ -18,6 +18,7 @@ const ADMIN_PASS = 'kanha@123';
 const UPI_ID = 'paytm.s18fahk@pty';
 const MERCHANT_NAME = 'Kanha Farm Fresh';
 const EASEBUZZ_PAYMENT_URL = 'https://pay.easebuzz.in/pay/initiateLink';
+const USE_EASEBUZZ = false; // toggle: true = Easebuzz gateway, false = manual UPI flow
 
 // --- STYLES (STRICT INLINE - NO CLASSES) ---
 const s = {
@@ -388,7 +389,7 @@ const PRODUCTS = [
   { id: 9, name: 'Ridge Gourd', unit: '500gm', price: 40, icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
   { id: 10, name: 'Plain Paneer', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
   { id: 11, name: 'Plain Tofu', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
-  { id: 12, name: 'Test Product', unit: '200g', price: 1, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
+//  { id: 12, name: 'Test Product', unit: '200g', price: 1, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
 
   
 
@@ -1048,39 +1049,43 @@ export default function SmartGrocerApp() {
 
             {paymentStep === 'idle' ? (
               <>
-                {/* ── PRIMARY: Easebuzz gateway ── */}
-                <button
-                  onClick={initiateEasebuzzPayment}
-                  disabled={isSubmitting}
-                  style={{ ...s.btn, ...s.btnPrimary, background: 'linear-gradient(135deg, #059669 0%, #047857 100%)', fontSize: '1.05rem', padding: '1rem', gap: '0.6rem', boxShadow: '0 4px 14px rgba(5,150,105,0.35)', marginTop: 0, opacity: isSubmitting ? 0.75 : 1 }}
-                >
-                  {isSubmitting ? <SpinLoader /> : <span style={{ fontSize: '1.3rem' }}>💳</span>}
-                  <span>{isSubmitting ? 'Preparing Payment...' : `Pay ₹${calculateTotal()} Securely`}</span>
-                </button>
+                {USE_EASEBUZZ && (
+                  <>
+                    {/* ── PRIMARY: Easebuzz gateway ── */}
+                    <button
+                      onClick={initiateEasebuzzPayment}
+                      disabled={isSubmitting}
+                      style={{ ...s.btn, ...s.btnPrimary, background: 'linear-gradient(135deg, #059669 0%, #047857 100%)', fontSize: '1.05rem', padding: '1rem', gap: '0.6rem', boxShadow: '0 4px 14px rgba(5,150,105,0.35)', marginTop: 0, opacity: isSubmitting ? 0.75 : 1 }}
+                    >
+                      {isSubmitting ? <SpinLoader /> : <span style={{ fontSize: '1.3rem' }}>💳</span>}
+                      <span>{isSubmitting ? 'Preparing Payment...' : `Pay ₹${calculateTotal()} Securely`}</span>
+                    </button>
 
-                {/* Supported methods */}
-                <div style={{ textAlign: 'center' }}>
-                  <p style={{ fontSize: '0.72rem', color: '#a8a29e', margin: '0 0 0.5rem' }}>UPI · Debit / Credit Cards · Net Banking · Wallets</p>
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    {[
-                      { label: 'G Pay', bg: '#4285F4' },
-                      { label: 'PhonePe', bg: '#5f259f' },
-                      { label: 'Paytm', bg: '#00BAF2' },
-                      { label: 'Cards', bg: '#374151' },
-                    ].map(app => (
-                      <span key={app.label} style={{ backgroundColor: app.bg, color: 'white', fontSize: '0.65rem', fontWeight: 700, padding: '0.2rem 0.55rem', borderRadius: 6 }}>{app.label}</span>
-                    ))}
-                  </div>
-                </div>
+                    {/* Supported methods */}
+                    <div style={{ textAlign: 'center' }}>
+                      <p style={{ fontSize: '0.72rem', color: '#a8a29e', margin: '0 0 0.5rem' }}>UPI · Debit / Credit Cards · Net Banking · Wallets</p>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {[
+                          { label: 'G Pay', bg: '#4285F4' },
+                          { label: 'PhonePe', bg: '#5f259f' },
+                          { label: 'Paytm', bg: '#00BAF2' },
+                          { label: 'Cards', bg: '#374151' },
+                        ].map(app => (
+                          <span key={app.label} style={{ backgroundColor: app.bg, color: 'white', fontSize: '0.65rem', fontWeight: 700, padding: '0.2rem 0.55rem', borderRadius: 6 }}>{app.label}</span>
+                        ))}
+                      </div>
+                    </div>
 
-                {/* Divider */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '0.25rem 0' }}>
-                  <div style={{ flex: 1, height: 1, background: '#e7e5e4' }} />
-                  <span style={{ fontSize: '0.72rem', color: '#a8a29e' }}>or pay manually via UPI</span>
-                  <div style={{ flex: 1, height: 1, background: '#e7e5e4' }} />
-                </div>
+                    {/* Divider */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '0.25rem 0' }}>
+                      <div style={{ flex: 1, height: 1, background: '#e7e5e4' }} />
+                      <span style={{ fontSize: '0.72rem', color: '#a8a29e' }}>or pay manually via UPI</span>
+                      <div style={{ flex: 1, height: 1, background: '#e7e5e4' }} />
+                    </div>
+                  </>
+                )}
 
-                {/* ── FALLBACK: manual UPI ── */}
+                {/* ── Manual UPI ── */}
                 <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: 12, padding: '0.875rem 1rem' }}>
                   <p style={{ fontSize: '0.7rem', color: '#047857', fontWeight: 700, margin: '0 0 0.4rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pay to UPI ID</p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
