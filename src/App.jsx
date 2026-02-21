@@ -434,7 +434,6 @@ export default function SmartGrocerApp() {
   const [paymentFile, setPaymentFile] = useState(null);
   const [showScrollCue, setShowScrollCue] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [paymentStep, setPaymentStep] = useState('idle'); // 'idle' | 'initiated'
   const [upiCopied, setUpiCopied] = useState(false);
   const [orderSummary, setOrderSummary] = useState(null);
 
@@ -1047,45 +1046,36 @@ export default function SmartGrocerApp() {
               <p style={{ fontSize: '3rem', fontWeight: 800, color: '#065f46', margin: '0.25rem 0 0' }}>₹{calculateTotal()}</p>
             </div>
 
-            {paymentStep === 'idle' ? (
+            {USE_EASEBUZZ ? (
               <>
-                {USE_EASEBUZZ && (
-                  <>
-                    {/* ── PRIMARY: Easebuzz gateway ── */}
-                    <button
-                      onClick={initiateEasebuzzPayment}
-                      disabled={isSubmitting}
-                      style={{ ...s.btn, ...s.btnPrimary, background: 'linear-gradient(135deg, #059669 0%, #047857 100%)', fontSize: '1.05rem', padding: '1rem', gap: '0.6rem', boxShadow: '0 4px 14px rgba(5,150,105,0.35)', marginTop: 0, opacity: isSubmitting ? 0.75 : 1 }}
-                    >
-                      {isSubmitting ? <SpinLoader /> : <span style={{ fontSize: '1.3rem' }}>💳</span>}
-                      <span>{isSubmitting ? 'Preparing Payment...' : `Pay ₹${calculateTotal()} Securely`}</span>
-                    </button>
+                {/* ── PRIMARY: Easebuzz gateway ── */}
+                <button
+                  onClick={initiateEasebuzzPayment}
+                  disabled={isSubmitting}
+                  style={{ ...s.btn, ...s.btnPrimary, background: 'linear-gradient(135deg, #059669 0%, #047857 100%)', fontSize: '1.05rem', padding: '1rem', gap: '0.6rem', boxShadow: '0 4px 14px rgba(5,150,105,0.35)', marginTop: 0, opacity: isSubmitting ? 0.75 : 1 }}
+                >
+                  {isSubmitting ? <SpinLoader /> : <span style={{ fontSize: '1.3rem' }}>💳</span>}
+                  <span>{isSubmitting ? 'Preparing Payment...' : `Pay ₹${calculateTotal()} Securely`}</span>
+                </button>
 
-                    {/* Supported methods */}
-                    <div style={{ textAlign: 'center' }}>
-                      <p style={{ fontSize: '0.72rem', color: '#a8a29e', margin: '0 0 0.5rem' }}>UPI · Debit / Credit Cards · Net Banking · Wallets</p>
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                        {[
-                          { label: 'G Pay', bg: '#4285F4' },
-                          { label: 'PhonePe', bg: '#5f259f' },
-                          { label: 'Paytm', bg: '#00BAF2' },
-                          { label: 'Cards', bg: '#374151' },
-                        ].map(app => (
-                          <span key={app.label} style={{ backgroundColor: app.bg, color: 'white', fontSize: '0.65rem', fontWeight: 700, padding: '0.2rem 0.55rem', borderRadius: 6 }}>{app.label}</span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Divider */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '0.25rem 0' }}>
-                      <div style={{ flex: 1, height: 1, background: '#e7e5e4' }} />
-                      <span style={{ fontSize: '0.72rem', color: '#a8a29e' }}>or pay manually via UPI</span>
-                      <div style={{ flex: 1, height: 1, background: '#e7e5e4' }} />
-                    </div>
-                  </>
-                )}
-
-                {/* ── Manual UPI ── */}
+                {/* Supported methods */}
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: '0.72rem', color: '#a8a29e', margin: '0 0 0.5rem' }}>UPI · Debit / Credit Cards · Net Banking · Wallets</p>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    {[
+                      { label: 'G Pay', bg: '#4285F4' },
+                      { label: 'PhonePe', bg: '#5f259f' },
+                      { label: 'Paytm', bg: '#00BAF2' },
+                      { label: 'Cards', bg: '#374151' },
+                    ].map(app => (
+                      <span key={app.label} style={{ backgroundColor: app.bg, color: 'white', fontSize: '0.65rem', fontWeight: 700, padding: '0.2rem 0.55rem', borderRadius: 6 }}>{app.label}</span>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* ── UPI ID ── */}
                 <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: 12, padding: '0.875rem 1rem' }}>
                   <p style={{ fontSize: '0.7rem', color: '#047857', fontWeight: 700, margin: '0 0 0.4rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pay to UPI ID</p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
@@ -1099,43 +1089,30 @@ export default function SmartGrocerApp() {
                   </div>
                 </div>
 
-                <a
-                  href={`upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${calculateTotal()}&cu=INR&tn=${encodeURIComponent('Kanha Farm Fresh Order')}`}
-                  onClick={() => setTimeout(() => setPaymentStep('initiated'), 1200)}
-                  style={{ textDecoration: 'none', display: 'block' }}
-                >
-                  <div style={{ ...s.btn, ...s.btnOutline, marginTop: 0, fontSize: '0.9rem', padding: '0.75rem', gap: '0.5rem' }}>
-                    <span>📱</span> Open UPI App to Pay
-                  </div>
-                </a>
-
-                <button
-                  onClick={() => setPaymentStep('initiated')}
-                  style={{ background: 'none', border: '1px solid #e7e5e4', borderRadius: 10, color: '#78716c', cursor: 'pointer', fontSize: '0.875rem', padding: '0.6rem', width: '100%' }}
-                >
-                  Already paid manually? Confirm order →
-                </button>
-              </>
-            ) : (
-              <>
-                {/* Payment initiated — confirmation step */}
-                <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: 16, padding: '1.5rem', textAlign: 'center' }}>
-                  <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>✅</div>
-                  <h3 style={{ color: '#065f46', margin: '0 0 0.5rem', fontWeight: 700 }}>Payment Done?</h3>
-                  <p style={{ color: '#78716c', margin: 0, fontSize: '0.875rem', lineHeight: 1.5 }}>
-                    Once your UPI app confirms the payment, tap below to place your order.
-                  </p>
+                {/* ── QR Code ── */}
+                <div style={{ textAlign: 'center', padding: '0.25rem 0' }}>
+                  <p style={{ fontSize: '0.75rem', color: '#78716c', margin: '0 0 0.75rem' }}>or scan with any UPI app</p>
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(`upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${calculateTotal()}&cu=INR`)}`}
+                    alt="UPI QR Code"
+                    style={{ width: 180, height: 180, borderRadius: 12, border: '2px solid #a7f3d0', display: 'block', margin: '0 auto' }}
+                  />
+                  <p style={{ fontSize: '0.7rem', color: '#a8a29e', margin: '0.5rem 0 0' }}>G Pay · PhonePe · Paytm · BHIM · any UPI app</p>
                 </div>
 
-                {/* Verification warning */}
-                <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '0.75rem 1rem', display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '1rem', flexShrink: 0 }}>⚠️</span>
-                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#92400e', lineHeight: 1.5 }}>
-                    Orders are dispatched only after payment is verified. Please confirm only if your UPI payment was successful.
-                  </p>
+                {/* ── Divider ── */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ flex: 1, height: 1, background: '#e7e5e4' }} />
+                  <span style={{ fontSize: '0.72rem', color: '#a8a29e', whiteSpace: 'nowrap' }}>after payment</span>
+                  <div style={{ flex: 1, height: 1, background: '#e7e5e4' }} />
                 </div>
 
-                {/* Mandatory screenshot upload */}
+                {/* ── Upload instruction ── */}
+                <p style={{ fontSize: '0.875rem', color: '#78716c', margin: 0, textAlign: 'center', lineHeight: 1.5 }}>
+                  Take a screenshot from your UPI app and upload it below to confirm your order
+                </p>
+
+                {/* ── Mandatory screenshot upload ── */}
                 <div style={{ border: `1.5px dashed ${paymentFile ? '#059669' : '#f59e0b'}`, borderRadius: 12, padding: '1rem', textAlign: 'center', background: paymentFile ? '#f0fdf4' : '#fffbeb' }}>
                   <p style={{ fontSize: '0.75rem', color: paymentFile ? '#059669' : '#b45309', fontWeight: 600, margin: '0 0 0.5rem' }}>
                     {paymentFile ? '✓ Screenshot attached' : '📸 Upload payment screenshot to continue'}
@@ -1154,16 +1131,9 @@ export default function SmartGrocerApp() {
                     style={{ ...s.btn, ...s.btnPrimary, marginTop: 0, fontSize: '1.05rem', padding: '1rem' }}
                   >
                     {isSubmitting ? <SpinLoader /> : <CheckCircle size={20} />}
-                    {isSubmitting ? 'Placing Order...' : 'Yes, Confirm My Order'}
+                    {isSubmitting ? 'Placing Order...' : 'Confirm My Order'}
                   </button>
                 )}
-
-                <button
-                  onClick={() => setPaymentStep('idle')}
-                  style={{ background: 'none', border: 'none', color: '#a8a29e', cursor: 'pointer', fontSize: '0.875rem', textAlign: 'center' }}
-                >
-                  ← Go back / Retry payment
-                </button>
               </>
             )}
           </div>
