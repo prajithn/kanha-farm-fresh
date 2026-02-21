@@ -12,9 +12,12 @@ import { MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Lea
 })();
 
 // --- CONFIGURATION ---
-const SHOW_HARVESTING_SCREEN = false; 
+const SHOW_HARVESTING_SCREEN = false;
 const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'kanha@123';
+const UPI_ID = 'paytm.s18fahk@pty';
+const MERCHANT_NAME = 'Kanha Farm Fresh';
+const EASEBUZZ_PAYMENT_URL = 'https://pay.easebuzz.in/pay/initiateLink';
 
 // --- STYLES (STRICT INLINE - NO CLASSES) ---
 const s = {
@@ -385,6 +388,7 @@ const PRODUCTS = [
   { id: 9, name: 'Ridge Gourd', unit: '500gm', price: 40, icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
   { id: 10, name: 'Plain Paneer', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
   { id: 11, name: 'Plain Tofu', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
+  { id: 12, name: 'Test Product', unit: '200g', price: 1, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
 
   
 
@@ -411,11 +415,10 @@ const DELIVERY_OPTIONS = [
 //  { id: 'gc', label: 'Pick up (Gachibowli Meditation Centre)', requiresApt: false },
 ];
 
-const QR_CODE_URL = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=paytm.s18fahk@pty&pn=KanhaFarmFresh"; 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7cz_Ykzim6EYILS0Fpo5_DJlcJiuO01mefnkqHUGqeui3zd6pRf95oTFJiit3tB6X/exec"; 
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7cz_Ykzim6EYILS0Fpo5_DJlcJiuO01mefnkqHUGqeui3zd6pRf95oTFJiit3tB6X/exec";
 
 export default function SmartGrocerApp() {
-  const [view, setView] = useState('home'); 
+  const [view, setView] = useState('landing');
   const [modal, setModal] = useState({ isOpen: false, type: 'alert', message: '', title: '', onConfirm: null, isLoading: false });
 
   // Customer State
@@ -430,7 +433,9 @@ export default function SmartGrocerApp() {
   const [paymentFile, setPaymentFile] = useState(null);
   const [showScrollCue, setShowScrollCue] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState(''); 
+  const [paymentStep, setPaymentStep] = useState('idle'); // 'idle' | 'initiated'
+  const [upiCopied, setUpiCopied] = useState(false);
+  const [orderSummary, setOrderSummary] = useState(null);
 
   // Admin State
   const [adminUser, setAdminUser] = useState('');
@@ -454,6 +459,48 @@ export default function SmartGrocerApp() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Payment callback — runs once on mount to detect Easebuzz redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paymentResult = params.get('payment');
+    const txnid = params.get('txnid');
+
+    if (paymentResult === 'success' && txnid) {
+      const saved = sessionStorage.getItem('kff_pending_order');
+      if (saved) {
+        const order = JSON.parse(saved);
+        sessionStorage.removeItem('kff_pending_order');
+        (async () => {
+          try {
+            const orderData = {
+              action: 'create',
+              customerName: order.customerName,
+              mobileNumber: order.mobileNumber,
+              deliveryType: order.deliveryLabel,
+              aptNumber: order.aptNumber ? "'" + order.aptNumber : '',
+              items: order.items,
+              total: order.total,
+              image: '',
+              imageName: '',
+            };
+            await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(orderData) });
+            setCustomerName(order.customerName);
+            setDeliveryType(order.deliveryType);
+            setOrderSummary({ total: order.total, deliveryLabel: order.deliveryLabel });
+            setOrderPlaced(true);
+            window.scrollTo(0, 0);
+          } catch {
+            setModal({ isOpen: true, type: 'alert', title: 'Error', message: 'Payment succeeded but order recording failed. Please contact Mani — 81790 68821.' });
+          }
+        })();
+      }
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (paymentResult === 'failure') {
+      setModal({ isOpen: true, type: 'alert', title: 'Payment Failed', message: 'Payment was not completed. Please try again or use manual UPI.' });
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // --- LOGIC ---
   const compressImage = (file) => {
@@ -516,32 +563,105 @@ export default function SmartGrocerApp() {
   }
 
   const handleFinalizeOrder = async () => {
-    if (!paymentFile) { setModal({ isOpen: true, type: 'alert', message: "Please upload the payment screenshot." }); return; }
     setIsSubmitting(true);
-    setUploadStatus('uploading');
     try {
-      const base64Image = await compressImage(paymentFile);
       const itemsString = Object.entries(cart).map(([id, qty]) => `${PRODUCTS.find(p => p.id === parseInt(id)).name} (${qty})`).join(", ");
+      let base64Image = '';
+      let imageName = '';
+      if (paymentFile) {
+        base64Image = await compressImage(paymentFile);
+        imageName = paymentFile.name;
+      }
       const orderData = {
         action: 'create',
         customerName,
         mobileNumber,
         deliveryType: DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label,
-        aptNumber: aptNumber ? "'" + aptNumber : '', 
+        aptNumber: aptNumber ? "'" + aptNumber : '',
         items: itemsString,
         total: calculateTotal(),
         image: base64Image,
-        imageName: paymentFile.name
+        imageName
       };
       await fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(orderData) });
-      setUploadStatus('success');
+      setOrderSummary({ total: calculateTotal(), deliveryLabel: DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label || '' });
       setOrderDate(new Date());
       setOrderPlaced(true);
       window.scrollTo(0, 0);
     } catch (error) {
-      setUploadStatus('error');
-      setModal({ isOpen: true, type: 'alert', message: "Error placing order." });
+      setModal({ isOpen: true, type: 'alert', message: "Error placing order. Please try again." });
     } finally { setIsSubmitting(false); }
+  };
+
+  const copyUpiId = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(UPI_ID).then(() => {
+        setUpiCopied(true);
+        setTimeout(() => setUpiCopied(false), 2500);
+      });
+    }
+  };
+
+  const initiateEasebuzzPayment = async () => {
+    setIsSubmitting(true);
+    try {
+      const total = calculateTotal();
+      const deliveryLabel = DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label || '';
+      const udf1 = `${deliveryLabel}${aptNumber ? ' - ' + aptNumber : ''}`;
+      const safeName = customerName.replace(/[^a-zA-Z0-9 ]/g, '').substring(0, 50) || 'Customer';
+
+      // Get hash from Apps Script (server-side, keeps salt off client)
+      const qs = new URLSearchParams({
+        action: 'generate_payment_hash',
+        amount: total.toString(),
+        firstname: safeName,
+        phone: mobileNumber,
+        udf1: udf1.substring(0, 100),
+        cb: Date.now(),
+      });
+      const response = await fetch(`${GOOGLE_SCRIPT_URL}?${qs}`, { credentials: 'omit' });
+      const payData = await response.json();
+
+      // Save order snapshot to sessionStorage before leaving the page
+      const itemsString = Object.entries(cart).map(([id, qty]) => {
+        const product = PRODUCTS.find(p => p.id === parseInt(id));
+        return `${product.name} (${qty})`;
+      }).join(', ');
+      sessionStorage.setItem('kff_pending_order', JSON.stringify({
+        customerName,
+        mobileNumber,
+        deliveryType,
+        deliveryLabel,
+        aptNumber,
+        items: itemsString,
+        total,
+        txnid: payData.txnid,
+      }));
+
+      // Build success / failure redirect URLs
+      const base = window.location.origin + window.location.pathname;
+      const surl = `${base}?payment=success&txnid=${payData.txnid}`;
+      const furl = `${base}?payment=failure`;
+
+      // Programmatically POST to Easebuzz (form submit navigates the page)
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = EASEBUZZ_PAYMENT_URL;
+      const fields = { ...payData, action: '1', surl, furl };
+      Object.entries(fields).forEach(([k, v]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = k;
+        input.value = v;
+        form.appendChild(input);
+      });
+      document.body.appendChild(form);
+      form.submit();
+      // Note: page navigates away — no need to reset isSubmitting
+    } catch {
+      setIsSubmitting(false);
+      setModal({ isOpen: true, type: 'alert', title: 'Error', message: 'Could not initiate payment. Please try manual UPI or try again.' });
+    }
   };
 
   const handleFileChange = (e) => {
@@ -573,6 +693,212 @@ export default function SmartGrocerApp() {
   };
 
   // --- VIEWS ---
+
+  if (view === 'landing') {
+    return (
+      <div style={{ ...s.container, paddingBottom: 0, backgroundColor: '#fafaf9' }}>
+
+        {/* ══ HERO ══ */}
+        <div style={{ background: 'linear-gradient(155deg, #052e16 0%, #064e3b 50%, #065f46 100%)', position: 'relative', overflow: 'hidden', paddingBottom: '4rem' }}>
+          {/* Subtle radial glow top-right */}
+          <div style={{ position: 'absolute', top: -80, right: -80, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(110,231,183,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
+          {/* Subtle glow bottom-left */}
+          <div style={{ position: 'absolute', bottom: -40, left: -60, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(5,150,105,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+          {/* Nav */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.25rem 0', position: 'relative', zIndex: 2 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div style={{ backgroundColor: 'white', color: '#059669', padding: '0.35rem', borderRadius: '7px', display: 'flex' }}>
+                <Leaf size={18} fill="currentColor" />
+              </div>
+              <div>
+                <div style={{ color: 'white', fontWeight: 800, fontSize: '1.1rem', lineHeight: 1 }}>Kanha</div>
+                <div style={{ color: '#6ee7b7', fontSize: '0.6rem', letterSpacing: '1.5px', fontWeight: 700 }}>FARM FRESH</div>
+              </div>
+            </div>
+            <button onClick={() => setView('admin-login')} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.4)', fontSize: '0.68rem', padding: '0.3rem 0.7rem', borderRadius: 6, cursor: 'pointer' }}>Admin</button>
+          </div>
+
+          {/* Hero content */}
+          <div style={{ padding: '2.25rem 1.25rem 1.75rem', position: 'relative', zIndex: 2 }}>
+            {/* Badge */}
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(110,231,183,0.15)', border: '1px solid rgba(110,231,183,0.25)', borderRadius: 20, padding: '0.3rem 0.85rem', marginBottom: '1.25rem' }}>
+              <span style={{ fontSize: '0.8rem' }}>🌱</span>
+              <span style={{ color: '#a7f3d0', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.5px' }}>Vanashanti FPO · Kanha Shantivanam</span>
+            </div>
+
+            {/* Headline — warm, benefit-led */}
+            <h1 style={{ color: 'white', fontSize: '2.15rem', fontWeight: 900, lineHeight: 1.18, margin: '0 0 1rem', letterSpacing: '-0.5px' }}>
+              From Kanha's Soil<br />
+              to Your Family's<br />
+              <span style={{ color: '#6ee7b7' }}>Table.</span>
+            </h1>
+
+            <p style={{ color: '#a7f3d0', fontSize: '0.88rem', lineHeight: 1.75, margin: '0 0 0.5rem' }}>
+              Pure organic produce, grown without chemicals, nourished by <strong style={{ color: '#d1fae5' }}>biochar & vermicompost</strong> from Kanha Shantivanam.
+            </p>
+            <p style={{ color: '#6ee7b7', fontSize: '0.8rem', lineHeight: 1.6, margin: '0 0 2rem', fontWeight: 600 }}>
+              Delivered fresh to your doorstep. 🚚
+            </p>
+
+            {/* CTA */}
+            <button
+              onClick={() => setView('home')}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', backgroundColor: 'white', color: '#047857', padding: '0.9rem 2rem', borderRadius: 14, border: 'none', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,0.3)', letterSpacing: '0.2px' }}
+            >
+              🛍️ Shop Now <ArrowRight size={16} />
+            </button>
+          </div>
+
+          {/* Daaji card floating at bottom of hero */}
+          <div style={{ margin: '0 1.25rem', position: 'relative', zIndex: 2 }}>
+            <div style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 16, padding: '1rem 1.25rem', display: 'flex', gap: '0.875rem', alignItems: 'center' }}>
+              <img
+                src="https://primary-assets.heartfulness.org/strapi-assets/medium_kamlesh_d_patel_daaji_2e9bb8ccd4.png"
+                alt="Daaji – Kamlesh D. Patel"
+                style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(110,231,183,0.5)' }}
+              />
+              <div>
+                <p style={{ margin: '0 0 0.1rem', fontSize: '0.62rem', color: '#6ee7b7', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>The Vision Behind Vanashanti</p>
+                <p style={{ margin: '0 0 0.15rem', fontWeight: 800, color: 'white', fontSize: '0.9rem' }}>Daaji</p>
+                <p style={{ margin: 0, fontSize: '0.7rem', color: '#a7f3d0' }}>Kamlesh D. Patel · Global Guide, Heartfulness</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Wave */}
+          <svg viewBox="0 0 390 55" preserveAspectRatio="none" style={{ display: 'block', width: '100%', height: 55, position: 'absolute', bottom: 0, left: 0 }}>
+            <path d="M0,35 C80,10 200,55 390,25 L390,55 L0,55 Z" fill="#fafaf9" />
+          </svg>
+        </div>
+
+        {/* ══ TRUST STRIP ══ */}
+        <div style={{ background: 'white', borderBottom: '1px solid #f0fdf4', padding: '0.875rem 1.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+            {[
+              { icon: '🚚', label: 'Home Delivery' },
+              { icon: '🌾', label: 'Weekly Fresh' },
+              { icon: '🚫', label: 'No Chemicals' },
+            ].map(item => (
+              <div key={item.label} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '1.1rem' }}>{item.icon}</div>
+                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#047857', marginTop: '0.15rem' }}>{item.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ══ VALUE PROPS ══ */}
+        <div style={{ padding: '1.5rem 1.25rem 0' }}>
+          <p style={{ margin: '0 0 0.875rem', fontSize: '0.7rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', letterSpacing: '1px' }}>Why Vanashanti</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+            {[
+              { icon: '🌱', title: 'Farm\nDirect', desc: 'No middlemen' },
+              { icon: '🌾', title: 'Healthy\nSoil', desc: 'Biochar & vermicompost' },
+              { icon: '🌿', title: 'Fully\nOrganic', desc: 'Chemical-free' },
+            ].map(item => (
+              <div key={item.title} style={{ background: 'white', border: '1px solid #e7e5e4', borderRadius: 14, padding: '1rem 0.6rem', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <div style={{ fontSize: '1.5rem', marginBottom: '0.35rem' }}>{item.icon}</div>
+                <div style={{ fontWeight: 800, fontSize: '0.72rem', color: '#064e3b', whiteSpace: 'pre-line', lineHeight: 1.25 }}>{item.title}</div>
+                <div style={{ fontSize: '0.6rem', color: '#a8a29e', marginTop: '0.2rem', lineHeight: 1.3 }}>{item.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ══ HOW IT WORKS ══ */}
+        <div style={{ padding: '1.5rem 1.25rem 0' }}>
+          <p style={{ margin: '0 0 0.875rem', fontSize: '0.7rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', letterSpacing: '1px' }}>How it works</p>
+          <div style={{ background: 'white', border: '1px solid #e7e5e4', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            {[
+              { step: '1', icon: '🛒', title: 'Browse & add to cart', desc: 'Pick from fresh, organic produce' },
+              { step: '2', icon: '💳', title: 'Pay via UPI', desc: 'GPay, PhonePe, Paytm — one tap' },
+              { step: '3', icon: '🚚', title: 'Delivered fresh', desc: 'To your door or pickup point' },
+            ].map((item, i, arr) => (
+              <div key={item.step} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.875rem 1rem', borderBottom: i < arr.length - 1 ? '1px solid #f0fdf4' : 'none' }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '1.1rem' }}>{item.icon}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#1c1917' }}>{item.title}</div>
+                  <div style={{ fontSize: '0.72rem', color: '#78716c', marginTop: '0.1rem' }}>{item.desc}</div>
+                </div>
+                <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#064e3b', color: 'white', fontSize: '0.65rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{item.step}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ══ ABOUT VANASHANTI ══ */}
+        <div style={{ padding: '1.5rem 1.25rem 0' }}>
+          <p style={{ margin: '0 0 0.875rem', fontSize: '0.7rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', letterSpacing: '1px' }}>Our Story</p>
+          <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: 16, padding: '1.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+              <div style={{ background: '#d1fae5', borderRadius: 8, padding: '0.3rem', display: 'flex' }}><Leaf size={15} color="#047857" fill="#047857" /></div>
+              <h2 style={{ margin: 0, fontWeight: 800, color: '#064e3b', fontSize: '0.95rem' }}>About Vanashanti</h2>
+            </div>
+            <p style={{ margin: '0 0 0.65rem', fontSize: '0.85rem', color: '#374151', lineHeight: 1.75 }}>
+              Vanashanti FPO is dedicated to <strong>restoring soil health</strong> through organic methods — helping farmers grow stronger, more resilient crops, naturally and sustainably.
+            </p>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: '#374151', lineHeight: 1.75 }}>
+              Working with <strong>Kanha Shantivanam</strong>, we supply farmers with <strong>biochar and vermicompost</strong> that rebuild microbial activity and boost natural fertility. Better soil → better crops → better food for your family.
+            </p>
+          </div>
+        </div>
+
+        {/* ══ KANHA SHANTIVANAM ══ */}
+        <div style={{ padding: '1.25rem 1.25rem 0' }}>
+          <div style={{ background: 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)', border: '1px solid #fde68a', borderRadius: 16, padding: '1.25rem' }}>
+            <div style={{ display: 'flex', gap: '0.875rem', alignItems: 'flex-start' }}>
+              <div style={{ fontSize: '2rem', flexShrink: 0, lineHeight: 1.1 }}>🌾</div>
+              <div>
+                <h3 style={{ margin: '0 0 0.35rem', fontWeight: 800, color: '#78350f', fontSize: '0.9rem' }}>
+                  Where Soil Comes Alive Again
+                </h3>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: '#92400e', lineHeight: 1.7 }}>
+                  Biochar and vermicompost from <strong>Kanha Shantivanam</strong> enrich microbial activity, rebuild natural fertility, and give farmers the foundation for strong, healthy harvests — season after season.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ══ PRODUCE PREVIEW — live from PRODUCTS ══ */}
+        <div style={{ padding: '1.5rem 1.25rem 0' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.875rem' }}>
+            <p style={{ margin: 0, fontSize: '0.7rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', letterSpacing: '1px' }}>Available Now</p>
+            <button onClick={() => setView('home')} style={{ background: 'none', border: 'none', color: '#047857', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>See all →</button>
+          </div>
+          <div style={{ display: 'flex', gap: '0.6rem', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'none' }}>
+            {PRODUCTS.filter((p, idx, arr) => arr.findIndex(q => q.name.split(' - ')[0] === p.name.split(' - ')[0]) === idx).map(p => (
+              <div key={p.id} style={{ flexShrink: 0, background: 'white', border: '1px solid #e7e5e4', borderRadius: 14, padding: '0.875rem 0.6rem', textAlign: 'center', minWidth: 72, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                <div style={{ fontSize: '1.5rem', display: 'flex', justifyContent: 'center', marginBottom: '0.3rem' }}>{p.icon}</div>
+                <div style={{ fontSize: '0.58rem', fontWeight: 700, color: '#374151', lineHeight: 1.3 }}>{p.name.split(' - ')[0]}</div>
+                <div style={{ fontSize: '0.58rem', color: '#047857', fontWeight: 700, marginTop: '0.2rem' }}>from ₹{p.price}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ══ BOTTOM CTA ══ */}
+        <div style={{ padding: '1.5rem 1.25rem 0' }}>
+          <button onClick={() => setView('home')} style={{ ...s.btn, ...s.btnPrimary, fontSize: '1.05rem', padding: '1rem', marginTop: 0, boxShadow: '0 4px 14px rgba(5,150,105,0.3)' }}>
+            🛍️ Start Shopping <ArrowRight size={18} />
+          </button>
+        </div>
+
+        {/* ══ FOOTER ══ */}
+        <div style={{ margin: '1.5rem 1.25rem 0', padding: '1.25rem', background: 'white', border: '1px solid #e7e5e4', borderRadius: 16, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+          <p style={{ margin: '0 0 0.35rem', fontSize: '0.7rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', letterSpacing: '1px' }}>Have a question?</p>
+          <p style={{ margin: '0 0 0.75rem', fontWeight: 800, color: '#064e3b', fontSize: '1rem' }}>Mani — 81790 68821</p>
+          <p style={{ margin: 0, fontSize: '0.65rem', color: '#a8a29e', lineHeight: 1.6 }}>
+            Fresh · Organic · Direct from Kanha Village<br />
+            Vanashanti FPO, Kanha Village, Rangareddy
+          </p>
+        </div>
+        <div style={{ height: '2.5rem' }} />
+
+      </div>
+    );
+  }
 
   if (view === 'admin-login') {
     return (
@@ -697,39 +1023,140 @@ export default function SmartGrocerApp() {
           <h2 style={{ fontWeight: 700, fontSize: '1.5rem', color: '#064e3b', margin: 0 }}>Order Received!</h2>
           <p style={{ textAlign: 'center', color: '#78716c', marginBottom: '1.5rem' }}>Thank you, {customerName}.</p>
           <div style={{ ...s.card, width: '100%' }}>
-            <p style={{ margin: '0 0 0.5rem' }}><strong>Total:</strong> ₹{calculateTotal()}/-</p>
-            <p style={{ margin: 0 }}><strong>Location:</strong> {DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label}</p>
+            <p style={{ margin: '0 0 0.5rem' }}><strong>Total:</strong> ₹{orderSummary?.total ?? calculateTotal()}/-</p>
+            <p style={{ margin: 0 }}><strong>Location:</strong> {orderSummary?.deliveryLabel || DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label}</p>
           </div>
           <button onClick={() => window.location.reload()} style={{ ...s.btn, ...s.btnPrimary }}>Place Another Order</button>
         </div>
       ) : showPayment ? (
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          {/* Header */}
           <div style={s.header}>
-            <button onClick={() => setShowPayment(false)} style={{ background: 'none', border: 'none', color: 'white', marginRight: '1rem', cursor: 'pointer' }}><ArrowRight style={{ transform: 'rotate(180deg)' }} /></button>
+            <button onClick={() => { setShowPayment(false); setPaymentStep('idle'); setPaymentFile(null); }} style={{ background: 'none', border: 'none', color: 'white', marginRight: '0.5rem', cursor: 'pointer' }}>
+              <ArrowRight style={{ transform: 'rotate(180deg)' }} />
+            </button>
             <h2 style={{ fontWeight: 700, fontSize: '1.25rem', margin: 0 }}>Payment</h2>
           </div>
-          <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-            <p style={{ fontSize: '0.875rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', margin: 0 }}>Total Amount</p>
-            <p style={{ fontSize: '2.5rem', fontWeight: 800, color: '#065f46', margin: '0.5rem 0 2rem' }}>₹{calculateTotal()}</p>
-            
-            <div style={{ background: '#3b82f6', padding: '1rem', borderRadius: 16, marginBottom: '2rem', width: '100%', maxWidth: 280 }}>
-               <div style={{ background: 'white', padding: '0.5rem', borderRadius: 8, display: 'flex', justifyContent: 'center' }}>
-                 <img src={QR_CODE_URL} alt="QR" style={{ width: '100%', mixBlendMode: 'multiply' }} />
-               </div>
-               <p style={{ textAlign: 'center', color: 'white', fontWeight: 700, marginTop: '0.5rem', fontSize: '0.875rem' }}>Scan to pay via UPI</p>
+
+          <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+            {/* Amount */}
+            <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', margin: 0, letterSpacing: '1px' }}>Total Amount</p>
+              <p style={{ fontSize: '3rem', fontWeight: 800, color: '#065f46', margin: '0.25rem 0 0' }}>₹{calculateTotal()}</p>
             </div>
 
-            <label style={{ width: '100%', border: '2px dashed #a7f3d0', borderRadius: 16, padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', backgroundColor: '#f0fdf4' }}>
-               <div style={{ backgroundColor: '#d1fae5', padding: '1rem', borderRadius: '50%', marginBottom: '1rem', color: '#059669' }}><Upload /></div>
-               <span style={{ color: '#065f46', fontWeight: 600 }}>Upload Payment Screenshot</span>
-               <span style={{ fontSize: '0.75rem', color: '#78716c', marginTop: '0.5rem' }}>{paymentFile ? paymentFile.name : 'Tap to select'}</span>
-               <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
-            </label>
-          </div>
-          <div style={{ padding: '1rem', backgroundColor: 'white', borderTop: '1px solid #e7e5e4' }}>
-             <button onClick={handleFinalizeOrder} disabled={!paymentFile || isSubmitting} style={{ ...s.btn, ...s.btnPrimary, marginTop: 0 }}>
-               {isSubmitting ? <SpinLoader /> : <CheckCircle />} Confirm Order
-             </button>
+            {paymentStep === 'idle' ? (
+              <>
+                {/* ── PRIMARY: Easebuzz gateway ── */}
+                <button
+                  onClick={initiateEasebuzzPayment}
+                  disabled={isSubmitting}
+                  style={{ ...s.btn, ...s.btnPrimary, background: 'linear-gradient(135deg, #059669 0%, #047857 100%)', fontSize: '1.05rem', padding: '1rem', gap: '0.6rem', boxShadow: '0 4px 14px rgba(5,150,105,0.35)', marginTop: 0, opacity: isSubmitting ? 0.75 : 1 }}
+                >
+                  {isSubmitting ? <SpinLoader /> : <span style={{ fontSize: '1.3rem' }}>💳</span>}
+                  <span>{isSubmitting ? 'Preparing Payment...' : `Pay ₹${calculateTotal()} Securely`}</span>
+                </button>
+
+                {/* Supported methods */}
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: '0.72rem', color: '#a8a29e', margin: '0 0 0.5rem' }}>UPI · Debit / Credit Cards · Net Banking · Wallets</p>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    {[
+                      { label: 'G Pay', bg: '#4285F4' },
+                      { label: 'PhonePe', bg: '#5f259f' },
+                      { label: 'Paytm', bg: '#00BAF2' },
+                      { label: 'Cards', bg: '#374151' },
+                    ].map(app => (
+                      <span key={app.label} style={{ backgroundColor: app.bg, color: 'white', fontSize: '0.65rem', fontWeight: 700, padding: '0.2rem 0.55rem', borderRadius: 6 }}>{app.label}</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '0.25rem 0' }}>
+                  <div style={{ flex: 1, height: 1, background: '#e7e5e4' }} />
+                  <span style={{ fontSize: '0.72rem', color: '#a8a29e' }}>or pay manually via UPI</span>
+                  <div style={{ flex: 1, height: 1, background: '#e7e5e4' }} />
+                </div>
+
+                {/* ── FALLBACK: manual UPI ── */}
+                <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: 12, padding: '0.875rem 1rem' }}>
+                  <p style={{ fontSize: '0.7rem', color: '#047857', fontWeight: 700, margin: '0 0 0.4rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pay to UPI ID</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontWeight: 700, color: '#064e3b', fontSize: '1rem' }}>{UPI_ID}</span>
+                    <button
+                      onClick={copyUpiId}
+                      style={{ flexShrink: 0, background: upiCopied ? '#059669' : 'white', color: upiCopied ? 'white' : '#059669', border: '1.5px solid #059669', borderRadius: 8, padding: '0.3rem 0.75rem', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', transition: 'all 0.2s' }}
+                    >
+                      {upiCopied ? '✓ Copied' : 'Copy'}
+                    </button>
+                  </div>
+                </div>
+
+                <a
+                  href={`upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${calculateTotal()}&cu=INR&tn=${encodeURIComponent('Kanha Farm Fresh Order')}`}
+                  onClick={() => setTimeout(() => setPaymentStep('initiated'), 1200)}
+                  style={{ textDecoration: 'none', display: 'block' }}
+                >
+                  <div style={{ ...s.btn, ...s.btnOutline, marginTop: 0, fontSize: '0.9rem', padding: '0.75rem', gap: '0.5rem' }}>
+                    <span>📱</span> Open UPI App to Pay
+                  </div>
+                </a>
+
+                <button
+                  onClick={() => setPaymentStep('initiated')}
+                  style={{ background: 'none', border: '1px solid #e7e5e4', borderRadius: 10, color: '#78716c', cursor: 'pointer', fontSize: '0.875rem', padding: '0.6rem', width: '100%' }}
+                >
+                  Already paid manually? Confirm order →
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Payment initiated — confirmation step */}
+                <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: 16, padding: '1.5rem', textAlign: 'center' }}>
+                  <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>✅</div>
+                  <h3 style={{ color: '#065f46', margin: '0 0 0.5rem', fontWeight: 700 }}>Payment Done?</h3>
+                  <p style={{ color: '#78716c', margin: 0, fontSize: '0.875rem', lineHeight: 1.5 }}>
+                    Once your UPI app confirms the payment, tap below to place your order.
+                  </p>
+                </div>
+
+                {/* Verification warning */}
+                <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '0.75rem 1rem', display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: '1rem', flexShrink: 0 }}>⚠️</span>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#92400e', lineHeight: 1.5 }}>
+                    Orders are dispatched only after payment is verified. Please confirm only if your UPI payment was successful.
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleFinalizeOrder}
+                  disabled={isSubmitting}
+                  style={{ ...s.btn, ...s.btnPrimary, marginTop: 0, fontSize: '1.05rem', padding: '1rem' }}
+                >
+                  {isSubmitting ? <SpinLoader /> : <CheckCircle size={20} />}
+                  {isSubmitting ? 'Placing Order...' : 'Yes, Confirm My Order'}
+                </button>
+
+                {/* Optional screenshot upload */}
+                <div style={{ border: '1px dashed #d6d3d1', borderRadius: 12, padding: '1rem', textAlign: 'center' }}>
+                  <p style={{ fontSize: '0.75rem', color: '#a8a29e', margin: '0 0 0.5rem' }}>Optional: attach payment screenshot</p>
+                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#78716c', fontSize: '0.875rem', fontWeight: 600 }}>
+                    <Upload size={16} />
+                    {paymentFile ? paymentFile.name : 'Upload screenshot'}
+                    <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+                  </label>
+                </div>
+
+                <button
+                  onClick={() => setPaymentStep('idle')}
+                  style={{ background: 'none', border: 'none', color: '#a8a29e', cursor: 'pointer', fontSize: '0.875rem', textAlign: 'center' }}
+                >
+                  ← Go back / Retry payment
+                </button>
+              </>
+            )}
           </div>
         </div>
       ) : (
