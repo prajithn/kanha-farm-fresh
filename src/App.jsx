@@ -1135,24 +1135,28 @@ export default function SmartGrocerApp() {
                   </p>
                 </div>
 
-                <button
-                  onClick={handleFinalizeOrder}
-                  disabled={isSubmitting}
-                  style={{ ...s.btn, ...s.btnPrimary, marginTop: 0, fontSize: '1.05rem', padding: '1rem' }}
-                >
-                  {isSubmitting ? <SpinLoader /> : <CheckCircle size={20} />}
-                  {isSubmitting ? 'Placing Order...' : 'Yes, Confirm My Order'}
-                </button>
-
-                {/* Optional screenshot upload */}
-                <div style={{ border: '1px dashed #d6d3d1', borderRadius: 12, padding: '1rem', textAlign: 'center' }}>
-                  <p style={{ fontSize: '0.75rem', color: '#a8a29e', margin: '0 0 0.5rem' }}>Optional: attach payment screenshot</p>
-                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#78716c', fontSize: '0.875rem', fontWeight: 600 }}>
+                {/* Mandatory screenshot upload */}
+                <div style={{ border: `1.5px dashed ${paymentFile ? '#059669' : '#f59e0b'}`, borderRadius: 12, padding: '1rem', textAlign: 'center', background: paymentFile ? '#f0fdf4' : '#fffbeb' }}>
+                  <p style={{ fontSize: '0.75rem', color: paymentFile ? '#059669' : '#b45309', fontWeight: 600, margin: '0 0 0.5rem' }}>
+                    {paymentFile ? '✓ Screenshot attached' : '📸 Upload payment screenshot to continue'}
+                  </p>
+                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: paymentFile ? '#047857' : '#78716c', fontSize: '0.875rem', fontWeight: 600 }}>
                     <Upload size={16} />
-                    {paymentFile ? paymentFile.name : 'Upload screenshot'}
+                    {paymentFile ? paymentFile.name : 'Choose screenshot'}
                     <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
                   </label>
                 </div>
+
+                {paymentFile && (
+                  <button
+                    onClick={handleFinalizeOrder}
+                    disabled={isSubmitting}
+                    style={{ ...s.btn, ...s.btnPrimary, marginTop: 0, fontSize: '1.05rem', padding: '1rem' }}
+                  >
+                    {isSubmitting ? <SpinLoader /> : <CheckCircle size={20} />}
+                    {isSubmitting ? 'Placing Order...' : 'Yes, Confirm My Order'}
+                  </button>
+                )}
 
                 <button
                   onClick={() => setPaymentStep('idle')}
