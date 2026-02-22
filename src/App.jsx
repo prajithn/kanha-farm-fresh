@@ -317,6 +317,7 @@ const BottleGourdIcon = () => (
   </svg>
 );
 
+
 const BitterGourdIcon = () => (
   <svg viewBox="0 0 100 100" style={{ width: 40, height: 40, overflow: 'visible' }}>
     {/* The Stem - Short and slightly gnarled */}
@@ -342,7 +343,11 @@ const BitterGourdIcon = () => (
     {/* Internal Bumps - Small dots/dashes to represent texture */}
     <circle cx="48" cy="35" r="1.5" fill="#1b3314" opacity="0.6" />
     <circle cx="52" cy="50" r="1.5" fill="#1b3314" opacity="0.6" />
-    <circle cx="48" cy="65" r="1.5" fill="#1b3314" opacity
+    <circle cx="48" cy="65" r="1.5" fill="#1b3314" opacity="0.6" />
+    <circle cx="51" cy="78" r="1.5" fill="#1b3314" opacity="0.6" />
+  </svg>
+);
+
 
 const RidgeGourdIcon = () => (
   <svg viewBox="0 0 100 100" style={{ width: 40, height: 40, overflow: 'visible' }}>
@@ -484,34 +489,23 @@ const PRODUCTS = [
   { id: 1, name: 'Strawberry - 200gm', unit: 'Box (200g)', price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 2, name: 'Strawberry - 500gm', unit: 'Box (500g)', price: 225, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 3, name: 'Strawberry - 1Kg', unit: 'Box (1Kg)', price: 400, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
-  { id: 8, name: 'Goldenberry', unit: '250gm', price: 200, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
+  { id: 4, name: 'Goldenberry', unit: '250gm', price: 200, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 5, name: 'Tender Coconut', unit: 'Piece', price: 50, icon: <TenderCoconutIcon />, desc: 'Refreshing' },
   { id: 6, name: 'Beetroot', unit: '500gm', price: 35, icon: <BeetrootIcon />, desc: 'Earthy Root' },
   { id: 7, name: 'Palak', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
-  { id: 12, name: 'Methi Leaves', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
-  { id: 13, name: 'Coriander Leaves', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
-  { id: 16, name: 'Bitter Gourd', unit: '500gm', price: 40, icon: <BitterGourdIcon />, desc: 'Healthy' },
-  { id: 14, name: 'Bottle Gourd', unit: '500gm', price: 30, icon: <BottleGourdIcon />, desc: 'Healthy' },
-  { id: 15, name: 'Smooth Gourd', unit: '500gm', price: 40, icon: <SmoothGourdIcon />, desc: 'Nutritious' },
-  { id: 9, name: 'Ridge Gourd', unit: '500gm', price: 40, icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
-  { id: 10, name: 'Plain Paneer', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
-  { id: 11, name: 'Plain Tofu', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
+  { id: 8, name: 'Methi Leaves', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
+  { id: 9, name: 'Coriander Leaves', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
+  { id: 10, name: 'Bitter Gourd', unit: '500gm', price: 40, icon: <BitterGourdIcon />, desc: 'Healthy' },
+  { id: 11, name: 'Bottle Gourd', unit: '500gm', price: 30, icon: <BottleGourdIcon />, desc: 'Healthy' },
+  { id: 12, name: 'Smooth Gourd', unit: '500gm', price: 40, icon: <SmoothGourdIcon />, desc: 'Nutritious' },
+  { id: 13, name: 'Ridge Gourd', unit: '500gm', price: 40, icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
+  { id: 14, name: 'Plain Paneer', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
+  { id: 15, name: 'Plain Tofu', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
  
 
-
-
-  //  { id: 12, name: 'Test Product', unit: '200g', price: 1, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
-
-  //  { id: 7, name: 'Methi Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
- // { id: 7, name: 'Beetroot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
- // { id: 8, name: 'Mint', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Fresh & Cooling' },
- // { id: 9, name: 'Curry Leaves', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🍃</span>, desc: 'Fresh' },
- // { id: 10, name: 'Carrot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🍃</span>, desc: 'Fresh' },
- // { id: 3, name: 'Coriander Leaves', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
- // { id: 4, name: 'Lettuce', unit: 'Bunch (300g)', price: 100, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Crunchy' },
-
-
 ];
+
+
 
 const DELIVERY_OPTIONS = [
   { id: 'vihanga', label: 'My Home Vihanga', requiresApt: true },
