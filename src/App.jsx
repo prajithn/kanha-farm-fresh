@@ -317,6 +317,33 @@ const BottleGourdIcon = () => (
   </svg>
 );
 
+const BitterGourdIcon = () => (
+  <svg viewBox="0 0 100 100" style={{ width: 40, height: 40, overflow: 'visible' }}>
+    {/* The Stem - Short and slightly gnarled */}
+    <path 
+      d="M38 15 Q 40 5 45 10" 
+      fill="none" 
+      stroke="#1b3314" 
+      strokeWidth="3" 
+      strokeLinecap="round" 
+    />
+    
+    {/* The Body - Jagged/Bumpy silhouette with pointed ends */}
+    <path 
+      d="M40 18 
+         L 45 22 L 50 18 L 55 25 L 58 35 L 55 45 L 58 55 L 54 65 L 56 75 L 50 90 
+         L 44 75 L 46 65 L 42 55 L 45 45 L 42 35 L 45 25 Z" 
+      fill="#4a7c44" 
+      stroke="#1b3314" 
+      strokeWidth="2.5" 
+      strokeLinejoin="round" 
+    />
+
+    {/* Internal Bumps - Small dots/dashes to represent texture */}
+    <circle cx="48" cy="35" r="1.5" fill="#1b3314" opacity="0.6" />
+    <circle cx="52" cy="50" r="1.5" fill="#1b3314" opacity="0.6" />
+    <circle cx="48" cy="65" r="1.5" fill="#1b3314" opacity
+
 const RidgeGourdIcon = () => (
   <svg viewBox="0 0 100 100" style={{ width: 40, height: 40, overflow: 'visible' }}>
     {/* The Stem */}
@@ -463,13 +490,14 @@ const PRODUCTS = [
   { id: 7, name: 'Palak', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
   { id: 12, name: 'Methi Leaves', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
   { id: 13, name: 'Coriander Leaves', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
+  { id: 16, name: 'Bitter Gourd', unit: '500gm', price: 40, icon: <BitterGourdIcon />, desc: 'Healthy' },
   { id: 14, name: 'Bottle Gourd', unit: '500gm', price: 30, icon: <BottleGourdIcon />, desc: 'Healthy' },
   { id: 15, name: 'Smooth Gourd', unit: '500gm', price: 40, icon: <SmoothGourdIcon />, desc: 'Nutritious' },
   { id: 9, name: 'Ridge Gourd', unit: '500gm', price: 40, icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
   { id: 10, name: 'Plain Paneer', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
   { id: 11, name: 'Plain Tofu', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
+  { id: 16, name: 'Bitter Gourd', unit: '500gm', price: 40, icon: <BitterGourdIcon />, desc: 'Healthy' },
  
-
 
 
 
