@@ -222,6 +222,9 @@ const AmaranthusIcon = () => (
 );
 
 
+
+
+
 const GoldenBerryIcon = () => (
   <svg viewBox="0 0 100 100" style={{ width: 40, height: 40, overflow: 'visible' }}>
     {/* The Husk (Back Leaves) */}
@@ -239,6 +242,78 @@ const GoldenBerryIcon = () => (
     
     {/* Leaf Detail Lines */}
     <path d="M30 75 L 40 85 M 70 75 L 60 85" stroke="#8b5e34" strokeWidth="0.5" />
+  </svg>
+);
+
+const SmoothGourdIcon = () => (
+  <svg viewBox="0 0 100 100" style={{ width: 40, height: 40, overflow: 'visible' }}>
+    {/* The Stem - Matching your Ridge Gourd style */}
+    <path 
+      d="M35 15 Q 40 5 45 12" 
+      fill="none" 
+      stroke="#2d4a22" 
+      strokeWidth="3" 
+      strokeLinecap="round" 
+    />
+    
+    {/* The Body - A smooth, slightly tapered cylindrical shape */}
+    <path 
+      d="M40 18 
+         C 55 18, 65 30, 65 55 
+         C 65 85, 55 92, 45 92 
+         C 35 92, 25 85, 25 55 
+         C 25 30, 30 18, 40 18 Z" 
+      fill="#6fa15a" 
+      stroke="#2d4a22" 
+      strokeWidth="2.5" 
+      strokeLinejoin="round" 
+    />
+
+    {/* Subtle light reflection to emphasize the "smooth" skin */}
+    <path 
+      d="M35 30 Q 32 50 35 70" 
+      fill="none" 
+      stroke="white" 
+      strokeWidth="1.5" 
+      strokeLinecap="round" 
+      opacity="0.3"
+    />
+  </svg>
+);
+
+const BottleGourdIcon = () => (
+  <svg viewBox="0 0 100 100" style={{ width: 40, height: 40, overflow: 'visible' }}>
+    {/* The Stem - Curved slightly to the left */}
+    <path 
+      d="M50 18 Q 45 5 38 10" 
+      fill="none" 
+      stroke="#2d4a22" 
+      strokeWidth="3" 
+      strokeLinecap="round" 
+    />
+    
+    {/* The Gourd Body - Smooth, rounded, and slightly cinched in the upper middle */}
+    <path 
+      d="M50 18 
+         C 65 18, 65 35, 58 45 
+         C 75 55, 75 85, 50 85 
+         C 25 85, 25 55, 42 45 
+         C 35 35, 35 18, 50 18 Z" 
+      fill="#8fbc8f" 
+      stroke="#2d4a22" 
+      strokeWidth="2.5" 
+      strokeLinejoin="round" 
+    />
+
+    {/* Subtle highlight for a 3D effect */}
+    <path 
+      d="M45 75 Q 35 70 38 60" 
+      fill="none" 
+      stroke="white" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      opacity="0.4"
+    />
   </svg>
 );
 
@@ -384,14 +459,21 @@ const PRODUCTS = [
   { id: 3, name: 'Strawberry - 1Kg', unit: 'Box (1Kg)', price: 400, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 5, name: 'Tender Coconut', unit: 'Piece', price: 50, icon: <TenderCoconutIcon />, desc: 'Refreshing' },
   { id: 6, name: 'Beetroot', unit: '500gm', price: 35, icon: <BeetrootIcon />, desc: 'Earthy Root' },
-  { id: 7, name: 'Palak', unit: 'Bunch (300g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
+  { id: 7, name: 'Palak', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
   { id: 8, name: 'Goldenberry', unit: '250gm', price: 200, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 9, name: 'Ridge Gourd', unit: '500gm', price: 40, icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
   { id: 10, name: 'Plain Paneer', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
   { id: 11, name: 'Plain Tofu', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
-//  { id: 12, name: 'Test Product', unit: '200g', price: 1, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
+  { id: 12, name: 'Methi Leaves', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
+  { id: 13, name: 'Coriander Leaves', unit: 'Bunch (300g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
+  { id: 14, name: 'Bottle Gourd', unit: '500gm', price: 30, icon: <BottleGourdIcon />, desc: 'Healthy' },
+  { id: 15, name: 'Smooth Gourd', unit: '500gm', price: 40, icon: <SmoothGourdIcon />, desc: 'Nutritious' },
+ 
 
-  
+
+
+
+  //  { id: 12, name: 'Test Product', unit: '200g', price: 1, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
 
   //  { id: 7, name: 'Methi Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
  // { id: 7, name: 'Beetroot Leaves', unit: 'Bunch (150g)', price: 50, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
@@ -418,7 +500,113 @@ const DELIVERY_OPTIONS = [
 
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7cz_Ykzim6EYILS0Fpo5_DJlcJiuO01mefnkqHUGqeui3zd6pRf95oTFJiit3tB6X/exec";
 
-export default function SmartGrocerApp() {
+function TestPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState(null); // null | 'success' | 'failure' | 'error'
+  const [statusMsg, setStatusMsg] = useState('');
+
+  const loadCheckoutScript = () => new Promise((resolve, reject) => {
+    if (window.EaseCheckout) { resolve(); return; }
+    const script = document.createElement('script');
+    script.src = 'https://ebz-static.s3.ap-south-1.amazonaws.com/easecheckout/v2.0.0/easebuzz-checkout-v2.min.js';
+    script.onload = resolve;
+    script.onerror = () => reject(new Error('Failed to load EaseCheckout script'));
+    document.head.appendChild(script);
+  });
+
+  const handlePay = async () => {
+    setIsSubmitting(true);
+    setStatus(null);
+    setStatusMsg('');
+    try {
+      // Step 1: Apps Script calls Easebuzz backend and returns access_key
+      const qs = new URLSearchParams({
+        action: 'get_easebuzz_access_key',
+        amount: '1.00',
+        firstname: 'Test User',
+        phone: '9999999999',
+        udf1: 'Test Payment',
+        cb: Date.now(),
+      });
+      const res = await fetch(`${GOOGLE_SCRIPT_URL}?${qs}`, { credentials: 'omit' });
+      const { key, access_key, status: apiStatus } = await res.json();
+
+      if (!access_key || apiStatus !== 1) throw new Error('Could not get payment token. Check Apps Script logs.');
+
+      // Step 2: Load EaseCheckout JS from CDN
+      await loadCheckoutScript();
+
+      // Step 3: Open payment overlay — no redirect, callback fires on completion
+      const checkout = new window.EaseCheckout(key, 'prod');
+      checkout.initiatePayment({
+        access_key,
+        onResponse: (data) => {
+          setIsSubmitting(false);
+          if (data.status === 'success') {
+            setStatus('success');
+          } else {
+            setStatus('failure');
+            setStatusMsg(data.error_Message || data.status || '');
+          }
+        },
+        theme: '#059669',
+      });
+    } catch (e) {
+      setIsSubmitting(false);
+      setStatus('error');
+      setStatusMsg(e.message);
+    }
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#f5f5f4', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', fontFamily: 'system-ui, sans-serif' }}>
+      <div style={{ background: 'white', borderRadius: 20, padding: '2rem', maxWidth: 360, width: '100%', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+        <h2 style={{ margin: '0 0 0.25rem', color: '#1c1917', fontSize: '1.25rem', fontWeight: 700 }}>Payment Test</h2>
+        <p style={{ margin: '0 0 1.5rem', color: '#78716c', fontSize: '0.875rem' }}>₹1 test charge — iframe mode, no redirect</p>
+
+        {status === 'success' && (
+          <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: 12, padding: '1.5rem', textAlign: 'center', marginBottom: '1rem' }}>
+            <div style={{ fontSize: '2.5rem' }}>✅</div>
+            <p style={{ margin: '0.5rem 0 0', fontWeight: 700, color: '#065f46' }}>Payment Successful!</p>
+          </div>
+        )}
+
+        {(status === 'failure' || status === 'error') && (
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 12, padding: '1.5rem', textAlign: 'center', marginBottom: '1rem' }}>
+            <div style={{ fontSize: '2.5rem' }}>❌</div>
+            <p style={{ margin: '0.5rem 0 0', fontWeight: 700, color: '#991b1b' }}>{status === 'error' ? 'Error' : 'Payment Failed'}</p>
+            {statusMsg && <p style={{ margin: '0.25rem 0 0', fontSize: '0.8rem', color: '#b91c1c' }}>{statusMsg}</p>}
+          </div>
+        )}
+
+        {!status && (
+          <button
+            onClick={handlePay}
+            disabled={isSubmitting}
+            style={{ width: '100%', padding: '0.875rem', background: isSubmitting ? '#6ee7b7' : '#059669', color: 'white', border: 'none', borderRadius: 12, fontSize: '1rem', fontWeight: 700, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
+          >
+            {isSubmitting ? 'Opening payment...' : 'Pay ₹1 via Easebuzz'}
+          </button>
+        )}
+
+        {status && (
+          <button
+            onClick={() => { setStatus(null); setStatusMsg(''); }}
+            style={{ width: '100%', padding: '0.75rem', background: 'none', border: '1px solid #e7e5e4', borderRadius: 12, fontSize: '0.875rem', color: '#78716c', cursor: 'pointer', marginTop: '0.75rem' }}
+          >
+            Try again
+          </button>
+        )}
+
+        <p style={{ margin: '1.25rem 0 0', fontSize: '0.75rem', color: '#a8a29e', textAlign: 'center' }}>
+          <a href="/" style={{ color: '#059669', textDecoration: 'none' }}>← Back to main app</a>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function SmartGrocerApp() {
   const [view, setView] = useState('landing');
   const [modal, setModal] = useState({ isOpen: false, type: 'alert', message: '', title: '', onConfirm: null, isLoading: false });
 
@@ -1243,4 +1431,9 @@ export default function SmartGrocerApp() {
       )}
     </div>
   );
+}
+
+export default function App() {
+  if (window.location.pathname === '/test') return <TestPage />;
+  return <SmartGrocerApp />;
 }
