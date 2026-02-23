@@ -838,7 +838,6 @@ function SmartGrocerApp() {
     try {
       const total = calculateTotal();
       const deliveryLabel = DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label || '';
-      const udf1 = `${deliveryLabel}${aptNumber ? ' - ' + aptNumber : ''}`.replace(/[^a-zA-Z0-9 \-]/g, '').substring(0, 100);
       const safeName = customerName.replace(/[^a-zA-Z0-9 ]/g, '').substring(0, 50) || 'Customer';
       const itemsString = Object.entries(cart).map(([id, qty]) => {
         const product = PRODUCTS.find(p => p.id === parseInt(id));
@@ -846,15 +845,11 @@ function SmartGrocerApp() {
       }).join(', ');
 
       // Get access_key from Apps Script (server-side hash + Easebuzz API call)
-      const qs = new URLSearchParams({
-        action: 'get_easebuzz_access_key',
-        amount: total.toString(),
-        firstname: safeName,
-        phone: mobileNumber,
-        udf1: udf1.substring(0, 100),
-        cb: Date.now(),
-      });
-      const res = await fetch(`${GOOGLE_SCRIPT_URL}?${qs}`, { credentials: 'omit' });
+      // udf1 intentionally omitted — delivery info stored in Sheets; avoids Easebuzz hash encoding issues
+      const res = await fetch(
+        `${GOOGLE_SCRIPT_URL}?action=get_easebuzz_access_key&amount=${encodeURIComponent(total.toString())}&firstname=${encodeURIComponent(safeName)}&phone=${encodeURIComponent(mobileNumber)}&cb=${Date.now()}`,
+        { credentials: 'omit' }
+      );
       const apiResponse = await res.json();
       const { key, access_key, txnid, status: apiStatus } = apiResponse;
 
