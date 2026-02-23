@@ -533,111 +533,6 @@ const DELIVERY_OPTIONS = [
 
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7cz_Ykzim6EYILS0Fpo5_DJlcJiuO01mefnkqHUGqeui3zd6pRf95oTFJiit3tB6X/exec";
 
-function TestPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [status, setStatus] = useState(null); // null | 'success' | 'failure' | 'error'
-  const [statusMsg, setStatusMsg] = useState('');
-
-  const loadCheckoutScript = () => new Promise((resolve, reject) => {
-    if (window.EasebuzzCheckout) { resolve(); return; }
-    const script = document.createElement('script');
-    script.src = 'https://ebz-static.s3.ap-south-1.amazonaws.com/easecheckout/easebuzz-checkout.js';
-    script.onload = resolve;
-    script.onerror = () => reject(new Error('Failed to load EasebuzzCheckout script'));
-    document.head.appendChild(script);
-  });
-
-  const handlePay = async () => {
-    setIsSubmitting(true);
-    setStatus(null);
-    setStatusMsg('');
-    try {
-      // Step 1: Apps Script calls Easebuzz backend and returns access_key
-      const qs = new URLSearchParams({
-        action: 'get_easebuzz_access_key',
-        amount: '1.00',
-        firstname: 'Test User',
-        phone: '9999999999',
-        udf1: 'Test Payment',
-        cb: Date.now(),
-      });
-      const res = await fetch(`${GOOGLE_SCRIPT_URL}?${qs}`, { credentials: 'omit' });
-      const { key, access_key, status: apiStatus } = await res.json();
-
-      if (!access_key || apiStatus !== 1) throw new Error('Could not get payment token. Check Apps Script logs.');
-
-      // Step 2: Load EaseCheckout JS from CDN
-      await loadCheckoutScript();
-
-      // Step 3: Open payment overlay — no redirect, callback fires on completion
-      const checkout = new window.EasebuzzCheckout(key, 'prod');
-      checkout.initiatePayment({
-        access_key,
-        onResponse: (data) => {
-          setIsSubmitting(false);
-          if (data.status === 'success') {
-            setStatus('success');
-          } else {
-            setStatus('failure');
-            setStatusMsg(data.error_Message || data.status || '');
-          }
-        },
-        theme: '#059669',
-      });
-    } catch (e) {
-      setIsSubmitting(false);
-      setStatus('error');
-      setStatusMsg(e.message);
-    }
-  };
-
-  return (
-    <div style={{ minHeight: '100vh', background: '#f5f5f4', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', fontFamily: 'system-ui, sans-serif' }}>
-      <div style={{ background: 'white', borderRadius: 20, padding: '2rem', maxWidth: 360, width: '100%', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
-        <h2 style={{ margin: '0 0 0.25rem', color: '#1c1917', fontSize: '1.25rem', fontWeight: 700 }}>Payment Test</h2>
-        <p style={{ margin: '0 0 1.5rem', color: '#78716c', fontSize: '0.875rem' }}>₹1 test charge — iframe mode, no redirect</p>
-
-        {status === 'success' && (
-          <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: 12, padding: '1.5rem', textAlign: 'center', marginBottom: '1rem' }}>
-            <div style={{ fontSize: '2.5rem' }}>✅</div>
-            <p style={{ margin: '0.5rem 0 0', fontWeight: 700, color: '#065f46' }}>Payment Successful!</p>
-          </div>
-        )}
-
-        {(status === 'failure' || status === 'error') && (
-          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 12, padding: '1.5rem', textAlign: 'center', marginBottom: '1rem' }}>
-            <div style={{ fontSize: '2.5rem' }}>❌</div>
-            <p style={{ margin: '0.5rem 0 0', fontWeight: 700, color: '#991b1b' }}>{status === 'error' ? 'Error' : 'Payment Failed'}</p>
-            {statusMsg && <p style={{ margin: '0.25rem 0 0', fontSize: '0.8rem', color: '#b91c1c' }}>{statusMsg}</p>}
-          </div>
-        )}
-
-        {!status && (
-          <button
-            onClick={handlePay}
-            disabled={isSubmitting}
-            style={{ width: '100%', padding: '0.875rem', background: isSubmitting ? '#6ee7b7' : '#059669', color: 'white', border: 'none', borderRadius: 12, fontSize: '1rem', fontWeight: 700, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
-          >
-            {isSubmitting ? 'Opening payment...' : 'Pay ₹1 via Easebuzz'}
-          </button>
-        )}
-
-        {status && (
-          <button
-            onClick={() => { setStatus(null); setStatusMsg(''); }}
-            style={{ width: '100%', padding: '0.75rem', background: 'none', border: '1px solid #e7e5e4', borderRadius: 12, fontSize: '0.875rem', color: '#78716c', cursor: 'pointer', marginTop: '0.75rem' }}
-          >
-            Try again
-          </button>
-        )}
-
-        <p style={{ margin: '1.25rem 0 0', fontSize: '0.75rem', color: '#a8a29e', textAlign: 'center' }}>
-          <a href="/" style={{ color: '#059669', textDecoration: 'none' }}>← Back to main app</a>
-        </p>
-      </div>
-    </div>
-  );
-}
 
 function SmartGrocerApp() {
   const [view, setView] = useState('landing');
@@ -874,7 +769,7 @@ function SmartGrocerApp() {
       const apiResponse = await res.json();
       const { key, access_key, txnid, status: apiStatus } = apiResponse;
 
-      if (!access_key || apiStatus !== 1) throw new Error('API response: ' + JSON.stringify(apiResponse));
+      if (!access_key || apiStatus !== 1) throw new Error(apiResponse.eb_error || 'Could not get payment token. Please try again.');
 
       // Step 1: Create a PENDING order row in Sheets immediately (before overlay opens).
       // The Apps Script webhook will update this row the moment Easebuzz confirms payment —
@@ -1534,6 +1429,5 @@ function SmartGrocerApp() {
 }
 
 export default function App() {
-  if (window.location.pathname === '/test') return <TestPage />;
   return <SmartGrocerApp />;
 }
