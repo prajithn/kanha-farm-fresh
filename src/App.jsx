@@ -529,6 +529,7 @@ const DELIVERY_OPTIONS = [
   { id: 'tranquil', label: 'Prestige Tranquil', requiresApt: true },
   { id: 'pbel', label: 'PBEL City', requiresApt: true },
   { id: 'mtv', label: 'Maple Town Villas', requiresApt: true },
+  { id: 'aristos', label: 'Poulomi Aristos', requiresApt: true },
   { id: 'pickup', label: 'Store pick up (Malabar Natives)', requiresApt: false },
 //  { id: 'gc', label: 'Pick up (Gachibowli Meditation Centre)', requiresApt: false },
 ];
@@ -1370,21 +1371,30 @@ function SmartGrocerApp() {
             <div ref={deliveryRef}>
               <h3 style={s.sectionTitle}><span style={s.step}>2</span> Delivery Details</h3>
               <div style={s.card}>
-                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', marginBottom: '1rem' }}>Select Location</p>
-                {DELIVERY_OPTIONS.map(option => (
-                  <div key={option.id} style={{ ...s.deliveryOption, backgroundColor: deliveryType === option.id ? '#ecfdf5' : '#fafaf9', borderColor: deliveryType === option.id ? '#059669' : 'transparent' }} onClick={() => setDeliveryType(option.id)}>
-                    <div style={{ width: '1.2rem', height: '1.2rem', borderRadius: '50%', border: '2px solid #e7e5e4', marginRight: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderColor: deliveryType === option.id ? '#059669' : '#e7e5e4' }}>
-                      {deliveryType === option.id && <div style={{ width: '0.6rem', height: '0.6rem', backgroundColor: '#059669', borderRadius: '50%' }}></div>}
-                    </div>
-                    <span style={{ fontSize: '0.9rem', fontWeight: 500, color: deliveryType === option.id ? '#064e3b' : '#44403c' }}>{option.label}</span>
-                    {option.requiresApt && <MapPin size={16} style={{ marginLeft: 'auto', color: '#a8a29e' }} />}
-                  </div>
-                ))}
-                
+                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Select Location</p>
+                <select
+                  value={deliveryType}
+                  onChange={e => { setDeliveryType(e.target.value); setAptNumber(''); }}
+                  style={{ width: '100%', padding: '0.75rem 2.5rem 0.75rem 1rem', border: '1px solid #e7e5e4', borderRadius: '12px', fontSize: '1rem', boxSizing: 'border-box', outline: 'none', backgroundColor: 'white', color: deliveryType ? '#1c1917' : '#a8a29e', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2378716c\' stroke-width=\'2\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
+                >
+                  <option value="">— Choose a location —</option>
+                  {DELIVERY_OPTIONS.map(option => (
+                    <option key={option.id} value={option.id}>{option.label}</option>
+                  ))}
+                </select>
+
                 {DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt && (
                   <div style={{ marginTop: '1rem' }}>
-                     <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Block & Flat Number</p>
-                     <input type="text" placeholder="e.g. A-101" value={aptNumber} onChange={e => setAptNumber(e.target.value)} style={s.input} />
+                    <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Block & Flat Number</p>
+                    <input
+                      type="text"
+                      placeholder="e.g. A-101"
+                      value={aptNumber}
+                      onChange={e => setAptNumber(e.target.value.slice(0, 15))}
+                      maxLength={15}
+                      style={s.input}
+                    />
+                    <p style={{ fontSize: '0.7rem', color: '#a8a29e', marginTop: '0.25rem', textAlign: 'right' }}>{aptNumber.length}/15</p>
                   </div>
                 )}
               </div>
