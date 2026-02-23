@@ -910,14 +910,7 @@ function SmartGrocerApp() {
           setIsSubmitting(false);
 
           if (data.status === 'success') {
-            // Webhook (surl) already updated the Sheets row instantly.
-            // This client-side call is a fallback — it updates the same row (no duplicate).
-            const paymentRef = data.easepayid || data.mihpayid || '';
-            fetch(
-              `${GOOGLE_SCRIPT_URL}?action=confirm_payment&txnid=${encodeURIComponent(txnid)}&ref=${encodeURIComponent(paymentRef)}&cb=${Date.now()}`,
-              { credentials: 'omit' }
-            ).catch(() => {});
-
+            // Sheet update handled by Vercel webhook (server-to-server) — no client call needed.
             setOrderSummary({ total, deliveryLabel });
             setOrderDate(new Date());
             setOrderPlaced(true);

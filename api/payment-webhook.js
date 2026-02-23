@@ -3,6 +3,8 @@
 const SCRIPT_URL =
   'https://script.google.com/macros/s/AKfycbz7cz_Ykzim6EYILS0Fpo5_DJlcJiuO01mefnkqHUGqeui3zd6pRf95oTFJiit3tB6X/exec';
 
+const WEBHOOK_SECRET = 'wh_kff_8x3q'; // server-side only — never sent to browser
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
@@ -14,10 +16,11 @@ export default async function handler(req, res) {
 
   console.log('Easebuzz webhook received:', { txnid, status, paymentRef });
 
-  if (txnid) {
+  if (txnid && status === 'success') {
     try {
       await fetch(
         `${SCRIPT_URL}?action=confirm_payment` +
+        `&webhook_secret=${WEBHOOK_SECRET}` +
         `&txnid=${encodeURIComponent(txnid)}` +
         `&ref=${encodeURIComponent(paymentRef)}` +
         `&status=${encodeURIComponent(status)}` +
