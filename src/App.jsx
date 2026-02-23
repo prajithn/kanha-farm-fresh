@@ -937,7 +937,7 @@ function SmartGrocerApp() {
   const fetchAdminOrders = async () => {
     setAdminLoading(true);
     try {
-      const response = await fetch(`${GOOGLE_SCRIPT_URL}?v=${new Date().getTime()}`, { credentials: 'omit' }); 
+      const response = await fetch(`${GOOGLE_SCRIPT_URL}?secret=kff_secret_9x7z&v=${new Date().getTime()}`, { credentials: 'omit' });
       const data = await response.json();
       setAdminOrders(Array.isArray(data) ? data.reverse() : []);
     } catch (error) { setModal({ isOpen: true, type: 'alert', message: "Failed to load orders." }); } 
@@ -949,7 +949,7 @@ function SmartGrocerApp() {
     setModal({ isOpen: true, type: 'confirm', message: `Mark delivery done for ${order.customerName}?`, onConfirm: async () => {
       setAdminOrders(prev => prev.map(o => o.rowIndex === order.rowIndex ? { ...o, status: 'Updating...', deliveryDate: new Date().toISOString() } : o));
       try {
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=mark_delivered&rowIndex=${order.rowIndex}&cb=${Date.now()}`, { credentials: 'omit' });
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=mark_delivered&secret=kff_secret_9x7z&rowIndex=${order.rowIndex}&cb=${Date.now()}`, { credentials: 'omit' });
         const result = await response.json();
         if (result.result === 'success') { fetchAdminOrders(); } else { throw new Error(); }
       } catch (error) { fetchAdminOrders(); }
