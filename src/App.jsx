@@ -863,7 +863,7 @@ function SmartGrocerApp() {
       // confirmation server-to-server the instant payment completes
       const webhookUrl = window.location.origin + '/api/payment-webhook';
       const res = await fetch(
-        `${GOOGLE_SCRIPT_URL}?action=get_easebuzz_access_key&amount=${encodeURIComponent(total.toString())}&firstname=${encodeURIComponent(safeName)}&phone=${encodeURIComponent(mobileNumber)}&webhookUrl=${encodeURIComponent(webhookUrl)}&cb=${Date.now()}`,
+        `${GOOGLE_SCRIPT_URL}?action=get_easebuzz_access_key&secret=kff_secret_9x7z&amount=${encodeURIComponent(total.toString())}&firstname=${encodeURIComponent(safeName)}&phone=${encodeURIComponent(mobileNumber)}&webhookUrl=${encodeURIComponent(webhookUrl)}&cb=${Date.now()}`,
         { credentials: 'omit' }
       );
       const apiResponse = await res.json();
