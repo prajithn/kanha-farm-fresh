@@ -17,8 +17,7 @@ const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'kanha@123';
 const UPI_ID = 'paytm.s18fahk@pty';
 const MERCHANT_NAME = 'Kanha Farm Fresh';
-const EASEBUZZ_PAYMENT_URL = 'https://pay.easebuzz.in/pay/initiateLink';
-const USE_EASEBUZZ = false; // toggle: true = Easebuzz gateway, false = manual UPI flow
+const USE_EASEBUZZ = true; // Easebuzz iframe checkout (no redirect)
 
 // --- STYLES (STRICT INLINE - NO CLASSES) ---
 const s = {
@@ -486,21 +485,35 @@ const Modal = ({ isOpen, type, message, title, onClose, onConfirm, isLoading }) 
 
 // --- DATA ---
 const PRODUCTS = [
+
+  //Fruits
   { id: 1, name: 'Strawberry - 200gm', unit: 'Box (200g)', price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 2, name: 'Strawberry - 500gm', unit: 'Box (500g)', price: 225, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 3, name: 'Strawberry - 1Kg', unit: 'Box (1Kg)', price: 400, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 4, name: 'Goldenberry', unit: '250gm', price: 200, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 5, name: 'Tender Coconut', unit: 'Piece', price: 50, icon: <TenderCoconutIcon />, desc: 'Refreshing' },
-  { id: 6, name: 'Beetroot', unit: '500gm', price: 35, icon: <BeetrootIcon />, desc: 'Earthy Root' },
-  { id: 7, name: 'Palak', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
-  { id: 8, name: 'Methi Leaves', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
-  { id: 9, name: 'Coriander Leaves', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
-  { id: 10, name: 'Bitter Gourd', unit: '500gm', price: 40, icon: <BitterGourdIcon />, desc: 'Healthy' },
-  { id: 11, name: 'Bottle Gourd', unit: '500gm', price: 30, icon: <BottleGourdIcon />, desc: 'Healthy' },
-  { id: 12, name: 'Smooth Gourd', unit: '500gm', price: 40, icon: <SmoothGourdIcon />, desc: 'Nutritious' },
-  { id: 13, name: 'Ridge Gourd', unit: '500gm', price: 40, icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
-  { id: 14, name: 'Plain Paneer', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
-  { id: 15, name: 'Plain Tofu', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
+
+  // leaves
+  { id: 11, name: 'Palak', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
+  { id: 12, name: 'Methi Leaves', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
+  { id: 13, name: 'Coriander Leaves', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
+ 
+  //vegs
+  { id: 21, name: 'Beetroot', unit: '500gm', price: 35, icon: <BeetrootIcon />, desc: 'Earthy Root' },
+  { id: 22, name: 'Bitter Gourd', unit: '500gm', price: 40, icon: <BitterGourdIcon />, desc: 'Healthy' },
+  { id: 23, name: 'Bottle Gourd', unit: '500gm', price: 30, icon: <BottleGourdIcon />, desc: 'Healthy' },
+  { id: 24, name: 'Smooth Gourd', unit: '500gm', price: 40, icon: <SmoothGourdIcon />, desc: 'Nutritious' },
+  { id: 25, name: 'Ridge Gourd', unit: '500gm', price: 40, icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
+ 
+  // paneer
+  { id: 31, name: 'Plain Paneer', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
+  { id: 32, name: 'Sundried Tomato & Basil flavoured Paneer', unit: '200g', price: 149, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
+  { id: 33, name: 'Mint & Chilli flavoured Paneer', unit: '200g', price: 149, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
+  { id: 34, name: 'Pepper flavoured Paneer', unit: '200g', price: 149, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
+  { id: 35, name: 'Plain Tofu', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
+ 
+ //test
+//  { id: 100, name: 'Test Item', unit: '200g', price: 1, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
  
 
 ];
@@ -527,11 +540,11 @@ function TestPage() {
   const [statusMsg, setStatusMsg] = useState('');
 
   const loadCheckoutScript = () => new Promise((resolve, reject) => {
-    if (window.EaseCheckout) { resolve(); return; }
+    if (window.EasebuzzCheckout) { resolve(); return; }
     const script = document.createElement('script');
-    script.src = 'https://ebz-static.s3.ap-south-1.amazonaws.com/easecheckout/v2.0.0/easebuzz-checkout-v2.min.js';
+    script.src = 'https://ebz-static.s3.ap-south-1.amazonaws.com/easecheckout/easebuzz-checkout.js';
     script.onload = resolve;
-    script.onerror = () => reject(new Error('Failed to load EaseCheckout script'));
+    script.onerror = () => reject(new Error('Failed to load EasebuzzCheckout script'));
     document.head.appendChild(script);
   });
 
@@ -558,7 +571,7 @@ function TestPage() {
       await loadCheckoutScript();
 
       // Step 3: Open payment overlay — no redirect, callback fires on completion
-      const checkout = new window.EaseCheckout(key, 'prod');
+      const checkout = new window.EasebuzzCheckout(key, 'prod');
       checkout.initiatePayment({
         access_key,
         onResponse: (data) => {
@@ -811,65 +824,83 @@ function SmartGrocerApp() {
     }
   };
 
+  const loadCheckoutScript = () => new Promise((resolve, reject) => {
+    if (window.EasebuzzCheckout) { resolve(); return; }
+    const script = document.createElement('script');
+    script.src = 'https://ebz-static.s3.ap-south-1.amazonaws.com/easecheckout/easebuzz-checkout.js';
+    script.onload = resolve;
+    script.onerror = () => reject(new Error('Failed to load payment SDK'));
+    document.head.appendChild(script);
+  });
+
   const initiateEasebuzzPayment = async () => {
     setIsSubmitting(true);
     try {
       const total = calculateTotal();
       const deliveryLabel = DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label || '';
-      const udf1 = `${deliveryLabel}${aptNumber ? ' - ' + aptNumber : ''}`;
+      const udf1 = `${deliveryLabel}${aptNumber ? ' - ' + aptNumber : ''}`.replace(/[^a-zA-Z0-9 \-]/g, '').substring(0, 100);
       const safeName = customerName.replace(/[^a-zA-Z0-9 ]/g, '').substring(0, 50) || 'Customer';
+      const itemsString = Object.entries(cart).map(([id, qty]) => {
+        const product = PRODUCTS.find(p => p.id === parseInt(id));
+        return `${product.name} (${qty})`;
+      }).join(', ');
 
-      // Get hash from Apps Script (server-side, keeps salt off client)
+      // Get access_key from Apps Script (server-side hash + Easebuzz API call)
       const qs = new URLSearchParams({
-        action: 'generate_payment_hash',
+        action: 'get_easebuzz_access_key',
         amount: total.toString(),
         firstname: safeName,
         phone: mobileNumber,
         udf1: udf1.substring(0, 100),
         cb: Date.now(),
       });
-      const response = await fetch(`${GOOGLE_SCRIPT_URL}?${qs}`, { credentials: 'omit' });
-      const payData = await response.json();
+      const res = await fetch(`${GOOGLE_SCRIPT_URL}?${qs}`, { credentials: 'omit' });
+      const apiResponse = await res.json();
+      const { key, access_key, txnid, status: apiStatus } = apiResponse;
 
-      // Save order snapshot to sessionStorage before leaving the page
-      const itemsString = Object.entries(cart).map(([id, qty]) => {
-        const product = PRODUCTS.find(p => p.id === parseInt(id));
-        return `${product.name} (${qty})`;
-      }).join(', ');
-      sessionStorage.setItem('kff_pending_order', JSON.stringify({
-        customerName,
-        mobileNumber,
-        deliveryType,
-        deliveryLabel,
-        aptNumber,
-        items: itemsString,
-        total,
-        txnid: payData.txnid,
-      }));
+      if (!access_key || apiStatus !== 1) throw new Error('API response: ' + JSON.stringify(apiResponse));
 
-      // Build success / failure redirect URLs
-      const base = window.location.origin + window.location.pathname;
-      const surl = `${base}?payment=success&txnid=${payData.txnid}`;
-      const furl = `${base}?payment=failure`;
-
-      // Programmatically POST to Easebuzz (form submit navigates the page)
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = EASEBUZZ_PAYMENT_URL;
-      const fields = { ...payData, action: '1', surl, furl };
-      Object.entries(fields).forEach(([k, v]) => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = k;
-        input.value = v;
-        form.appendChild(input);
+      // Load EasebuzzCheckout SDK and open payment overlay (no page redirect)
+      await loadCheckoutScript();
+      const checkout = new window.EasebuzzCheckout(key, 'prod');
+      checkout.initiatePayment({
+        access_key,
+        onResponse: async (data) => {
+          setIsSubmitting(false);
+          const paymentRef = data.easepayid || data.mihpayid || '';
+          if (data.status === 'success') {
+            // Submit order to Google Sheets; store payment info in Screenshot Link column
+            const paymentNote = `PAID | TxnID: ${txnid} | Ref: ${paymentRef}`;
+            try {
+              await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify({
+                  action: 'create',
+                  customerName,
+                  mobileNumber,
+                  deliveryType: deliveryLabel,
+                  aptNumber: aptNumber ? "'" + aptNumber : '',
+                  items: itemsString,
+                  total,
+                  image: paymentNote,
+                  imageName: 'easebuzz',
+                }),
+              });
+            } catch { /* show confirmation regardless */ }
+            setOrderSummary({ total, deliveryLabel });
+            setOrderDate(new Date());
+            setOrderPlaced(true);
+            window.scrollTo(0, 0);
+          } else if (data.status !== 'userCancelled') {
+            setModal({ isOpen: true, type: 'alert', title: 'Payment Failed', message: (data.error_Message || 'Payment was not completed.') + ' Please try again.' });
+          }
+        },
+        theme: '#059669',
       });
-      document.body.appendChild(form);
-      form.submit();
-      // Note: page navigates away — no need to reset isSubmitting
-    } catch {
+    } catch (e) {
       setIsSubmitting(false);
-      setModal({ isOpen: true, type: 'alert', title: 'Error', message: 'Could not initiate payment. Please try manual UPI or try again.' });
+      setModal({ isOpen: true, type: 'alert', title: 'Error', message: e.message || 'Could not initiate payment. Please try again.' });
     }
   };
 
@@ -1241,7 +1272,7 @@ function SmartGrocerApp() {
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           {/* Header */}
           <div style={s.header}>
-            <button onClick={() => { setShowPayment(false); setPaymentStep('idle'); setPaymentFile(null); }} style={{ background: 'none', border: 'none', color: 'white', marginRight: '0.5rem', cursor: 'pointer' }}>
+            <button onClick={() => { setShowPayment(false); setPaymentFile(null); }} style={{ background: 'none', border: 'none', color: 'white', marginRight: '0.5rem', cursor: 'pointer' }}>
               <ArrowRight style={{ transform: 'rotate(180deg)' }} />
             </button>
             <h2 style={{ fontWeight: 700, fontSize: '1.25rem', margin: 0 }}>Payment</h2>
