@@ -42,9 +42,9 @@ const s = {
   header: {
     backgroundColor: '#047857',
     color: 'white',
-    padding: '1.5rem 1rem 2.5rem',
+    padding: '1rem 1rem 2rem',
     borderRadius: '0 0 24px 24px',
-    position: 'relative', 
+    position: 'relative',
     zIndex: 10,
     display: 'flex',
     alignItems: 'center',
@@ -485,41 +485,42 @@ const Modal = ({ isOpen, type, message, title, onClose, onConfirm, isLoading }) 
 // --- DATA ---
 const PRODUCTS = [
 
-  //Fruits
-  { id: 1, name: 'Strawberry - 200gm', unit: 'Box (200g)', price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
-  { id: 2, name: 'Strawberry - 500gm', unit: 'Box (500g)', price: 225, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
-  { id: 3, name: 'Strawberry - 1Kg', unit: 'Box (1Kg)', price: 400, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
-  { id: 4, name: 'Goldenberry', unit: '250gm', price: 200, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
-  { id: 5, name: 'Tender Coconut', unit: 'Piece', price: 50, icon: <TenderCoconutIcon />, desc: 'Refreshing' },
-  { id: 6, name: 'Guava', unit: '1 Kg', price: 80, icon: <span style={{ fontSize: '2rem' }}>🍈</span>, desc: 'Fresh & Sweet' },
-  { id: 7, name: 'Banana - Karpooravalli', unit: '1 Kg', price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
+  // cat: 'fruits'
+  { id: 1,  cat: 'fruits', name: 'Strawberry - 200gm',                       unit: 'Box (200g)',   price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
+  { id: 2,  cat: 'fruits', name: 'Strawberry - 500gm',                       unit: 'Box (500g)',   price: 225, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
+  { id: 3,  cat: 'fruits', name: 'Strawberry - 1Kg',                         unit: 'Box (1Kg)',    price: 400, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
+  { id: 4,  cat: 'fruits', name: 'Goldenberry',                              unit: '250gm',        price: 200, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
+  { id: 5,  cat: 'fruits', name: 'Tender Coconut',                           unit: 'Piece',        price: 50,  icon: <TenderCoconutIcon />, desc: 'Refreshing' },
+  { id: 6,  cat: 'fruits', name: 'Guava',                                    unit: '1 Kg',         price: 80,  icon: <span style={{ fontSize: '2rem' }}>🍈</span>, desc: 'Fresh & Sweet' },
+  { id: 7,  cat: 'fruits', name: 'Banana - Karpooravalli',                   unit: '1 Kg',         price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
 
-  // leaves
-  { id: 11, name: 'Palak', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
-  { id: 12, name: 'Methi Leaves', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
-  { id: 13, name: 'Coriander Leaves', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
- 
-  //vegs
-  { id: 21, name: 'Beetroot', unit: '500gm', price: 35, icon: <BeetrootIcon />, desc: 'Earthy Root' },
-  { id: 22, name: 'Bitter Gourd', unit: '500gm', price: 40, icon: <BitterGourdIcon />, desc: 'Healthy' },
-  { id: 23, name: 'Bottle Gourd', unit: '500gm', price: 30, icon: <BottleGourdIcon />, desc: 'Healthy' },
-  { id: 24, name: 'Smooth Gourd', unit: '500gm', price: 40, icon: <SmoothGourdIcon />, desc: 'Nutritious' },
-  { id: 25, name: 'Ridge Gourd', unit: '500gm', price: 40, icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
- 
-  // paneer
-  { id: 31, name: 'Plain Paneer', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
-  { id: 32, name: 'Sundried Tomato & Basil flavoured Paneer', unit: '200g', price: 149, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
-  { id: 33, name: 'Mint & Chilli flavoured Paneer', unit: '200g', price: 149, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
-  { id: 34, name: 'Pepper flavoured Paneer', unit: '200g', price: 149, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
-  { id: 35, name: 'Plain Tofu', unit: '200g', price: 119, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
- 
- //test
-//  { id: 100, name: 'Test Item', unit: '200g', price: 1, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
- 
+  // cat: 'greens'
+  { id: 11, cat: 'greens', name: 'Palak',                                    unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
+  { id: 12, cat: 'greens', name: 'Methi Leaves',                             unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
+  { id: 13, cat: 'greens', name: 'Coriander Leaves',                         unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
+
+  // cat: 'vegs'
+  { id: 21, cat: 'vegs',   name: 'Beetroot',                                 unit: '500gm',        price: 35,  icon: <BeetrootIcon />, desc: 'Earthy Root' },
+  { id: 22, cat: 'vegs',   name: 'Bitter Gourd',                             unit: '500gm',        price: 40,  icon: <BitterGourdIcon />, desc: 'Healthy' },
+  { id: 23, cat: 'vegs',   name: 'Bottle Gourd',                             unit: '500gm',        price: 30,  icon: <BottleGourdIcon />, desc: 'Healthy' },
+  { id: 24, cat: 'vegs',   name: 'Smooth Gourd',                             unit: '500gm',        price: 40,  icon: <SmoothGourdIcon />, desc: 'Nutritious' },
+  { id: 25, cat: 'vegs',   name: 'Ridge Gourd',                              unit: '500gm',        price: 40,  icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
+
+  // cat: 'dairy'
+  { id: 31, cat: 'dairy',  name: 'Plain Paneer',                             unit: '200g',         price: 119, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
+  { id: 32, cat: 'dairy',  name: 'Sundried Tomato & Basil flavoured Paneer', unit: '200g',         price: 149, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
+  { id: 33, cat: 'dairy',  name: 'Mint & Chilli flavoured Paneer',           unit: '200g',         price: 149, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
+  { id: 34, cat: 'dairy',  name: 'Pepper flavoured Paneer',                  unit: '200g',         price: 149, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
+  { id: 35, cat: 'dairy',  name: 'Plain Tofu',                               unit: '200g',         price: 119, icon: <span style={{ fontSize: '2rem' }}>🧊</span>, desc: 'Lean & Vegan' },
 
 ];
 
-
+const CATEGORIES = [
+  { key: 'fruits', label: 'Fruits',       emoji: '🍓', iconBg: '#ffe4ef' },
+  { key: 'greens', label: 'Fresh Greens', emoji: '🥬', iconBg: '#dcfce7' },
+  { key: 'vegs',   label: 'Vegetables',   emoji: '🥦', iconBg: '#fed7aa' },
+  { key: 'dairy',  label: 'Dairy & More', emoji: '🧀', iconBg: '#fef3c7' },
+];
 
 const DELIVERY_OPTIONS = [
   { id: 'vihanga', label: 'My Home Vihanga', requiresApt: true },
@@ -1333,10 +1334,16 @@ function SmartGrocerApp() {
       ) : (
         <>
           <div style={s.header}>
-            <div style={{ backgroundColor: 'white', color: '#059669', padding: '0.4rem', borderRadius: '8px', display: 'flex' }}><Leaf size={20} fill="currentColor" /></div>
+            <div style={{ backgroundColor: 'white', color: '#059669', padding: '0.5rem', borderRadius: '10px', display: 'flex', flexShrink: 0 }}>
+              <Leaf size={24} fill="currentColor" />
+            </div>
             <div>
-              <h1 style={{ margin: 0, fontSize: '1.25rem', lineHeight: 1 }}>Kanha</h1>
-              <span style={{ fontSize: '0.7rem', opacity: 0.9, letterSpacing: '1px' }}>FARM FRESH</span>
+              <h1 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, lineHeight: 1.1, color: 'white' }}>Kanha Farm Fresh</h1>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.25rem' }}>
+                <span style={{ fontSize: '0.65rem', color: '#6ee7b7', fontWeight: 700, letterSpacing: '0.3px' }}>Vanashanti FPO</span>
+                <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.55rem' }}>•</span>
+                <span style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.6)', letterSpacing: '0.3px' }}>100% Organic</span>
+              </div>
             </div>
           </div>
           
@@ -1347,23 +1354,48 @@ function SmartGrocerApp() {
             <div ref={productsRef} style={{ paddingTop: '2rem' }}>
               <h3 style={s.sectionTitle}><span style={s.step}>1</span> Fresh Produce</h3>
               <div>
-                {PRODUCTS.map(product => (
-                  <div key={product.id} style={s.productRow}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                      <div style={{ fontSize: '2rem', backgroundColor: '#fafaf9', width: '3rem', height: '3rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px' }}>{product.icon}</div>
-                      <div>
-                        <h4 style={{ margin: 0, fontSize: '1rem' }}>{product.name}</h4>
-                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#78716c' }}>{product.desc} • {product.unit}</p>
-                        <span style={{ fontWeight: 700, color: '#047857', marginTop: '0.25rem', display: 'block' }}>₹{product.price}/-</span>
+                {CATEGORIES.map(cat => {
+                  const catProducts = PRODUCTS.filter(p => p.cat === cat.key);
+                  if (catProducts.length === 0) return null;
+                  return (
+                    <div key={cat.key} style={{ marginBottom: '1.25rem' }}>
+                      {/* Category header */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.625rem' }}>
+                        <span style={{ fontSize: '1rem' }}>{cat.emoji}</span>
+                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{cat.label}</span>
+                        <div style={{ flex: 1, height: '1px', background: '#e7e5e4' }} />
+                      </div>
+                      {/* Product grid */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
+                        {catProducts.map(product => {
+                          const qty = cart[product.id] || 0;
+                          return (
+                            <div key={product.id} style={{ backgroundColor: 'white', border: qty > 0 ? '2px solid #059669' : '1px solid #e7e5e4', borderRadius: '14px', overflow: 'hidden', boxShadow: qty > 0 ? '0 2px 8px rgba(5,150,105,0.15)' : '0 1px 4px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                              {qty > 0 && (
+                                <div style={{ position: 'absolute', top: '0.4rem', right: '0.4rem', background: '#059669', color: 'white', fontSize: '0.6rem', fontWeight: 700, borderRadius: '10px', padding: '1px 6px', lineHeight: 1.4, zIndex: 1 }}>×{qty}</div>
+                              )}
+                              {/* Coloured icon area */}
+                              <div style={{ background: cat.iconBg, padding: '0.75rem 0.5rem 0.5rem', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '2.4rem', lineHeight: 1 }}>
+                                {product.icon}
+                              </div>
+                              {/* Text + controls */}
+                              <div style={{ padding: '0.5rem 0.5rem 0.625rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem', flex: 1 }}>
+                                <h4 style={{ margin: 0, fontSize: '0.78rem', lineHeight: 1.3, fontWeight: 600, color: '#1c1917' }}>{product.name}</h4>
+                                <p style={{ margin: 0, fontSize: '0.65rem', color: '#78716c' }}>{product.unit}</p>
+                                <span style={{ fontWeight: 700, color: '#047857', fontSize: '0.95rem', marginTop: '0.1rem' }}>₹{product.price}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.35rem' }}>
+                                  <button onClick={() => updateQuantity(product.id, -1)} disabled={!qty} style={{ width: '28px', height: '28px', border: qty ? '1px solid #059669' : '1px solid #e7e5e4', borderRadius: '6px', background: 'white', color: qty ? '#059669' : '#d4d4d0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: qty ? 'pointer' : 'default' }}><Minus size={12} /></button>
+                                  <span style={{ fontSize: '0.9rem', fontWeight: 700, minWidth: '1.2rem', textAlign: 'center', color: qty > 0 ? '#059669' : '#1c1917' }}>{qty}</span>
+                                  <button onClick={() => updateQuantity(product.id, 1)} style={{ width: '28px', height: '28px', border: 'none', borderRadius: '6px', background: '#059669', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Plus size={12} /></button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
-                    <div style={s.qtyWrapper}>
-                      <button style={{ ...s.qtyBtn, backgroundColor: '#059669', color: 'white' }} onClick={() => updateQuantity(product.id, 1)}><Plus size={14}/></button>
-                      <span style={{ fontSize: '0.8rem', fontWeight: 700, margin: '2px 0' }}>{cart[product.id] || 0}</span>
-                      <button style={{ ...s.qtyBtn, backgroundColor: 'white', border: '1px solid #e7e5e4', color: '#059669' }} onClick={() => updateQuantity(product.id, -1)} disabled={!cart[product.id]}><Minus size={14}/></button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
