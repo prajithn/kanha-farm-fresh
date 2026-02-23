@@ -491,6 +491,8 @@ const PRODUCTS = [
   { id: 3, name: 'Strawberry - 1Kg', unit: 'Box (1Kg)', price: 400, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 4, name: 'Goldenberry', unit: '250gm', price: 200, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 5, name: 'Tender Coconut', unit: 'Piece', price: 50, icon: <TenderCoconutIcon />, desc: 'Refreshing' },
+  { id: 6, name: 'Guava', unit: '1 Kg', price: 80, icon: <span style={{ fontSize: '2rem' }}>🍈</span>, desc: 'Fresh & Sweet' },
+  { id: 7, name: 'Banana - Karpooravalli', unit: '1 Kg', price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
 
   // leaves
   { id: 11, name: 'Palak', unit: 'Bunch (200g)', price: 30, icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
