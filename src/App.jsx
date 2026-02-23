@@ -672,6 +672,7 @@ function SmartGrocerApp() {
   const productsRef = useRef(null);
   const deliveryRef = useRef(null);
   const infoRef = useRef(null);
+  const paymentHandledRef = useRef(false); // prevents duplicate onResponse processing
 
   useEffect(() => {
     const handleScroll = () => {
@@ -721,6 +722,20 @@ function SmartGrocerApp() {
     } else if (paymentResult === 'failure') {
       setModal({ isOpen: true, type: 'alert', title: 'Payment Failed', message: 'Payment was not completed. Please try again or use manual UPI.' });
       window.history.replaceState({}, '', window.location.pathname);
+    }
+
+    // Recovery: resubmit any paid order whose Sheets entry was lost (e.g. network drop after payment)
+    const savedPaid = sessionStorage.getItem('kff_paid_order');
+    if (savedPaid) {
+      (async () => {
+        try {
+          const o = JSON.parse(savedPaid);
+          if (o.orderBody) {
+            await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: o.orderBody });
+            sessionStorage.removeItem('kff_paid_order');
+          }
+        } catch { /* will retry on next load */ }
+      })();
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -855,34 +870,47 @@ function SmartGrocerApp() {
 
       if (!access_key || apiStatus !== 1) throw new Error('API response: ' + JSON.stringify(apiResponse));
 
-      // Load EasebuzzCheckout SDK and open payment overlay (no page redirect)
+      // Step 1: Create a PENDING order row in Sheets immediately (before overlay opens).
+      // The Apps Script webhook will update this row the moment Easebuzz confirms payment —
+      // no need to wait for the customer to return to the app.
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST', mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            action: 'create',
+            customerName,
+            mobileNumber,
+            deliveryType: deliveryLabel,
+            aptNumber: aptNumber ? "'" + aptNumber : '',
+            items: itemsString,
+            total,
+            image: `PAYMENT PENDING | TxnID: ${txnid}`,
+            imageName: 'easebuzz_pending',
+          }),
+        });
+      } catch { /* best-effort; webhook + client fallback will still update the row */ }
+
+      // Step 2: Open payment overlay
+      paymentHandledRef.current = false;
       await loadCheckoutScript();
       const checkout = new window.EasebuzzCheckout(key, 'prod');
       checkout.initiatePayment({
         access_key,
-        onResponse: async (data) => {
+        onResponse: (data) => {
+          if (paymentHandledRef.current) return; // guard against duplicate callbacks
+          paymentHandledRef.current = true;
           setIsSubmitting(false);
-          const paymentRef = data.easepayid || data.mihpayid || '';
+
           if (data.status === 'success') {
-            // Submit order to Google Sheets; store payment info in Screenshot Link column
-            const paymentNote = `PAID | TxnID: ${txnid} | Ref: ${paymentRef}`;
-            try {
-              await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify({
-                  action: 'create',
-                  customerName,
-                  mobileNumber,
-                  deliveryType: deliveryLabel,
-                  aptNumber: aptNumber ? "'" + aptNumber : '',
-                  items: itemsString,
-                  total,
-                  image: paymentNote,
-                  imageName: 'easebuzz',
-                }),
-              });
-            } catch { /* show confirmation regardless */ }
+            // Webhook (surl) already updated the Sheets row instantly.
+            // This client-side call is a fallback — it updates the same row (no duplicate).
+            const paymentRef = data.easepayid || data.mihpayid || '';
+            fetch(
+              `${GOOGLE_SCRIPT_URL}?action=confirm_payment&txnid=${encodeURIComponent(txnid)}&ref=${encodeURIComponent(paymentRef)}&cb=${Date.now()}`,
+              { credentials: 'omit' }
+            ).catch(() => {});
+
             setOrderSummary({ total, deliveryLabel });
             setOrderDate(new Date());
             setOrderPlaced(true);
