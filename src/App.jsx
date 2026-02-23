@@ -859,10 +859,11 @@ function SmartGrocerApp() {
         return `${product.name} (${qty})`;
       }).join(', ');
 
-      // Get access_key from Apps Script (server-side hash + Easebuzz API call)
-      // udf1 intentionally omitted — delivery info stored in Sheets; avoids Easebuzz hash encoding issues
+      // Webhook URL = this app's own Vercel function, receives Easebuzz payment
+      // confirmation server-to-server the instant payment completes
+      const webhookUrl = window.location.origin + '/api/payment-webhook';
       const res = await fetch(
-        `${GOOGLE_SCRIPT_URL}?action=get_easebuzz_access_key&amount=${encodeURIComponent(total.toString())}&firstname=${encodeURIComponent(safeName)}&phone=${encodeURIComponent(mobileNumber)}&cb=${Date.now()}`,
+        `${GOOGLE_SCRIPT_URL}?action=get_easebuzz_access_key&amount=${encodeURIComponent(total.toString())}&firstname=${encodeURIComponent(safeName)}&phone=${encodeURIComponent(mobileNumber)}&webhookUrl=${encodeURIComponent(webhookUrl)}&cb=${Date.now()}`,
         { credentials: 'omit' }
       );
       const apiResponse = await res.json();
