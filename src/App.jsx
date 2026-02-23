@@ -762,11 +762,17 @@ function SmartGrocerApp() {
       // Webhook URL = this app's own Vercel function, receives Easebuzz payment
       // confirmation server-to-server the instant payment completes
       const webhookUrl = window.location.origin + '/api/payment-webhook';
-      const res = await fetch(
-        `${GOOGLE_SCRIPT_URL}?action=get_easebuzz_access_key&secret=kff_secret_9x7z&amount=${encodeURIComponent(total.toString())}&firstname=${encodeURIComponent(safeName)}&phone=${encodeURIComponent(mobileNumber)}&webhookUrl=${encodeURIComponent(webhookUrl)}&cb=${Date.now()}`,
-        { credentials: 'omit' }
-      );
-      const apiResponse = await res.json();
+      const buildUrl = () =>
+        `${GOOGLE_SCRIPT_URL}?action=get_easebuzz_access_key&secret=kff_secret_9x7z&amount=${encodeURIComponent(total.toString())}&firstname=${encodeURIComponent(safeName)}&phone=${encodeURIComponent(mobileNumber)}&webhookUrl=${encodeURIComponent(webhookUrl)}&cb=${Date.now()}`;
+
+      // Retry once — Easebuzz's initiateLink API occasionally returns transient errors
+      let apiResponse = null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const res = await fetch(buildUrl(), { credentials: 'omit' });
+        apiResponse = await res.json();
+        if (apiResponse.access_key && apiResponse.status === 1) break;
+        if (attempt === 0) await new Promise(r => setTimeout(r, 1500)); // brief pause before retry
+      }
       const { key, access_key, txnid, status: apiStatus } = apiResponse;
 
       if (!access_key || apiStatus !== 1) throw new Error(apiResponse.eb_error || 'Could not get payment token. Please try again.');
