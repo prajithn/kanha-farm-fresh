@@ -16,6 +16,7 @@ const SHOW_HARVESTING_SCREEN = false;
 const UPI_ID = 'paytm.s18fahk@pty';
 const MERCHANT_NAME = 'Kanha Farm Fresh';
 const USE_EASEBUZZ = true; // Easebuzz iframe checkout (no redirect)
+const SCRIPT_SECRET = 'kff_secret_9x7z';
 
 // --- STYLES (STRICT INLINE - NO CLASSES) ---
 const s = {
@@ -698,6 +699,7 @@ function SmartGrocerApp() {
           try {
             const orderData = {
               action: 'create',
+              secret: SCRIPT_SECRET,
               customerName: order.customerName,
               mobileNumber: order.mobileNumber,
               deliveryType: order.deliveryLabel,
@@ -731,7 +733,9 @@ function SmartGrocerApp() {
         try {
           const o = JSON.parse(savedPaid);
           if (o.orderBody) {
-            await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: o.orderBody });
+            const parsedBody = JSON.parse(o.orderBody);
+            parsedBody.secret = SCRIPT_SECRET;
+            await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(parsedBody) });
             sessionStorage.removeItem('kff_paid_order');
           }
         } catch { /* will retry on next load */ }
@@ -811,6 +815,7 @@ function SmartGrocerApp() {
       }
       const orderData = {
         action: 'create',
+        secret: SCRIPT_SECRET,
         customerName,
         mobileNumber,
         deliveryType: DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label,
@@ -880,6 +885,7 @@ function SmartGrocerApp() {
           headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({
             action: 'create',
+            secret: SCRIPT_SECRET,
             customerName,
             mobileNumber,
             deliveryType: deliveryLabel,
