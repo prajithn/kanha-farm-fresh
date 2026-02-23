@@ -13,8 +13,6 @@ import { MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Lea
 
 // --- CONFIGURATION ---
 const SHOW_HARVESTING_SCREEN = false;
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'kanha@123';
 const UPI_ID = 'paytm.s18fahk@pty';
 const MERCHANT_NAME = 'Kanha Farm Fresh';
 const USE_EASEBUZZ = true; // Easebuzz iframe checkout (no redirect)
@@ -662,6 +660,8 @@ function SmartGrocerApp() {
   // Admin State
   const [adminUser, setAdminUser] = useState('');
   const [adminPass, setAdminPass] = useState('');
+  const [adminToken, setAdminToken] = useState('');
+  const [adminLoggingIn, setAdminLoggingIn] = useState(false);
   const [adminError, setAdminError] = useState('');
   const [adminOrders, setAdminOrders] = useState([]);
   const [adminLoading, setAdminLoading] = useState(false);
@@ -934,10 +934,11 @@ function SmartGrocerApp() {
     }
   };
 
-  const fetchAdminOrders = async () => {
+  const fetchAdminOrders = async (token) => {
+    const authToken = token || adminToken;
     setAdminLoading(true);
     try {
-      const response = await fetch(`${GOOGLE_SCRIPT_URL}?secret=kff_secret_9x7z&v=${new Date().getTime()}`, { credentials: 'omit' });
+      const response = await fetch(`${GOOGLE_SCRIPT_URL}?admin_token=${encodeURIComponent(authToken)}&v=${new Date().getTime()}`, { credentials: 'omit' });
       const data = await response.json();
       setAdminOrders(Array.isArray(data) ? data.reverse() : []);
     } catch (error) { setModal({ isOpen: true, type: 'alert', message: "Failed to load orders." }); } 
@@ -949,7 +950,7 @@ function SmartGrocerApp() {
     setModal({ isOpen: true, type: 'confirm', message: `Mark delivery done for ${order.customerName}?`, onConfirm: async () => {
       setAdminOrders(prev => prev.map(o => o.rowIndex === order.rowIndex ? { ...o, status: 'Updating...', deliveryDate: new Date().toISOString() } : o));
       try {
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=mark_delivered&secret=kff_secret_9x7z&rowIndex=${order.rowIndex}&cb=${Date.now()}`, { credentials: 'omit' });
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=mark_delivered&admin_token=${encodeURIComponent(adminToken)}&rowIndex=${order.rowIndex}&cb=${Date.now()}`, { credentials: 'omit' });
         const result = await response.json();
         if (result.result === 'success') { fetchAdminOrders(); } else { throw new Error(); }
       } catch (error) { fetchAdminOrders(); }
@@ -1173,7 +1174,29 @@ function SmartGrocerApp() {
              <div style={{ background: '#e7e5e4', padding: '1rem', borderRadius: '50%' }}><Lock size={32} color="#78716c"/></div>
           </div>
           <h2 style={{ textAlign: 'center', fontWeight: 700, fontSize: '1.5rem', marginBottom: '1.5rem', marginTop: 0 }}>Admin Login</h2>
-          <form onSubmit={(e) => { e.preventDefault(); if(adminUser===ADMIN_USER && adminPass===ADMIN_PASS){ setView('admin-dashboard'); fetchAdminOrders(); setAdminError(''); } else { setAdminError('Invalid credentials'); } }}>
+          <form onSubmit={async (e) => {
+            e.preventDefault();
+            setAdminLoggingIn(true);
+            setAdminError('');
+            try {
+              const res = await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify({ action: 'verify_admin', username: adminUser, password: adminPass }),
+                credentials: 'omit',
+              });
+              const data = await res.json();
+              if (data.token) {
+                setAdminToken(data.token);
+                setView('admin-dashboard');
+                fetchAdminOrders(data.token);
+                setAdminError('');
+              } else {
+                setAdminError('Invalid credentials');
+              }
+            } catch { setAdminError('Login failed. Please try again.'); }
+            finally { setAdminLoggingIn(false); }
+          }}>
             <div style={s.inputGroup}>
               <input type="text" placeholder="Username" value={adminUser} onChange={e => setAdminUser(e.target.value)} style={s.input} />
             </div>
@@ -1181,7 +1204,9 @@ function SmartGrocerApp() {
               <input type="password" placeholder="Password" value={adminPass} onChange={e => setAdminPass(e.target.value)} style={s.input} />
             </div>
             {adminError && <p style={{ color: 'red', textAlign: 'center', fontSize: '0.875rem' }}>{adminError}</p>}
-            <button type="submit" style={{ ...s.btn, ...s.btnPrimary }}>Login</button>
+            <button type="submit" style={{ ...s.btn, ...s.btnPrimary }} disabled={adminLoggingIn}>
+              {adminLoggingIn ? 'Verifying...' : 'Login'}
+            </button>
           </form>
           <button onClick={() => setView('home')} style={{ width: '100%', marginTop: '1rem', background: 'none', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>Back to Home</button>
         </div>
