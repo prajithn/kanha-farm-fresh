@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
   console.log('Easebuzz webhook received:', { txnid, status, paymentRef });
 
-  if (txnid && status === 'success') {
+  if (txnid && status) {
     try {
       await fetch(
         `${SCRIPT_URL}?action=confirm_payment` +
