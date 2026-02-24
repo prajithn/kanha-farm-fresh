@@ -829,8 +829,8 @@ function SmartGrocerApp() {
     } catch (e) {
       setIsSubmitting(false);
       setModal({
-        isOpen: true, type: 'confirm', title: 'Payment Error',
-        message: (e.message || 'Could not initiate payment.') + '\n\nThis is usually temporary. Try again?',
+        isOpen: true, type: 'confirm', title: 'Almost there!',
+        message: 'The payment gateway took a moment to respond. Tap Try Again — it usually works on the next attempt.',
         confirmLabel: 'Try Again',
         onConfirm: initiateEasebuzzPayment,
       });
