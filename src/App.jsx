@@ -492,10 +492,10 @@ const PRODUCTS = [
   { id: 4,  cat: 'fruits', name: 'Goldenberry',                              unit: '250gm',        price: 200, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 5,  cat: 'fruits', name: 'Tender Coconut',                           unit: 'Piece',        price: 50,  icon: <TenderCoconutIcon />, desc: 'Refreshing' },
 //  { id: 6,  cat: 'fruits', name: 'Guava',                                    unit: '1 Kg',         price: 80,  icon: <span style={{ fontSize: '2rem' }}>🍈</span>, desc: 'Fresh & Sweet' },
-  { id: 7,  cat: 'fruits', name: 'Banana - Karpooravalli',                   unit: '1 Kg',         price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
+//  { id: 7,  cat: 'fruits', name: 'Banana - Karpooravalli',                   unit: '1 Kg',         price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
 
   // cat: 'greens'
-  { id: 11, cat: 'greens', name: 'Palak',                                    unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
+//  { id: 11, cat: 'greens', name: 'Palak',                                    unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
   { id: 12, cat: 'greens', name: 'Methi Leaves',                             unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
   { id: 13, cat: 'greens', name: 'Coriander Leaves',                         unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
 
