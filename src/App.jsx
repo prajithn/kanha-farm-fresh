@@ -399,7 +399,7 @@ const SpinLoader = () => (
   </>
 );
 
-const Modal = ({ isOpen, type, message, title, onClose, onConfirm, confirmLabel, isLoading }) => {
+const Modal = ({ isOpen, type, message, title, onClose, onConfirm, confirmLabel, refId, isLoading }) => {
   if (!isOpen) return null;
   
   const isAi = type === 'ai';
@@ -451,7 +451,14 @@ const Modal = ({ isOpen, type, message, title, onClose, onConfirm, confirmLabel,
               <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }`}</style>
             </div>
           ) : (
-            message
+            <>
+              {message}
+              {refId && (
+                <div style={{ marginTop: '0.75rem', fontSize: '0.7rem', color: '#a8a29e', fontFamily: 'monospace' }}>
+                  {refId}
+                </div>
+              )}
+            </>
           )}
         </div>
         
@@ -537,6 +544,13 @@ const DELIVERY_OPTIONS = [
 
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7cz_Ykzim6EYILS0Fpo5_DJlcJiuO01mefnkqHUGqeui3zd6pRf95oTFJiit3tB6X/exec";
 
+const classifyPaymentError = (err) => {
+  const msg = (err?.message || '').toLowerCase();
+  if (msg.includes('hash') || msg.includes('mismatch') || msg.includes('verif')) return 'Gateway verification failed';
+  if (msg.includes('fetch') || msg.includes('network') || msg.includes('failed to fetch')) return 'Connection issue';
+  if (msg.includes('token') || msg.includes('access_key')) return 'Gateway unavailable';
+  return 'Unexpected error';
+};
 
 function SmartGrocerApp() {
   const [view, setView] = useState('landing');
@@ -615,7 +629,7 @@ function SmartGrocerApp() {
             setOrderPlaced(true);
             window.scrollTo(0, 0);
           } catch {
-            setModal({ isOpen: true, type: 'alert', title: 'Error', message: 'Payment succeeded but order recording failed. Please contact Mani — 81790 68821.' });
+            setModal({ isOpen: true, type: 'alert', title: 'Order not saved', message: 'Your payment went through! But we couldn\'t save your order. Please WhatsApp Mani on 81790 68821 and we\'ll sort it out right away.' });
           }
         })();
       }
@@ -730,7 +744,7 @@ function SmartGrocerApp() {
       setOrderPlaced(true);
       window.scrollTo(0, 0);
     } catch (error) {
-      setModal({ isOpen: true, type: 'alert', message: "Error placing order. Please try again." });
+      setModal({ isOpen: true, type: 'alert', title: 'Couldn\'t place order', message: 'Something went wrong while saving your order. Please try again, or WhatsApp Mani on 81790 68821 if it keeps happening.' });
     } finally { setIsSubmitting(false); }
   };
 
@@ -757,7 +771,7 @@ function SmartGrocerApp() {
     try {
       const total = calculateTotal();
       const deliveryLabel = DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label || '';
-      const safeName = customerName.replace(/[^a-zA-Z0-9 ]/g, '').substring(0, 50) || 'Customer';
+      const safeName = customerName.replace(/[^a-zA-Z0-9 ]/g, '').trim().substring(0, 50) || 'Customer';
       const itemsString = Object.entries(cart).map(([id, qty]) => {
         const product = PRODUCTS.find(p => p.id === parseInt(id));
         return `${product.name} (${qty})`;
@@ -821,16 +835,18 @@ function SmartGrocerApp() {
             setOrderPlaced(true);
             window.scrollTo(0, 0);
           } else if (data.status !== 'userCancelled') {
-            setModal({ isOpen: true, type: 'alert', title: 'Payment Failed', message: (data.error_Message || 'Payment was not completed.') + ' Please try again.' });
+            setModal({ isOpen: true, type: 'alert', title: 'Payment not completed', message: 'Your payment didn\'t go through. Please try again — or use the manual UPI option below if the issue continues.' });
           }
         },
         theme: '#059669',
       });
     } catch (e) {
       setIsSubmitting(false);
+      const refId = 'KFF-' + Date.now().toString(36).toUpperCase().slice(-6);
       setModal({
         isOpen: true, type: 'confirm', title: 'Almost there!',
         message: 'The payment gateway took a moment to respond. Tap Try Again — it usually works on the next attempt.',
+        refId: `${classifyPaymentError(e)} · Ref: ${refId}`,
         confirmLabel: 'Try Again',
         onConfirm: initiateEasebuzzPayment,
       });
