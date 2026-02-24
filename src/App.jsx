@@ -399,7 +399,7 @@ const SpinLoader = () => (
   </>
 );
 
-const Modal = ({ isOpen, type, message, title, onClose, onConfirm, isLoading }) => {
+const Modal = ({ isOpen, type, message, title, onClose, onConfirm, confirmLabel, isLoading }) => {
   if (!isOpen) return null;
   
   const isAi = type === 'ai';
@@ -473,7 +473,7 @@ const Modal = ({ isOpen, type, message, title, onClose, onConfirm, isLoading }) 
                 backgroundColor: isAi ? '#9333ea' : '#059669'
               }}
             >
-              {type === 'confirm' ? 'Yes, Proceed' : 'Okay'}
+              {confirmLabel || (type === 'confirm' ? 'Yes, Proceed' : 'Okay')}
             </button>
           </div>
         )}
@@ -771,11 +771,11 @@ function SmartGrocerApp() {
 
       // Retry once — Easebuzz's initiateLink API occasionally returns transient errors
       let apiResponse = null;
-      for (let attempt = 0; attempt < 2; attempt++) {
+      for (let attempt = 0; attempt < 3; attempt++) {
         const res = await fetch(buildUrl(), { credentials: 'omit' });
         apiResponse = await res.json();
         if (apiResponse.access_key && apiResponse.status === 1) break;
-        if (attempt === 0) await new Promise(r => setTimeout(r, 1500)); // brief pause before retry
+        if (attempt < 2) await new Promise(r => setTimeout(r, 1000)); // brief pause before retry
       }
       const { key, access_key, txnid, status: apiStatus } = apiResponse;
 
@@ -828,7 +828,12 @@ function SmartGrocerApp() {
       });
     } catch (e) {
       setIsSubmitting(false);
-      setModal({ isOpen: true, type: 'alert', title: 'Error', message: e.message || 'Could not initiate payment. Please try again.' });
+      setModal({
+        isOpen: true, type: 'confirm', title: 'Payment Error',
+        message: (e.message || 'Could not initiate payment.') + '\n\nThis is usually temporary. Try again?',
+        confirmLabel: 'Try Again',
+        onConfirm: initiateEasebuzzPayment,
+      });
     }
   };
 
