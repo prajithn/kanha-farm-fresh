@@ -585,6 +585,7 @@ function SmartGrocerApp() {
   const [adminFilterType, setAdminFilterType] = useState('');
   const [adminSearchName, setAdminSearchName] = useState('');
   const [adminFilterStatus, setAdminFilterStatus] = useState('Pending');
+  const [disabledProducts, setDisabledProducts] = useState([]);
 
   const productsRef = useRef(null);
   const deliveryRef = useRef(null);
@@ -598,6 +599,14 @@ function SmartGrocerApp() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Fetch disabled products on mount — fail silently (show all if unreachable)
+  useEffect(() => {
+    fetch(`${GOOGLE_SCRIPT_URL}?action=get_disabled_products&cb=${Date.now()}`, { credentials: 'omit' })
+      .then(r => r.json())
+      .then(data => setDisabledProducts(data.disabled || []))
+      .catch(() => {});
   }, []);
 
   // Payment callback — runs once on mount to detect Easebuzz redirect
@@ -883,6 +892,17 @@ function SmartGrocerApp() {
         if (result.result === 'success') { fetchAdminOrders(); } else { throw new Error(); }
       } catch (error) { fetchAdminOrders(); }
     }});
+  };
+
+  const toggleProduct = async (productId) => {
+    const id = String(productId);
+    const isDisabled = disabledProducts.includes(id);
+    const newDisabled = isDisabled ? disabledProducts.filter(x => x !== id) : [...disabledProducts, id];
+    setDisabledProducts(newDisabled); // optimistic update
+    await fetch(
+      `${GOOGLE_SCRIPT_URL}?action=set_disabled_products&secret=${SCRIPT_SECRET}&ids=${newDisabled.join(',')}&cb=${Date.now()}`,
+      { credentials: 'omit' }
+    ).catch(() => setDisabledProducts(disabledProducts)); // revert on error
   };
 
   // --- VIEWS ---
@@ -1218,6 +1238,37 @@ function SmartGrocerApp() {
               </div>
             ))}
           </div>
+
+          {/* ── PRODUCT AVAILABILITY ── */}
+          <div style={{ ...s.card, marginTop: '1rem' }}>
+            <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', fontWeight: 700 }}>Product Availability</h3>
+            {CATEGORIES.map(cat => {
+              const catProds = PRODUCTS.filter(p => p.cat === cat.key);
+              if (catProds.length === 0) return null;
+              return (
+                <div key={cat.key} style={{ marginBottom: '1rem' }}>
+                  <p style={{ margin: '0 0 0.5rem', fontSize: '0.72rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase' }}>{cat.emoji} {cat.label}</p>
+                  {catProds.map(product => {
+                    const isDisabled = disabledProducts.includes(String(product.id));
+                    return (
+                      <div key={product.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0', borderBottom: '1px solid #f5f5f4' }}>
+                        <span style={{ fontSize: '0.875rem', color: isDisabled ? '#a8a29e' : '#1c1917', textDecoration: isDisabled ? 'line-through' : 'none' }}>
+                          {product.name} <span style={{ color: '#a8a29e', fontSize: '0.75rem' }}>({product.unit})</span>
+                        </span>
+                        <button
+                          onClick={() => toggleProduct(product.id)}
+                          style={{ padding: '0.25rem 0.75rem', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, background: isDisabled ? '#f5f5f4' : '#d1fae5', color: isDisabled ? '#a8a29e' : '#047857' }}
+                        >
+                          {isDisabled ? 'Hidden' : 'Visible'}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+
         </div>
       </div>
     );
@@ -1379,7 +1430,7 @@ function SmartGrocerApp() {
               <h3 style={s.sectionTitle}><span style={s.step}>1</span> Fresh Produce</h3>
               <div>
                 {CATEGORIES.map(cat => {
-                  const catProducts = PRODUCTS.filter(p => p.cat === cat.key);
+                  const catProducts = PRODUCTS.filter(p => p.cat === cat.key && !disabledProducts.includes(String(p.id)));
                   if (catProducts.length === 0) return null;
                   return (
                     <div key={cat.key} style={{ marginBottom: '1.25rem' }}>
