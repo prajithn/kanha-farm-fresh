@@ -752,7 +752,7 @@ function SmartGrocerApp() {
         imageName
       };
       await fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(orderData) });
-      setOrderSummary({ total: calculateTotal(), deliveryLabel: DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label || '' });
+      setOrderSummary({ total: calculateTotal(), deliveryLabel: DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label || '', items: Object.entries(cart).filter(([,qty]) => qty > 0).map(([id, qty]) => { const p = PRODUCTS.find(p => p.id === parseInt(id)); return { name: p.name, unit: p.unit, qty }; }) });
       setOrderDate(new Date());
       setOrderPlaced(true);
       window.scrollTo(0, 0);
@@ -843,7 +843,7 @@ function SmartGrocerApp() {
 
           if (data.status === 'success') {
             // Sheet update handled by Vercel webhook (server-to-server) — no client call needed.
-            setOrderSummary({ total, deliveryLabel });
+            setOrderSummary({ total, deliveryLabel, items: Object.entries(cart).filter(([,qty]) => qty > 0).map(([id, qty]) => { const p = PRODUCTS.find(p => p.id === parseInt(id)); return { name: p.name, unit: p.unit, qty }; }) });
             setOrderDate(new Date());
             setOrderPlaced(true);
             window.scrollTo(0, 0);
@@ -1333,8 +1333,31 @@ function SmartGrocerApp() {
           <h2 style={{ fontWeight: 700, fontSize: '1.5rem', color: '#064e3b', margin: 0 }}>Order Received!</h2>
           <p style={{ textAlign: 'center', color: '#78716c', marginBottom: '1.5rem' }}>Thank you, {customerName}.</p>
           <div style={{ ...s.card, width: '100%' }}>
-            <p style={{ margin: '0 0 0.5rem' }}><strong>Total:</strong> ₹{orderSummary?.total ?? calculateTotal()}/-</p>
-            <p style={{ margin: 0 }}><strong>Location:</strong> {orderSummary?.deliveryLabel || DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label}</p>
+            {/* Items list */}
+            {orderSummary?.items?.length > 0 && (
+              <>
+                <p style={{ margin: '0 0 0.625rem', fontSize: '0.7rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Your Order</p>
+                {orderSummary.items.map((item, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.4rem 0', borderBottom: i < orderSummary.items.length - 1 ? '1px solid #f5f5f4' : 'none' }}>
+                    <div>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>{item.name}</span>
+                      <span style={{ fontSize: '0.72rem', color: '#a8a29e', marginLeft: '0.35rem' }}>({item.unit})</span>
+                    </div>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#059669' }}>× {item.qty}</span>
+                  </div>
+                ))}
+                <div style={{ height: '1px', background: '#e7e5e4', margin: '0.75rem 0' }} />
+              </>
+            )}
+            {/* Summary */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+              <span style={{ color: '#78716c', fontSize: '0.875rem' }}>📍 Location</span>
+              <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{orderSummary?.deliveryLabel || DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: '#78716c', fontSize: '0.875rem' }}>💰 Total</span>
+              <span style={{ fontWeight: 800, fontSize: '1.1rem', color: '#064e3b' }}>₹{orderSummary?.total ?? calculateTotal()}</span>
+            </div>
           </div>
           <button onClick={() => window.location.reload()} style={{ ...s.btn, ...s.btnPrimary }}>Place Another Order</button>
         </div>
