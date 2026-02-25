@@ -503,15 +503,18 @@ const PRODUCTS = [
 
   // cat: 'greens'
 //  { id: 11, cat: 'greens', name: 'Palak',                                    unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
-  { id: 12, cat: 'greens', name: 'Methi Leaves',                             unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
+//  { id: 12, cat: 'greens', name: 'Methi Leaves',                             unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
   { id: 13, cat: 'greens', name: 'Coriander Leaves',                         unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
+  { id: 14, cat: 'greens', name: 'Curry Leaves',                             unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
 
   // cat: 'vegs'
   { id: 21, cat: 'vegs',   name: 'Beetroot',                                 unit: '500gm',        price: 35,  icon: <BeetrootIcon />, desc: 'Earthy Root' },
-  { id: 22, cat: 'vegs',   name: 'Bitter Gourd',                             unit: '500gm',        price: 40,  icon: <BitterGourdIcon />, desc: 'Healthy' },
-  { id: 23, cat: 'vegs',   name: 'Bottle Gourd',                             unit: '500gm',        price: 30,  icon: <BottleGourdIcon />, desc: 'Healthy' },
+//  { id: 22, cat: 'vegs',   name: 'Bitter Gourd',                             unit: '500gm',        price: 40,  icon: <BitterGourdIcon />, desc: 'Healthy' },
+//  { id: 23, cat: 'vegs',   name: 'Bottle Gourd',                             unit: '500gm',        price: 30,  icon: <BottleGourdIcon />, desc: 'Healthy' },
   { id: 24, cat: 'vegs',   name: 'Smooth Gourd',                             unit: '500gm',        price: 40,  icon: <SmoothGourdIcon />, desc: 'Nutritious' },
   { id: 25, cat: 'vegs',   name: 'Ridge Gourd',                              unit: '500gm',        price: 40,  icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
+  { id: 26, cat: 'vegs',   name: 'Tomato',                                   unit: '1 Kg',         price: 60,  icon: <span style={{ fontSize: '2rem' }}>🍅</span>, desc: 'Fresh & Tangy' },
+
 
   // cat: 'dairy'
   { id: 31, cat: 'dairy',  name: 'Plain Paneer',                             unit: '200g',         price: 119, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
