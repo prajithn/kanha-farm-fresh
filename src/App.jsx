@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, Loader2, Lock, Search, X, AlertCircle, Sparkles } from 'lucide-react';
+import { MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, ArrowLeft, Loader2, Lock, Search, X, AlertCircle, Sparkles } from 'lucide-react';
 
 // --- GLOBAL SHIM ---
 // Prevents environment crashes by mocking the tailwind object immediately
@@ -498,19 +498,19 @@ const PRODUCTS = [
   { id: 3,  cat: 'fruits', name: 'Strawberry - 1Kg',                         unit: 'Box (1Kg)',    price: 400, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 4,  cat: 'fruits', name: 'Goldenberry',                              unit: '250gm',        price: 200, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 5,  cat: 'fruits', name: 'Tender Coconut',                           unit: 'Piece',        price: 50,  icon: <TenderCoconutIcon />, desc: 'Refreshing' },
-//  { id: 6,  cat: 'fruits', name: 'Guava',                                    unit: '1 Kg',         price: 80,  icon: <span style={{ fontSize: '2rem' }}>🍈</span>, desc: 'Fresh & Sweet' },
-//  { id: 7,  cat: 'fruits', name: 'Banana - Karpooravalli',                   unit: '1 Kg',         price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
+  { id: 6,  cat: 'fruits', name: 'Guava',                                    unit: '1 Kg',         price: 80,  icon: <span style={{ fontSize: '2rem' }}>🍈</span>, desc: 'Fresh & Sweet' },
+  { id: 7,  cat: 'fruits', name: 'Banana - Karpooravalli',                   unit: '1 Kg',         price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
 
   // cat: 'greens'
-//  { id: 11, cat: 'greens', name: 'Palak',                                    unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
-//  { id: 12, cat: 'greens', name: 'Methi Leaves',                             unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
+  { id: 11, cat: 'greens', name: 'Palak',                                    unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
+  { id: 12, cat: 'greens', name: 'Methi Leaves',                             unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
   { id: 13, cat: 'greens', name: 'Coriander Leaves',                         unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
   { id: 14, cat: 'greens', name: 'Curry Leaves',                             unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
 
   // cat: 'vegs'
   { id: 21, cat: 'vegs',   name: 'Beetroot',                                 unit: '500gm',        price: 35,  icon: <BeetrootIcon />, desc: 'Earthy Root' },
-//  { id: 22, cat: 'vegs',   name: 'Bitter Gourd',                             unit: '500gm',        price: 40,  icon: <BitterGourdIcon />, desc: 'Healthy' },
-//  { id: 23, cat: 'vegs',   name: 'Bottle Gourd',                             unit: '500gm',        price: 30,  icon: <BottleGourdIcon />, desc: 'Healthy' },
+  { id: 22, cat: 'vegs',   name: 'Bitter Gourd',                             unit: '500gm',        price: 40,  icon: <BitterGourdIcon />, desc: 'Healthy' },
+  { id: 23, cat: 'vegs',   name: 'Bottle Gourd',                             unit: '500gm',        price: 30,  icon: <BottleGourdIcon />, desc: 'Healthy' },
   { id: 24, cat: 'vegs',   name: 'Smooth Gourd',                             unit: '500gm',        price: 40,  icon: <SmoothGourdIcon />, desc: 'Nutritious' },
   { id: 25, cat: 'vegs',   name: 'Ridge Gourd',                              unit: '500gm',        price: 40,  icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
   { id: 26, cat: 'vegs',   name: 'Tomato',                                   unit: '1 Kg',         price: 60,  icon: <span style={{ fontSize: '2rem' }}>🍅</span>, desc: 'Fresh & Tangy' },
@@ -585,6 +585,7 @@ function SmartGrocerApp() {
   const [adminFilterType, setAdminFilterType] = useState('');
   const [adminSearchName, setAdminSearchName] = useState('');
   const [adminFilterStatus, setAdminFilterStatus] = useState('Pending');
+  const [adminSection, setAdminSection] = useState('menu');
   const [disabledProducts, setDisabledProducts] = useState([]);
 
   const productsRef = useRef(null);
@@ -1173,101 +1174,142 @@ function SmartGrocerApp() {
       return true;
     });
 
+    const sectionTitles = { menu: 'Admin Dashboard', products: 'Product Availability', orders: 'Manage Orders' };
+
     return (
       <div style={{ ...s.container, paddingBottom: '2rem' }}>
         <Modal {...modal} onClose={() => setModal({ ...modal, isOpen: false })} />
-        <div style={{ background: '#064e3b', color: 'white', padding: '1rem', position: 'sticky', top: 0, zIndex: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1 style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, fontSize: '1.1rem' }}><Lock size={18} /> Admin Dashboard</h1>
-          <button onClick={() => setView('home')} style={{ fontSize: '0.75rem', background: 'rgba(0,0,0,0.2)', color: 'white', border: 'none', padding: '4px 8px', borderRadius: 4, cursor: 'pointer' }}>Logout</button>
-        </div>
-        
-        <div style={{ padding: '1rem' }}>
-          <div style={s.card}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-              <select value={adminFilterStatus} onChange={e => setAdminFilterStatus(e.target.value)} style={s.input}>
-                <option value="Pending">Pending</option><option value="Done">Completed</option><option value="All">All</option>
-              </select>
-              <select value={adminFilterType} onChange={e => setAdminFilterType(e.target.value)} style={s.input}>
-                <option value="">All Locations</option>
-                {DELIVERY_OPTIONS.map(opt => <option key={opt.id} value={opt.label}>{opt.label}</option>)}
-              </select>
-            </div>
-            <div style={{ ...s.inputGroup, marginBottom: 0 }}>
-              <Search style={s.iconPrefix} size={18} />
-              <input type="text" placeholder="Search Name/Apt..." value={adminSearchName} onChange={e => setAdminSearchName(e.target.value)} style={s.input} />
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', fontSize: '0.875rem', color: '#78716c' }}>
-              <span>Found <strong>{filteredOrders.length}</strong> orders</span>
-              <button onClick={fetchAdminOrders} style={{ color: '#059669', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Refresh</button>
-            </div>
-          </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {adminLoading ? <div style={{ textAlign: 'center', padding: '2rem', color: '#a8a29e' }}><SpinLoader /> Loading...</div> : 
-             filteredOrders.map((order, idx) => (
-              <div key={idx} style={{ ...s.card, borderLeft: order.status === 'Done' ? '4px solid #10b981' : '1px solid #e7e5e4' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                  <div>
-                    <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.1rem' }}>{order.customerName}</h3>
-                    <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: '#78716c', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                       <MapPin size={14}/> {order.deliveryType} {order.aptNumber && <span>• {order.aptNumber.replace(/^'/, '')}</span>}
-                    </p>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <span style={{ 
-                      padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase',
-                      backgroundColor: order.status === 'Done' ? '#d1fae5' : '#fef3c7',
-                      color: order.status === 'Done' ? '#047857' : '#b45309'
-                    }}>{order.status || 'Pending'}</span>
-                    <p style={{ fontSize: '0.75rem', color: '#a8a29e', margin: '0.25rem 0 0' }}>{new Date(order.date).toLocaleDateString()}</p>
-                  </div>
-                </div>
-                <div style={{ backgroundColor: '#fafaf9', padding: '0.75rem', borderRadius: 8, fontSize: '0.875rem' }}>
-                  <p style={{ margin: '0 0 0.25rem', fontWeight: 700 }}>Items:</p>
-                  <p style={{ margin: 0 }}>{order.items}</p>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid #e7e5e4', fontWeight: 700 }}>
-                    <span>Total:</span><span>₹{order.total}</span>
-                  </div>
-                </div>
-                {order.status !== 'Done' && (
-                  <button onClick={() => markAsDelivered(order)} disabled={order.status === 'Updating...'} style={{ ...s.btn, ...s.btnPrimary, marginTop: '1rem' }}>
-                    {order.status === 'Updating...' ? <SpinLoader /> : <CheckCircle size={20} />}
-                    Mark Delivered
-                  </button>
-                )}
-              </div>
-            ))}
+        {/* ── Header ── */}
+        <div style={{ background: '#064e3b', color: 'white', padding: '1rem', position: 'sticky', top: 0, zIndex: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {adminSection !== 'menu' ? (
+              <button onClick={() => setAdminSection('menu')} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: '0 0.25rem', display: 'flex', alignItems: 'center' }}>
+                <ArrowLeft size={20} />
+              </button>
+            ) : (
+              <Lock size={18} />
+            )}
+            <h1 style={{ fontWeight: 700, margin: 0, fontSize: '1.1rem' }}>{sectionTitles[adminSection]}</h1>
           </div>
+          <button onClick={() => { setView('home'); setAdminSection('menu'); }} style={{ fontSize: '0.75rem', background: 'rgba(0,0,0,0.2)', color: 'white', border: 'none', padding: '4px 8px', borderRadius: 4, cursor: 'pointer' }}>Logout</button>
+        </div>
+
+        <div style={{ padding: '1rem' }}>
+
+          {/* ── MENU ── */}
+          {adminSection === 'menu' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
+              {[
+                { key: 'products', emoji: '🛒', title: 'Product Availability', desc: 'Show or hide items from the catalogue' },
+                { key: 'orders',   emoji: '📦', title: 'Manage Orders',        desc: 'View orders and mark deliveries' },
+              ].map(item => (
+                <button key={item.key} onClick={() => setAdminSection(item.key)} style={{ width: '100%', padding: '1.25rem', background: 'white', border: '1px solid #e7e5e4', borderRadius: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem', textAlign: 'left', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                  <div style={{ background: '#d1fae5', padding: '0.75rem', borderRadius: '10px', fontSize: '1.5rem', lineHeight: 1 }}>{item.emoji}</div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ margin: 0, fontWeight: 700, fontSize: '1rem', color: '#1c1917' }}>{item.title}</p>
+                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.8rem', color: '#78716c' }}>{item.desc}</p>
+                  </div>
+                  <ArrowRight size={20} color="#a8a29e" />
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* ── PRODUCT AVAILABILITY ── */}
-          <div style={{ ...s.card, marginTop: '1rem' }}>
-            <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', fontWeight: 700 }}>Product Availability</h3>
-            {CATEGORIES.map(cat => {
-              const catProds = PRODUCTS.filter(p => p.cat === cat.key);
-              if (catProds.length === 0) return null;
-              return (
-                <div key={cat.key} style={{ marginBottom: '1rem' }}>
-                  <p style={{ margin: '0 0 0.5rem', fontSize: '0.72rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase' }}>{cat.emoji} {cat.label}</p>
-                  {catProds.map(product => {
-                    const isDisabled = disabledProducts.includes(String(product.id));
-                    return (
-                      <div key={product.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0', borderBottom: '1px solid #f5f5f4' }}>
-                        <span style={{ fontSize: '0.875rem', color: isDisabled ? '#a8a29e' : '#1c1917', textDecoration: isDisabled ? 'line-through' : 'none' }}>
-                          {product.name} <span style={{ color: '#a8a29e', fontSize: '0.75rem' }}>({product.unit})</span>
-                        </span>
-                        <button
-                          onClick={() => toggleProduct(product.id)}
-                          style={{ padding: '0.25rem 0.75rem', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, background: isDisabled ? '#f5f5f4' : '#d1fae5', color: isDisabled ? '#a8a29e' : '#047857' }}
-                        >
-                          {isDisabled ? 'Hidden' : 'Visible'}
-                        </button>
-                      </div>
-                    );
-                  })}
+          {adminSection === 'products' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {CATEGORIES.map(cat => {
+                const catProds = PRODUCTS.filter(p => p.cat === cat.key);
+                if (catProds.length === 0) return null;
+                const visibleCount = catProds.filter(p => !disabledProducts.includes(String(p.id))).length;
+                return (
+                  <div key={cat.key} style={{ background: 'white', borderRadius: '14px', border: '1px solid #e7e5e4', overflow: 'hidden' }}>
+                    {/* Category header */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.625rem 1rem', background: '#f5f5f4', borderBottom: '1px solid #e7e5e4' }}>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#57534e', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{cat.emoji} {cat.label}</span>
+                      <span style={{ fontSize: '0.7rem', color: '#78716c' }}>{visibleCount}/{catProds.length} visible</span>
+                    </div>
+                    {/* Product rows */}
+                    {catProds.map((product, idx) => {
+                      const isDisabled = disabledProducts.includes(String(product.id));
+                      return (
+                        <div key={product.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', background: isDisabled ? '#fafaf9' : '#f0fdf4', borderBottom: idx < catProds.length - 1 ? '1px solid #e7e5e4' : 'none' }}>
+                          <div>
+                            <div style={{ fontSize: '0.875rem', fontWeight: 600, color: isDisabled ? '#a8a29e' : '#1c1917', textDecoration: isDisabled ? 'line-through' : 'none' }}>{product.name}</div>
+                            <div style={{ fontSize: '0.72rem', color: isDisabled ? '#c4c4c0' : '#6b7280', marginTop: '0.1rem' }}>{product.unit} · <strong>₹{product.price}</strong></div>
+                          </div>
+                          {/* Toggle switch */}
+                          <div onClick={() => toggleProduct(product.id)} style={{ width: '44px', height: '26px', borderRadius: '13px', background: isDisabled ? '#d4d4d0' : '#059669', display: 'flex', alignItems: 'center', padding: '3px', cursor: 'pointer', flexShrink: 0, marginLeft: '1rem', justifyContent: isDisabled ? 'flex-start' : 'flex-end' }}>
+                            <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.25)' }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* ── MANAGE ORDERS ── */}
+          {adminSection === 'orders' && (
+            <>
+              <div style={s.card}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                  <select value={adminFilterStatus} onChange={e => setAdminFilterStatus(e.target.value)} style={s.input}>
+                    <option value="Pending">Pending</option><option value="Done">Completed</option><option value="All">All</option>
+                  </select>
+                  <select value={adminFilterType} onChange={e => setAdminFilterType(e.target.value)} style={s.input}>
+                    <option value="">All Locations</option>
+                    {DELIVERY_OPTIONS.map(opt => <option key={opt.id} value={opt.label}>{opt.label}</option>)}
+                  </select>
                 </div>
-              );
-            })}
-          </div>
+                <div style={{ ...s.inputGroup, marginBottom: 0 }}>
+                  <Search style={s.iconPrefix} size={18} />
+                  <input type="text" placeholder="Search Name/Apt..." value={adminSearchName} onChange={e => setAdminSearchName(e.target.value)} style={s.input} />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', fontSize: '0.875rem', color: '#78716c' }}>
+                  <span>Found <strong>{filteredOrders.length}</strong> orders</span>
+                  <button onClick={fetchAdminOrders} style={{ color: '#059669', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Refresh</button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {adminLoading ? <div style={{ textAlign: 'center', padding: '2rem', color: '#a8a29e' }}><SpinLoader /> Loading...</div> :
+                  filteredOrders.map((order, idx) => (
+                    <div key={idx} style={{ ...s.card, borderLeft: order.status === 'Done' ? '4px solid #10b981' : '1px solid #e7e5e4' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                        <div>
+                          <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.1rem' }}>{order.customerName}</h3>
+                          <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: '#78716c', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                            <MapPin size={14}/> {order.deliveryType} {order.aptNumber && <span>• {order.aptNumber.replace(/^'/, '')}</span>}
+                          </p>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <span style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', backgroundColor: order.status === 'Done' ? '#d1fae5' : '#fef3c7', color: order.status === 'Done' ? '#047857' : '#b45309' }}>{order.status || 'Pending'}</span>
+                          <p style={{ fontSize: '0.75rem', color: '#a8a29e', margin: '0.25rem 0 0' }}>{new Date(order.date).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <div style={{ backgroundColor: '#fafaf9', padding: '0.75rem', borderRadius: 8, fontSize: '0.875rem' }}>
+                        <p style={{ margin: '0 0 0.25rem', fontWeight: 700 }}>Items:</p>
+                        <p style={{ margin: 0 }}>{order.items}</p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid #e7e5e4', fontWeight: 700 }}>
+                          <span>Total:</span><span>₹{order.total}</span>
+                        </div>
+                      </div>
+                      {order.status !== 'Done' && (
+                        <button onClick={() => markAsDelivered(order)} disabled={order.status === 'Updating...'} style={{ ...s.btn, ...s.btnPrimary, marginTop: '1rem' }}>
+                          {order.status === 'Updating...' ? <SpinLoader /> : <CheckCircle size={20} />}
+                          Mark Delivered
+                        </button>
+                      )}
+                    </div>
+                  ))
+                }
+              </div>
+            </>
+          )}
 
         </div>
       </div>
