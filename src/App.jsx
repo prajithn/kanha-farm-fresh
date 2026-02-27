@@ -541,7 +541,7 @@ const DELIVERY_OPTIONS = [
   { id: 'pbel', label: 'PBEL City', requiresApt: true },
   { id: 'mtv', label: 'Maple Town Villas', requiresApt: true },
   { id: 'aristos', label: 'Poulomi Aristos', requiresApt: true },
-  { id: 'pickup', label: 'Store pick up (Malabar Natives)', requiresApt: false },
+//  { id: 'pickup', label: 'Store pick up (Malabar Natives)', requiresApt: false },
 //  { id: 'gc', label: 'Pick up (Gachibowli Meditation Centre)', requiresApt: false },
 ];
 
