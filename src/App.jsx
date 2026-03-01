@@ -542,7 +542,7 @@ const PRODUCTS = [
   { id: 6,  cat: 'fruits', name: 'Guava',                                    unit: '1 Kg',         price: 80,  icon: <span style={{ fontSize: '2rem' }}>🍈</span>, desc: 'Fresh & Sweet' },
   { id: 7,  cat: 'fruits', name: 'Banana - Karpooravalli',                   unit: '1 Kg',         price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
   { id: 8,  cat: 'fruits', name: 'Mulberry',                                 unit: '125gm',        price: 100, icon: <MulberryIcon />,        desc: 'Sweet & Juicy' },
-  { id: 9,  cat: 'fruits', name: 'Indian Raspberry',                         unit: '100gm',        price: 100, icon: <IndianRaspberryIcon />, desc: 'Tangy & Fresh' },
+  { id: 9,  cat: 'fruits', name: 'Indian Raspberry',                         unit: '100gm',        price: 200, icon: <IndianRaspberryIcon />, desc: 'Tangy & Fresh' },
 
   // cat: 'greens'
   { id: 11, cat: 'greens', name: 'Palak',                                    unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
