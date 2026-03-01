@@ -537,13 +537,13 @@ const PRODUCTS = [
   { id: 1,  cat: 'fruits', name: 'Strawberry - 200gm',                       unit: 'Box (200g)',   price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 2,  cat: 'fruits', name: 'Strawberry - 500gm',                       unit: 'Box (500g)',   price: 225, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 3,  cat: 'fruits', name: 'Strawberry - 1Kg',                         unit: 'Box (1Kg)',    price: 400, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
-  { id: 4,  cat: 'fruits', name: 'Goldenberry',                              unit: '150gm',        price: 100, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
-  { id: 5,  cat: 'fruits', name: 'Goldenberry',                              unit: '250gm',        price: 150, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
+  { id: 4,  cat: 'fruits', name: 'Goldenberry - 150gm',                      unit: '150gm',        price: 100, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
+  { id: 5,  cat: 'fruits', name: 'Goldenberry - 250gm',                      unit: '250gm',        price: 150, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 6,  cat: 'fruits', name: 'Tender Coconut',                           unit: 'Piece',        price: 50,  icon: <TenderCoconutIcon />, desc: 'Refreshing' },
   { id: 7,  cat: 'fruits', name: 'Guava',                                    unit: '1 Kg',         price: 80,  icon: <span style={{ fontSize: '2rem' }}>🍈</span>, desc: 'Fresh & Sweet' },
   { id: 8,  cat: 'fruits', name: 'Banana - Karpooravalli',                   unit: '1 Kg',         price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
   { id: 9,  cat: 'fruits', name: 'Mulberry',                                 unit: '125gm',        price: 100, icon: <MulberryIcon />,        desc: 'Sweet & Juicy' },
-  { id: 10,  cat: 'fruits', name: 'Indian Raspberry',                         unit: '100gm',        price: 200, icon: <IndianRaspberryIcon />, desc: 'Tangy & Fresh' },
+  { id: 10,  cat: 'fruits', name: 'Indian Raspberry',                        unit: '100gm',        price: 200, icon: <IndianRaspberryIcon />, desc: 'Tangy & Fresh' },
 
   // cat: 'vegs'
   { id: 21, cat: 'vegs',   name: 'Beetroot',                                 unit: '500gm',        price: 35,  icon: <BeetrootIcon />, desc: 'Earthy Root' },
