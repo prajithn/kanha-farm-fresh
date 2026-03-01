@@ -500,6 +500,8 @@ const PRODUCTS = [
   { id: 5,  cat: 'fruits', name: 'Tender Coconut',                           unit: 'Piece',        price: 50,  icon: <TenderCoconutIcon />, desc: 'Refreshing' },
   { id: 6,  cat: 'fruits', name: 'Guava',                                    unit: '1 Kg',         price: 80,  icon: <span style={{ fontSize: '2rem' }}>🍈</span>, desc: 'Fresh & Sweet' },
   { id: 7,  cat: 'fruits', name: 'Banana - Karpooravalli',                   unit: '1 Kg',         price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
+  { id: 8,  cat: 'fruits', name: 'Mulberry',                                 unit: '125gm',        price: 100, icon: <span style={{ fontSize: '2rem' }}>🫐</span>, desc: 'Sweet & Juicy' },
+  { id: 9,  cat: 'fruits', name: 'Indian Raspberry',                         unit: '100gm',        price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Tangy & Fresh' },
 
   // cat: 'greens'
   { id: 11, cat: 'greens', name: 'Palak',                                    unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
@@ -514,6 +516,7 @@ const PRODUCTS = [
   { id: 24, cat: 'vegs',   name: 'Smooth Gourd',                             unit: '500gm',        price: 40,  icon: <SmoothGourdIcon />, desc: 'Nutritious' },
   { id: 25, cat: 'vegs',   name: 'Ridge Gourd',                              unit: '500gm',        price: 40,  icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
   { id: 26, cat: 'vegs',   name: 'Tomato',                                   unit: '1 Kg',         price: 60,  icon: <span style={{ fontSize: '2rem' }}>🍅</span>, desc: 'Fresh & Tangy' },
+  { id: 27, cat: 'vegs',   name: 'Carrot',                                   unit: '1 Kg',         price: 60,  icon: <span style={{ fontSize: '2rem' }}>🥕</span>, desc: 'Crunchy & Sweet' },
 
 
   // cat: 'dairy'
