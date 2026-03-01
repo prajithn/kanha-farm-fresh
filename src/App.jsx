@@ -392,6 +392,47 @@ const RidgeGourdIcon = () => (
   </svg>
 );
 
+const MulberryIcon = () => (
+  <svg viewBox="0 0 100 100" style={{ width: 40, height: 40, overflow: 'visible' }}>
+    {/* Stem */}
+    <path d="M44 18 Q 50 8 56 18" stroke="#15803d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    {/* Elongated drupe cluster — dark purple, like a blackberry/mulberry */}
+    <circle cx="50" cy="27" r="9"   fill="#7e22ce"/>
+    <circle cx="40" cy="37" r="9"   fill="#6b21a8"/>
+    <circle cx="60" cy="37" r="9"   fill="#6b21a8"/>
+    <circle cx="50" cy="47" r="9"   fill="#7e22ce"/>
+    <circle cx="38" cy="56" r="8.5" fill="#6b21a8"/>
+    <circle cx="62" cy="56" r="8.5" fill="#6b21a8"/>
+    <circle cx="50" cy="65" r="9"   fill="#7e22ce"/>
+    <circle cx="42" cy="74" r="8"   fill="#6b21a8"/>
+    <circle cx="58" cy="74" r="8"   fill="#6b21a8"/>
+    <circle cx="50" cy="82" r="8"   fill="#581c87"/>
+    {/* Shine dots */}
+    <circle cx="47" cy="29" r="2.5" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="47" cy="49" r="2"   fill="rgba(255,255,255,0.3)"/>
+    <circle cx="47" cy="67" r="2"   fill="rgba(255,255,255,0.3)"/>
+  </svg>
+);
+
+const IndianRaspberryIcon = () => (
+  <svg viewBox="0 0 100 100" style={{ width: 40, height: 40, overflow: 'visible' }}>
+    {/* Stem */}
+    <path d="M44 16 Q 50 6 56 16" stroke="#15803d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    {/* Round drupe cluster — golden yellow (hill raspberry is yellow when ripe) */}
+    <circle cx="50" cy="34"  r="11"  fill="#f59e0b"/>
+    <circle cx="36" cy="46"  r="11"  fill="#fbbf24"/>
+    <circle cx="64" cy="46"  r="11"  fill="#fbbf24"/>
+    <circle cx="43" cy="61"  r="11"  fill="#f59e0b"/>
+    <circle cx="57" cy="61"  r="11"  fill="#f59e0b"/>
+    <circle cx="50" cy="74"  r="10"  fill="#d97706"/>
+    {/* Hollow centre hint (raspberries are hollow) */}
+    <circle cx="50" cy="52"  r="5"   fill="#92400e" opacity="0.25"/>
+    {/* Shine dots */}
+    <circle cx="47" cy="32"  r="3"   fill="rgba(255,255,255,0.5)"/>
+    <circle cx="33" cy="44"  r="2.5" fill="rgba(255,255,255,0.45)"/>
+  </svg>
+);
+
 const SpinLoader = () => (
   <>
     <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
@@ -500,8 +541,8 @@ const PRODUCTS = [
   { id: 5,  cat: 'fruits', name: 'Tender Coconut',                           unit: 'Piece',        price: 50,  icon: <TenderCoconutIcon />, desc: 'Refreshing' },
   { id: 6,  cat: 'fruits', name: 'Guava',                                    unit: '1 Kg',         price: 80,  icon: <span style={{ fontSize: '2rem' }}>🍈</span>, desc: 'Fresh & Sweet' },
   { id: 7,  cat: 'fruits', name: 'Banana - Karpooravalli',                   unit: '1 Kg',         price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
-  { id: 8,  cat: 'fruits', name: 'Mulberry',                                 unit: '125gm',        price: 100, icon: <span style={{ fontSize: '2rem' }}>🫐</span>, desc: 'Sweet & Juicy' },
-  { id: 9,  cat: 'fruits', name: 'Indian Raspberry',                         unit: '100gm',        price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Tangy & Fresh' },
+  { id: 8,  cat: 'fruits', name: 'Mulberry',                                 unit: '125gm',        price: 100, icon: <MulberryIcon />,        desc: 'Sweet & Juicy' },
+  { id: 9,  cat: 'fruits', name: 'Indian Raspberry',                         unit: '100gm',        price: 100, icon: <IndianRaspberryIcon />, desc: 'Tangy & Fresh' },
 
   // cat: 'greens'
   { id: 11, cat: 'greens', name: 'Palak',                                    unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
@@ -538,12 +579,15 @@ const CATEGORIES = [
 const DELIVERY_OPTIONS = [
   { id: 'vihanga', label: 'My Home Vihanga', requiresApt: true },
   { id: 'krishe', label: 'My Home Krishe', requiresApt: true },
-  { id: 'phf', label: 'Prestige High Fields', requiresApt: true },
+  { id: 'bhooja', label: 'My Home Bhooja', requiresApt: true },
+  //  { id: 'phf', label: 'Prestige High Fields', requiresApt: true },
   { id: 'atria', label: 'Rajapushpa Atria', requiresApt: true },
-  { id: 'tranquil', label: 'Prestige Tranquil', requiresApt: true },
-  { id: 'pbel', label: 'PBEL City', requiresApt: true },
+//  { id: 'tranquil', label: 'Prestige Tranquil', requiresApt: true },
+//  { id: 'pbel', label: 'PBEL City', requiresApt: true },
   { id: 'mtv', label: 'Maple Town Villas', requiresApt: true },
-  { id: 'aristos', label: 'Poulomi Aristos', requiresApt: true },
+  { id: 'asblks', label: 'ASBL Lakeside', requiresApt: true },
+
+//  { id: 'aristos', label: 'Poulomi Aristos', requiresApt: true },
 //  { id: 'pickup', label: 'Store pick up (Malabar Natives)', requiresApt: false },
 //  { id: 'gc', label: 'Pick up (Gachibowli Meditation Centre)', requiresApt: false },
 ];
