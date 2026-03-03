@@ -533,6 +533,7 @@ const Modal = ({ isOpen, type, message, title, onClose, onConfirm, confirmLabel,
 // --- DATA ---
 const PRODUCTS = [
 
+
   // cat: 'fruits'
   { id: 1,  cat: 'fruits', name: 'Strawberry - 200gm',                       unit: 'Box (200g)',   price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 2,  cat: 'fruits', name: 'Strawberry - 500gm',                       unit: 'Box (500g)',   price: 225, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
@@ -540,10 +541,10 @@ const PRODUCTS = [
   { id: 4,  cat: 'fruits', name: 'Goldenberry - 150gm',                      unit: '150gm',        price: 100, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 5,  cat: 'fruits', name: 'Goldenberry - 250gm',                      unit: '250gm',        price: 150, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 6,  cat: 'fruits', name: 'Tender Coconut',                           unit: 'Piece',        price: 50,  icon: <TenderCoconutIcon />, desc: 'Refreshing' },
-  { id: 7,  cat: 'fruits', name: 'Guava',                                    unit: '1 Kg',         price: 80,  icon: <span style={{ fontSize: '2rem' }}>🍈</span>, desc: 'Fresh & Sweet' },
-  { id: 8,  cat: 'fruits', name: 'Banana - Karpooravalli',                   unit: '1 Kg',         price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
-  { id: 9,  cat: 'fruits', name: 'Mulberry',                                 unit: '125gm',        price: 100, icon: <MulberryIcon />,        desc: 'Sweet & Juicy' },
-  { id: 10,  cat: 'fruits', name: 'Indian Raspberry',                        unit: '100gm',        price: 200, icon: <IndianRaspberryIcon />, desc: 'Tangy & Fresh' },
+ // { id: 7,  cat: 'fruits', name: 'Guava',                                    unit: '1 Kg',         price: 80,  icon: <span style={{ fontSize: '2rem' }}>🍈</span>, desc: 'Fresh & Sweet' },
+ // { id: 8,  cat: 'fruits', name: 'Banana - Karpooravalli',                   unit: '1 Kg',         price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
+ // { id: 9,  cat: 'fruits', name: 'Mulberry',                                 unit: '125gm',        price: 100, icon: <MulberryIcon />,        desc: 'Sweet & Juicy' },
+  { id: 10, cat: 'fruits', name: 'Indian Raspberry',                        unit: '100gm',        price: 200, icon: <IndianRaspberryIcon />, desc: 'Tangy & Fresh' },
 
   // cat: 'vegs'
   { id: 21, cat: 'vegs',   name: 'Beetroot',                                 unit: '500gm',        price: 35,  icon: <BeetrootIcon />, desc: 'Earthy Root' },
@@ -565,8 +566,8 @@ const PRODUCTS = [
 
   // cat: 'greens'
   { id: 41, cat: 'greens', name: 'Palak',                                    unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
-  { id: 42, cat: 'greens', name: 'Methi Leaves',                             unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
-  { id: 43, cat: 'greens', name: 'Coriander Leaves',                         unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
+ // { id: 42, cat: 'greens', name: 'Methi Leaves',                             unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
+ // { id: 43, cat: 'greens', name: 'Coriander Leaves',                         unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
   { id: 44, cat: 'greens', name: 'Curry Leaves',                             unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
 
 ];
