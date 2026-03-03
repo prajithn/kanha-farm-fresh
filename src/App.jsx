@@ -577,15 +577,18 @@ const CATEGORIES = [
 ];
 
 const DELIVERY_OPTIONS = [
-  { id: 'vihanga', label: 'My Home Vihanga', requiresApt: true },
-  { id: 'krishe', label: 'My Home Krishe', requiresApt: true },
+  { id: 'asblks', label: 'ASBL Lakeside', requiresApt: true },
+
+  { id: 'mtv', label: 'Maple Town Villas', requiresApt: true },
   { id: 'bhooja', label: 'My Home Bhooja', requiresApt: true },
-  //  { id: 'phf', label: 'Prestige High Fields', requiresApt: true },
+  { id: 'krishe', label: 'My Home Krishe', requiresApt: true },
+
+  { id: 'vihanga', label: 'My Home Vihanga', requiresApt: true },
   { id: 'atria', label: 'Rajapushpa Atria', requiresApt: true },
+
+  //  { id: 'phf', label: 'Prestige High Fields', requiresApt: true },
 //  { id: 'tranquil', label: 'Prestige Tranquil', requiresApt: true },
 //  { id: 'pbel', label: 'PBEL City', requiresApt: true },
-  { id: 'mtv', label: 'Maple Town Villas', requiresApt: true },
-  { id: 'asblks', label: 'ASBL Lakeside', requiresApt: true },
 
 //  { id: 'aristos', label: 'Poulomi Aristos', requiresApt: true },
 //  { id: 'pickup', label: 'Store pick up (Malabar Natives)', requiresApt: false },
@@ -1290,7 +1293,7 @@ function SmartGrocerApp() {
   }
 
   return (
-    <div style={s.container}>
+    <div style={{ ...s.container, paddingBottom: view === 'delivery' ? 0 : s.container.paddingBottom }}>
       <Modal {...modal} onClose={() => setModal({ ...modal, isOpen: false })} />
       
       {SHOW_HARVESTING_SCREEN ? (
@@ -1366,56 +1369,118 @@ function SmartGrocerApp() {
             })}
           </div>
 
+          {showScrollCue && Object.keys(cart).length > 4 && (
+            <>
+              <style>{`@keyframes scrollBounce { 0%, 100% { transform: translateY(0); } 55% { transform: translateY(5px); } }`}</style>
+              <div style={{ position: 'fixed', bottom: '6.25rem', left: '50%', transform: 'translateX(-50%)', pointerEvents: 'none', zIndex: 40, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ background: 'white', borderRadius: '20px', padding: '0.25rem 0.75rem 0.3rem', boxShadow: '0 2px 10px rgba(0,0,0,0.13)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.05rem' }}>
+                  <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#78716c', letterSpacing: '0.5px', textTransform: 'uppercase' }}>More below</span>
+                  <ChevronDown color="#059669" size={15} style={{ animation: 'scrollBounce 1.3s ease-in-out infinite' }} />
+                </div>
+              </div>
+            </>
+          )}
+
           <div style={s.bottomBar}>
             <div style={{ maxWidth: '600px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <p style={{ fontSize: '0.75rem', color: '#78716c', textTransform: 'uppercase', fontWeight: 700, margin: 0 }}>Total</p>
                 <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#064e3b', margin: 0 }}>₹{calculateTotal()}</p>
               </div>
-              <button onClick={() => setView('checkout')} style={{ ...s.btn, ...s.btnPrimary, width: 'auto', paddingLeft: '1.5rem', paddingRight: '1.5rem', marginTop: 0 }}>
+              <button onClick={() => { setView('delivery'); window.scrollTo(0, 0); }} style={{ ...s.btn, ...s.btnPrimary, width: 'auto', paddingLeft: '1.5rem', paddingRight: '1.5rem', marginTop: 0 }}>
                 Proceed <ArrowRight size={18} />
               </button>
             </div>
           </div>
         </>
 
-      ) : view === 'checkout' ? (
-        // ── CHECKOUT VIEW ──
-        <>
+      ) : view === 'delivery' ? (
+        // ── DELIVERY LOCATION VIEW ──
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           <div style={{ background: '#047857', color: 'white', padding: '1rem', borderRadius: '0 0 24px 24px', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button onClick={() => setView('cart')} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}>
+            <button onClick={() => { setView('cart'); window.scrollTo(0, 0); }} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}>
               <ArrowLeft size={22} />
             </button>
-            <h2 style={{ fontWeight: 700, fontSize: '1.25rem', margin: 0 }}>Checkout</h2>
+            <div>
+              <p style={{ margin: 0, fontSize: '0.65rem', color: '#6ee7b7', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Step 1 of 2</p>
+              <h2 style={{ fontWeight: 700, fontSize: '1.25rem', margin: 0 }}>Delivery Location</h2>
+            </div>
+          </div>
+
+          <div style={{ flex: 1, padding: '1rem' }}>
+            <p style={{ fontSize: '0.8rem', color: '#78716c', margin: '0 0 1rem' }}>Where should we deliver your order?</p>
+            <select
+              value={deliveryType}
+              onChange={e => { setDeliveryType(e.target.value); setAptNumber(''); }}
+              style={{ width: '100%', padding: '0.875rem 2.5rem 0.875rem 1rem', border: '1px solid #e7e5e4', borderRadius: '12px', fontSize: '1rem', boxSizing: 'border-box', outline: 'none', backgroundColor: 'white', color: deliveryType ? '#1c1917' : '#a8a29e', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2378716c\' stroke-width=\'2\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+            >
+              <option value="">— Choose a location —</option>
+              {DELIVERY_OPTIONS.map(option => (
+                <option key={option.id} value={option.id}>{option.label}</option>
+              ))}
+            </select>
+
+            {DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt && (
+              <div style={{ marginTop: '1.25rem' }}>
+                <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '0 0 0.5rem' }}>Block & Flat Number</p>
+                <input type="text" placeholder="e.g. A-101" value={aptNumber} onChange={e => setAptNumber(e.target.value.slice(0, 15))} maxLength={15} style={{ ...s.input, padding: '0.875rem 1rem', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }} />
+                <p style={{ fontSize: '0.7rem', color: '#a8a29e', marginTop: '0.25rem', textAlign: 'right' }}>{aptNumber.length}/15</p>
+              </div>
+            )}
+
+            {deliveryType && (
+              <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: '12px', padding: '0.75rem 1rem', marginTop: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <MapPin size={16} color="#047857" />
+                <span style={{ fontSize: '0.875rem', color: '#047857', fontWeight: 600 }}>
+                  {DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label}
+                  {aptNumber ? ` · ${aptNumber}` : ''}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div style={{ backgroundColor: 'white', padding: '1rem', borderTop: '1px solid #e7e5e4' }}>
+            <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+              <button
+                onClick={() => {
+                  const needsApt = DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt;
+                  const ready = !!deliveryType && (!needsApt || !!aptNumber.trim());
+                  if (ready) setView('checkout');
+                }}
+                disabled={!deliveryType || (DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt && !aptNumber.trim())}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                  width: '100%', padding: '0.875rem 1.5rem', border: 'none', borderRadius: '12px',
+                  backgroundColor: '#059669', color: 'white', fontWeight: 700, fontSize: '1rem',
+                  cursor: 'pointer', boxSizing: 'border-box',
+                  opacity: (!deliveryType || (DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt && !aptNumber.trim())) ? 0.5 : 1
+                }}
+              >
+                Next <ArrowRight size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+      ) : view === 'checkout' ? (
+        // ── YOUR INFO VIEW ──
+        <>
+          <div style={{ background: '#047857', color: 'white', padding: '1rem', borderRadius: '0 0 24px 24px', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <button onClick={() => { document.activeElement?.blur(); setView('delivery'); window.scrollTo(0, 0); }} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}>
+              <ArrowLeft size={22} />
+            </button>
+            <div>
+              <p style={{ margin: 0, fontSize: '0.65rem', color: '#6ee7b7', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Step 2 of 2</p>
+              <h2 style={{ fontWeight: 700, fontSize: '1.25rem', margin: 0 }}>Your Info</h2>
+            </div>
           </div>
 
           <div style={{ padding: '1rem' }}>
-            <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '0 0 0.5rem' }}>Delivery Location</p>
-            <div style={s.card}>
-              <select
-                value={deliveryType}
-                onChange={e => { setDeliveryType(e.target.value); setAptNumber(''); }}
-                style={{ width: '100%', padding: '0.75rem 2.5rem 0.75rem 1rem', border: '1px solid #e7e5e4', borderRadius: '12px', fontSize: '1rem', boxSizing: 'border-box', outline: 'none', backgroundColor: 'white', color: deliveryType ? '#1c1917' : '#a8a29e', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2378716c\' stroke-width=\'2\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
-              >
-                <option value="">— Choose a location —</option>
-                {DELIVERY_OPTIONS.map(option => (
-                  <option key={option.id} value={option.id}>{option.label}</option>
-                ))}
-              </select>
-              {DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt && (
-                <div style={{ marginTop: '1rem' }}>
-                  <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Block & Flat Number</p>
-                  <input type="text" placeholder="e.g. A-101" value={aptNumber} onChange={e => setAptNumber(e.target.value.slice(0, 15))} maxLength={15} style={s.input} />
-                  <p style={{ fontSize: '0.7rem', color: '#a8a29e', marginTop: '0.25rem', textAlign: 'right' }}>{aptNumber.length}/15</p>
-                </div>
-              )}
-            </div>
-
-            <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '1rem 0 0.5rem' }}>Your Info</p>
+            <p style={{ fontSize: '0.8rem', color: '#78716c', margin: '0 0 1rem' }}>Almost there! Just your name and number.</p>
             <div style={s.card}>
               <div style={s.inputGroup}>
                 <User style={s.iconPrefix} size={18} />
-                <input type="text" placeholder="Full Name" value={customerName} onChange={e => setCustomerName(e.target.value)} style={s.input} />
+                <input type="text" placeholder="Full Name" value={customerName} onChange={e => setCustomerName(e.target.value)} style={s.input} autoFocus />
               </div>
               <div style={{ ...s.inputGroup, marginBottom: 0 }}>
                 <Phone style={s.iconPrefix} size={18} />
@@ -1423,17 +1488,26 @@ function SmartGrocerApp() {
               </div>
             </div>
 
-            <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: '12px', padding: '0.75rem 1rem', marginTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.875rem', color: '#047857' }}>Order Total</span>
-              <span style={{ fontWeight: 800, fontSize: '1.25rem', color: '#064e3b' }}>₹{calculateTotal()}</span>
+            <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: '12px', padding: '0.875rem 1rem', marginTop: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem' }}>
+                <MapPin size={14} color="#047857" />
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#047857', textTransform: 'uppercase', letterSpacing: '0.4px' }}>Delivering to</span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.875rem', color: '#064e3b', fontWeight: 600 }}>
+                {DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label}
+                {aptNumber ? ` · ${aptNumber}` : ''}
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.625rem', paddingTop: '0.625rem', borderTop: '1px solid #a7f3d0' }}>
+                <span style={{ fontSize: '0.875rem', color: '#047857' }}>Order Total</span>
+                <span style={{ fontWeight: 800, fontSize: '1.25rem', color: '#064e3b' }}>₹{calculateTotal()}</span>
+              </div>
             </div>
           </div>
 
           <div style={s.bottomBar}>
             <div style={{ maxWidth: '600px', margin: '0 auto' }}>
               {(() => {
-                const needsApt = DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt;
-                const ready = !!deliveryType && (!needsApt || !!aptNumber.trim()) && customerName.trim().length >= 2 && mobileNumber.length >= 10;
+                const ready = customerName.trim().length >= 2 && mobileNumber.length >= 10;
                 return (
                   <>
                     <button
@@ -1538,11 +1612,16 @@ function SmartGrocerApp() {
             )}
           </div>
 
-          {showScrollCue && (
-            <div style={{ position: 'fixed', bottom: '6rem', left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: 0.6, pointerEvents: 'none' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c' }}>Scroll Down</span>
-              <ChevronDown color="#78716c" />
-            </div>
+          {showScrollCue && productsReady && !productsError && (
+            <>
+              <style>{`@keyframes scrollBounce { 0%, 100% { transform: translateY(0); } 55% { transform: translateY(5px); } }`}</style>
+              <div style={{ position: 'fixed', bottom: '6.25rem', left: '50%', transform: 'translateX(-50%)', pointerEvents: 'none', zIndex: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}>
+                <div style={{ background: 'white', borderRadius: '20px', padding: '0.25rem 0.75rem 0.3rem', boxShadow: '0 2px 10px rgba(0,0,0,0.13)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.05rem' }}>
+                  <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#78716c', letterSpacing: '0.5px', textTransform: 'uppercase' }}>More below</span>
+                  <ChevronDown color="#059669" size={15} style={{ animation: 'scrollBounce 1.3s ease-in-out infinite' }} />
+                </div>
+              </div>
+            </>
           )}
 
           <div style={s.bottomBar}>
@@ -1556,7 +1635,7 @@ function SmartGrocerApp() {
                 const itemCount = Object.values(cart).reduce((sum, q) => sum + q, 0);
                 return (
                   <button
-                    onClick={() => { if (total > 0) setView('cart'); }}
+                    onClick={() => { if (total > 0) { setView('cart'); window.scrollTo(0, 0); } }}
                     disabled={total === 0}
                     style={{ ...s.btn, ...s.btnPrimary, width: 'auto', paddingLeft: '1.25rem', paddingRight: '1.25rem', marginTop: 0, opacity: total === 0 ? 0.5 : 1 }}
                   >
