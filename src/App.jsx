@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, ArrowLeft, Loader2, Lock, Search, X, AlertCircle, Sparkles } from 'lucide-react';
+import { MapPin, Phone, User, CheckCircle, ChevronDown, Minus, Plus, Leaf, ArrowRight, ArrowLeft, Loader2, Lock, Search, X, AlertCircle, Sparkles, Trash2 } from 'lucide-react';
 
 // --- GLOBAL SHIM ---
 // Prevents environment crashes by mocking the tailwind object immediately
@@ -13,9 +13,6 @@ import { MapPin, Phone, User, Upload, CheckCircle, ChevronDown, Minus, Plus, Lea
 
 // --- CONFIGURATION ---
 const SHOW_HARVESTING_SCREEN = false;
-const UPI_ID = 'paytm.s18fahk@pty';
-const MERCHANT_NAME = 'Kanha Farm Fresh';
-const USE_EASEBUZZ = true; // Easebuzz iframe checkout (no redirect)
 const SCRIPT_SECRET = 'kff_secret_9x7z';
 
 // --- STYLES (STRICT INLINE - NO CLASSES) ---
@@ -541,9 +538,9 @@ const PRODUCTS = [
   { id: 4,  cat: 'fruits', name: 'Goldenberry - 150gm',                      unit: '150gm',        price: 100, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 5,  cat: 'fruits', name: 'Goldenberry - 250gm',                      unit: '250gm',        price: 150, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 6,  cat: 'fruits', name: 'Tender Coconut',                           unit: 'Piece',        price: 50,  icon: <TenderCoconutIcon />, desc: 'Refreshing' },
- // { id: 7,  cat: 'fruits', name: 'Guava',                                    unit: '1 Kg',         price: 80,  icon: <span style={{ fontSize: '2rem' }}>🍈</span>, desc: 'Fresh & Sweet' },
- // { id: 8,  cat: 'fruits', name: 'Banana - Karpooravalli',                   unit: '1 Kg',         price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
- // { id: 9,  cat: 'fruits', name: 'Mulberry',                                 unit: '125gm',        price: 100, icon: <MulberryIcon />,        desc: 'Sweet & Juicy' },
+  { id: 7,  cat: 'fruits', name: 'Guava',                                    unit: '1 Kg',         price: 80,  icon: <span style={{ fontSize: '2rem' }}>🍈</span>, desc: 'Fresh & Sweet' },
+  { id: 8,  cat: 'fruits', name: 'Banana - Karpooravalli',                   unit: '1 Kg',         price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
+  { id: 9,  cat: 'fruits', name: 'Mulberry',                                 unit: '125gm',        price: 100, icon: <MulberryIcon />,        desc: 'Sweet & Juicy' },
   { id: 10, cat: 'fruits', name: 'Indian Raspberry',                        unit: '100gm',        price: 200, icon: <IndianRaspberryIcon />, desc: 'Tangy & Fresh' },
 
   // cat: 'vegs'
@@ -566,8 +563,8 @@ const PRODUCTS = [
 
   // cat: 'greens'
   { id: 41, cat: 'greens', name: 'Palak',                                    unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🥬</span>, desc: 'Iron Rich' },
- // { id: 42, cat: 'greens', name: 'Methi Leaves',                             unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
- // { id: 43, cat: 'greens', name: 'Coriander Leaves',                         unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
+  { id: 42, cat: 'greens', name: 'Methi Leaves',                             unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Nutritious' },
+  { id: 43, cat: 'greens', name: 'Coriander Leaves',                         unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
   { id: 44, cat: 'greens', name: 'Curry Leaves',                             unit: 'Bunch (200g)', price: 30,  icon: <span style={{ fontSize: '2rem' }}>🌿</span>, desc: 'Aromatic' },
 
 ];
@@ -615,13 +612,9 @@ function SmartGrocerApp() {
   const [aptNumber, setAptNumber] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
-  const [showPayment, setShowPayment] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const [orderDate, setOrderDate] = useState(null);
-  const [paymentFile, setPaymentFile] = useState(null);
   const [showScrollCue, setShowScrollCue] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [upiCopied, setUpiCopied] = useState(false);
   const [orderSummary, setOrderSummary] = useState(null);
 
   // Admin State
@@ -637,10 +630,9 @@ function SmartGrocerApp() {
   const [adminFilterStatus, setAdminFilterStatus] = useState('Pending');
   const [adminSection, setAdminSection] = useState('menu');
   const [disabledProducts, setDisabledProducts] = useState([]);
+  const [productsReady, setProductsReady] = useState(false);
+  const [productsError, setProductsError] = useState(false);
 
-  const productsRef = useRef(null);
-  const deliveryRef = useRef(null);
-  const infoRef = useRef(null);
   const paymentHandledRef = useRef(false); // prevents duplicate onResponse processing
 
   useEffect(() => {
@@ -652,13 +644,36 @@ function SmartGrocerApp() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fetch disabled products on mount — fail silently (show all if unreachable)
+  // Fetch disabled products on mount — use localStorage cache if available
   useEffect(() => {
+    const CACHE_KEY = 'kff_disabled_products';
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      setDisabledProducts(JSON.parse(cached));
+      setProductsReady(true);
+    }
     fetch(`${GOOGLE_SCRIPT_URL}?action=get_disabled_products&cb=${Date.now()}`, { credentials: 'omit' })
       .then(r => r.json())
-      .then(data => setDisabledProducts(data.disabled || []))
-      .catch(() => {});
+      .then(data => {
+        const disabled = data.disabled || [];
+        setDisabledProducts(disabled);
+        setProductsReady(true);
+        localStorage.setItem(CACHE_KEY, JSON.stringify(disabled));
+      })
+      .catch(() => {
+        if (!cached) {
+          // No cache — refuse to show products to avoid showing disabled items
+          setProductsError(true);
+          setProductsReady(true);
+        }
+        // If cache exists it's already applied — silently keep it
+      });
   }, []);
+
+  // Auto-navigate back to products if cart becomes empty while on cart view
+  useEffect(() => {
+    if (view === 'cart' && Object.keys(cart).length === 0) setView('home');
+  }, [cart, view]);
 
   // Payment callback — runs once on mount to detect Easebuzz redirect
   useEffect(() => {
@@ -720,29 +735,6 @@ function SmartGrocerApp() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // --- LOGIC ---
-  const compressImage = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 800;
-          const scaleSize = MAX_WIDTH / img.width;
-          if (img.width > MAX_WIDTH) { canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize; } 
-          else { canvas.width = img.width; canvas.height = img.height; }
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          resolve(canvas.toDataURL('image/jpeg', 0.6));
-        };
-        img.onerror = reject;
-      };
-      reader.onerror = reject;
-    });
-  };
-
   const updateQuantity = (id, change) => {
     setCart(prev => {
       const current = prev[id] || 0;
@@ -757,68 +749,6 @@ function SmartGrocerApp() {
     return total + (product ? product.price * qty : 0);
   }, 0);
 
-  const handleSmartAction = () => {
-    const total = calculateTotal();
-    if (total === 0) { productsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
-    if (!deliveryType) { deliveryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
-    const needsApt = DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt;
-    if (needsApt && aptNumber.trim().length === 0) { deliveryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
-    if (customerName.trim().length < 2 || mobileNumber.length < 10) { infoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
-    setShowPayment(true);
-    window.scrollTo(0, 0);
-  };
-
-  const getButtonText = () => {
-     const total = calculateTotal();
-     if (total === 0) return { text: "Add Items", icon: <Plus size={20} /> };
-     if (!deliveryType) return { text: "Choose Delivery", icon: <MapPin size={20} /> };
-     const needsApt = DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt;
-     // FIX: Validation logic matched to handleSmartAction to prevent confusing user
-     if (needsApt && aptNumber.trim().length === 0) return { text: "Enter Apt #", icon: <MapPin size={20} /> };
-     if (customerName.trim().length < 2 || mobileNumber.length < 10) return { text: "Enter Contact Info", icon: <User size={20} /> };
-     return { text: "Proceed to Pay", icon: <ArrowRight size={20} /> };
-  }
-
-  const handleFinalizeOrder = async () => {
-    setIsSubmitting(true);
-    try {
-      const itemsString = Object.entries(cart).map(([id, qty]) => `${PRODUCTS.find(p => p.id === parseInt(id)).name} (${qty})`).join(", ");
-      let base64Image = '';
-      let imageName = '';
-      if (paymentFile) {
-        base64Image = await compressImage(paymentFile);
-        imageName = paymentFile.name;
-      }
-      const orderData = {
-        action: 'create',
-        secret: SCRIPT_SECRET,
-        customerName,
-        mobileNumber,
-        deliveryType: DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label,
-        aptNumber: aptNumber ? "'" + aptNumber : '',
-        items: itemsString,
-        total: calculateTotal(),
-        image: base64Image,
-        imageName
-      };
-      await fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(orderData) });
-      setOrderSummary({ total: calculateTotal(), deliveryLabel: DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.label || '', items: Object.entries(cart).filter(([,qty]) => qty > 0).map(([id, qty]) => { const p = PRODUCTS.find(p => p.id === parseInt(id)); return { name: p.name, unit: p.unit, qty }; }) });
-      setOrderDate(new Date());
-      setOrderPlaced(true);
-      window.scrollTo(0, 0);
-    } catch (error) {
-      setModal({ isOpen: true, type: 'alert', title: 'Couldn\'t place order', message: 'Something went wrong while saving your order. Please try again, or WhatsApp Mani on 81790 68821 if it keeps happening.' });
-    } finally { setIsSubmitting(false); }
-  };
-
-  const copyUpiId = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(UPI_ID).then(() => {
-        setUpiCopied(true);
-        setTimeout(() => setUpiCopied(false), 2500);
-      });
-    }
-  };
 
   const loadCheckoutScript = () => new Promise((resolve, reject) => {
     if (window.EasebuzzCheckout) { resolve(); return; }
@@ -894,7 +824,6 @@ function SmartGrocerApp() {
           if (data.status === 'success') {
             // Sheet update handled by Vercel webhook (server-to-server) — no client call needed.
             setOrderSummary({ total, deliveryLabel, items: Object.entries(cart).filter(([,qty]) => qty > 0).map(([id, qty]) => { const p = PRODUCTS.find(p => p.id === parseInt(id)); return { name: p.name, unit: p.unit, qty }; }) });
-            setOrderDate(new Date());
             setOrderPlaced(true);
             window.scrollTo(0, 0);
           } else if (data.status !== 'userCancelled') {
@@ -913,12 +842,6 @@ function SmartGrocerApp() {
         confirmLabel: 'Try Again',
         onConfirm: initiateEasebuzzPayment,
       });
-    }
-  };
-
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setPaymentFile(e.target.files[0]);
     }
   };
 
@@ -1411,116 +1334,123 @@ function SmartGrocerApp() {
           </div>
           <button onClick={() => window.location.reload()} style={{ ...s.btn, ...s.btnPrimary }}>Place Another Order</button>
         </div>
-      ) : showPayment ? (
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-          {/* Header */}
-          <div style={s.header}>
-            <button onClick={() => { setShowPayment(false); setPaymentFile(null); }} style={{ background: 'none', border: 'none', color: 'white', marginRight: '0.5rem', cursor: 'pointer' }}>
-              <ArrowRight style={{ transform: 'rotate(180deg)' }} />
+      ) : view === 'cart' ? (
+        // ── CART VIEW ──
+        <>
+          <div style={{ background: '#047857', color: 'white', padding: '1rem', borderRadius: '0 0 24px 24px', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <button onClick={() => setView('home')} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}>
+              <ArrowLeft size={22} />
             </button>
-            <h2 style={{ fontWeight: 700, fontSize: '1.25rem', margin: 0 }}>Payment</h2>
+            <h2 style={{ fontWeight: 700, fontSize: '1.25rem', margin: 0 }}>Your Cart</h2>
           </div>
 
-          <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ padding: '1rem' }}>
+            {Object.entries(cart).filter(([, qty]) => qty > 0).map(([id, qty]) => {
+              const product = PRODUCTS.find(p => p.id === parseInt(id));
+              if (!product) return null;
+              return (
+                <div key={id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', backgroundColor: 'white', border: '1px solid #e7e5e4', borderRadius: '12px', padding: '0.75rem 0.875rem', marginBottom: '0.625rem', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                  <div style={{ fontSize: '1.75rem', flexShrink: 0, lineHeight: 1, display: 'flex', alignItems: 'center' }}>{product.icon}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: 0, fontWeight: 600, fontSize: '0.875rem', color: '#1c1917', lineHeight: 1.3 }}>{product.name}</p>
+                    <p style={{ margin: '0.1rem 0 0', fontSize: '0.72rem', color: '#78716c' }}>{product.unit} · ₹{product.price}</p>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
+                    <button onClick={() => updateQuantity(product.id, -1)} style={{ width: '28px', height: '28px', border: '1px solid #e7e5e4', borderRadius: '6px', background: 'white', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Minus size={13} /></button>
+                    <span style={{ minWidth: '1.5rem', textAlign: 'center', fontWeight: 700, fontSize: '0.9rem', color: '#1c1917' }}>{qty}</span>
+                    <button onClick={() => updateQuantity(product.id, 1)} style={{ width: '28px', height: '28px', border: 'none', borderRadius: '6px', background: '#059669', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Plus size={13} /></button>
+                    <button onClick={() => setCart(prev => { const next = { ...prev }; delete next[product.id]; return next; })} style={{ width: '28px', height: '28px', border: 'none', borderRadius: '6px', background: '#fff1f2', color: '#e11d48', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginLeft: '0.25rem' }}><Trash2 size={13} /></button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-            {/* Amount */}
-            <div style={{ textAlign: 'center', padding: '1rem 0' }}>
-              <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', margin: 0, letterSpacing: '1px' }}>Total Amount</p>
-              <p style={{ fontSize: '3rem', fontWeight: 800, color: '#065f46', margin: '0.25rem 0 0' }}>₹{calculateTotal()}</p>
+          <div style={s.bottomBar}>
+            <div style={{ maxWidth: '600px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p style={{ fontSize: '0.75rem', color: '#78716c', textTransform: 'uppercase', fontWeight: 700, margin: 0 }}>Total</p>
+                <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#064e3b', margin: 0 }}>₹{calculateTotal()}</p>
+              </div>
+              <button onClick={() => setView('checkout')} style={{ ...s.btn, ...s.btnPrimary, width: 'auto', paddingLeft: '1.5rem', paddingRight: '1.5rem', marginTop: 0 }}>
+                Proceed <ArrowRight size={18} />
+              </button>
+            </div>
+          </div>
+        </>
+
+      ) : view === 'checkout' ? (
+        // ── CHECKOUT VIEW ──
+        <>
+          <div style={{ background: '#047857', color: 'white', padding: '1rem', borderRadius: '0 0 24px 24px', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <button onClick={() => setView('cart')} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}>
+              <ArrowLeft size={22} />
+            </button>
+            <h2 style={{ fontWeight: 700, fontSize: '1.25rem', margin: 0 }}>Checkout</h2>
+          </div>
+
+          <div style={{ padding: '1rem' }}>
+            <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '0 0 0.5rem' }}>Delivery Location</p>
+            <div style={s.card}>
+              <select
+                value={deliveryType}
+                onChange={e => { setDeliveryType(e.target.value); setAptNumber(''); }}
+                style={{ width: '100%', padding: '0.75rem 2.5rem 0.75rem 1rem', border: '1px solid #e7e5e4', borderRadius: '12px', fontSize: '1rem', boxSizing: 'border-box', outline: 'none', backgroundColor: 'white', color: deliveryType ? '#1c1917' : '#a8a29e', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2378716c\' stroke-width=\'2\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
+              >
+                <option value="">— Choose a location —</option>
+                {DELIVERY_OPTIONS.map(option => (
+                  <option key={option.id} value={option.id}>{option.label}</option>
+                ))}
+              </select>
+              {DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt && (
+                <div style={{ marginTop: '1rem' }}>
+                  <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Block & Flat Number</p>
+                  <input type="text" placeholder="e.g. A-101" value={aptNumber} onChange={e => setAptNumber(e.target.value.slice(0, 15))} maxLength={15} style={s.input} />
+                  <p style={{ fontSize: '0.7rem', color: '#a8a29e', marginTop: '0.25rem', textAlign: 'right' }}>{aptNumber.length}/15</p>
+                </div>
+              )}
             </div>
 
-            {USE_EASEBUZZ ? (
-              <>
-                {/* ── PRIMARY: Easebuzz gateway ── */}
-                <button
-                  onClick={initiateEasebuzzPayment}
-                  disabled={isSubmitting}
-                  style={{ ...s.btn, ...s.btnPrimary, background: 'linear-gradient(135deg, #059669 0%, #047857 100%)', fontSize: '1.05rem', padding: '1rem', gap: '0.6rem', boxShadow: '0 4px 14px rgba(5,150,105,0.35)', marginTop: 0, opacity: isSubmitting ? 0.75 : 1 }}
-                >
-                  {isSubmitting ? <SpinLoader /> : <span style={{ fontSize: '1.3rem' }}>💳</span>}
-                  <span>{isSubmitting ? 'Preparing Payment...' : `Pay ₹${calculateTotal()} Securely`}</span>
-                </button>
+            <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '1rem 0 0.5rem' }}>Your Info</p>
+            <div style={s.card}>
+              <div style={s.inputGroup}>
+                <User style={s.iconPrefix} size={18} />
+                <input type="text" placeholder="Full Name" value={customerName} onChange={e => setCustomerName(e.target.value)} style={s.input} />
+              </div>
+              <div style={{ ...s.inputGroup, marginBottom: 0 }}>
+                <Phone style={s.iconPrefix} size={18} />
+                <input type="tel" placeholder="Mobile Number" value={mobileNumber} onChange={e => { if(/^\d*$/.test(e.target.value)) setMobileNumber(e.target.value) }} style={s.input} />
+              </div>
+            </div>
 
-                {/* Supported methods */}
-                <div style={{ textAlign: 'center' }}>
-                  <p style={{ fontSize: '0.72rem', color: '#a8a29e', margin: '0 0 0.5rem' }}>UPI · Debit / Credit Cards · Net Banking · Wallets</p>
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    {[
-                      { label: 'G Pay', bg: '#4285F4' },
-                      { label: 'PhonePe', bg: '#5f259f' },
-                      { label: 'Paytm', bg: '#00BAF2' },
-                      { label: 'Cards', bg: '#374151' },
-                    ].map(app => (
-                      <span key={app.label} style={{ backgroundColor: app.bg, color: 'white', fontSize: '0.65rem', fontWeight: 700, padding: '0.2rem 0.55rem', borderRadius: 6 }}>{app.label}</span>
-                    ))}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                {/* ── UPI ID ── */}
-                <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: 12, padding: '0.875rem 1rem' }}>
-                  <p style={{ fontSize: '0.7rem', color: '#047857', fontWeight: 700, margin: '0 0 0.4rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pay to UPI ID</p>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontWeight: 700, color: '#064e3b', fontSize: '1rem' }}>{UPI_ID}</span>
-                    <button
-                      onClick={copyUpiId}
-                      style={{ flexShrink: 0, background: upiCopied ? '#059669' : 'white', color: upiCopied ? 'white' : '#059669', border: '1.5px solid #059669', borderRadius: 8, padding: '0.3rem 0.75rem', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', transition: 'all 0.2s' }}
-                    >
-                      {upiCopied ? '✓ Copied' : 'Copy'}
-                    </button>
-                  </div>
-                </div>
-
-                {/* ── QR Code ── */}
-                <div style={{ textAlign: 'center', padding: '0.25rem 0' }}>
-                  <p style={{ fontSize: '0.75rem', color: '#78716c', margin: '0 0 0.75rem' }}>or scan with any UPI app</p>
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(`upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${calculateTotal()}&cu=INR`)}`}
-                    alt="UPI QR Code"
-                    style={{ width: 180, height: 180, borderRadius: 12, border: '2px solid #a7f3d0', display: 'block', margin: '0 auto' }}
-                  />
-                  <p style={{ fontSize: '0.7rem', color: '#a8a29e', margin: '0.5rem 0 0' }}>G Pay · PhonePe · Paytm · BHIM · any UPI app</p>
-                </div>
-
-                {/* ── Divider ── */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <div style={{ flex: 1, height: 1, background: '#e7e5e4' }} />
-                  <span style={{ fontSize: '0.72rem', color: '#a8a29e', whiteSpace: 'nowrap' }}>after payment</span>
-                  <div style={{ flex: 1, height: 1, background: '#e7e5e4' }} />
-                </div>
-
-                {/* ── Upload instruction ── */}
-                <p style={{ fontSize: '0.875rem', color: '#78716c', margin: 0, textAlign: 'center', lineHeight: 1.5 }}>
-                  Take a screenshot from your UPI app and upload it below to confirm your order
-                </p>
-
-                {/* ── Mandatory screenshot upload ── */}
-                <div style={{ border: `1.5px dashed ${paymentFile ? '#059669' : '#f59e0b'}`, borderRadius: 12, padding: '1rem', textAlign: 'center', background: paymentFile ? '#f0fdf4' : '#fffbeb' }}>
-                  <p style={{ fontSize: '0.75rem', color: paymentFile ? '#059669' : '#b45309', fontWeight: 600, margin: '0 0 0.5rem' }}>
-                    {paymentFile ? '✓ Screenshot attached' : '📸 Upload payment screenshot to continue'}
-                  </p>
-                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: paymentFile ? '#047857' : '#78716c', fontSize: '0.875rem', fontWeight: 600 }}>
-                    <Upload size={16} />
-                    {paymentFile ? paymentFile.name : 'Choose screenshot'}
-                    <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
-                  </label>
-                </div>
-
-                {paymentFile && (
-                  <button
-                    onClick={handleFinalizeOrder}
-                    disabled={isSubmitting}
-                    style={{ ...s.btn, ...s.btnPrimary, marginTop: 0, fontSize: '1.05rem', padding: '1rem' }}
-                  >
-                    {isSubmitting ? <SpinLoader /> : <CheckCircle size={20} />}
-                    {isSubmitting ? 'Placing Order...' : 'Confirm My Order'}
-                  </button>
-                )}
-              </>
-            )}
+            <div style={{ background: '#f0fdf4', border: '1px solid #a7f3d0', borderRadius: '12px', padding: '0.75rem 1rem', marginTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.875rem', color: '#047857' }}>Order Total</span>
+              <span style={{ fontWeight: 800, fontSize: '1.25rem', color: '#064e3b' }}>₹{calculateTotal()}</span>
+            </div>
           </div>
-        </div>
+
+          <div style={s.bottomBar}>
+            <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+              {(() => {
+                const needsApt = DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt;
+                const ready = !!deliveryType && (!needsApt || !!aptNumber.trim()) && customerName.trim().length >= 2 && mobileNumber.length >= 10;
+                return (
+                  <>
+                    <button
+                      onClick={() => ready && !isSubmitting && initiateEasebuzzPayment()}
+                      disabled={!ready || isSubmitting}
+                      style={{ ...s.btn, ...s.btnPrimary, background: 'linear-gradient(135deg, #059669 0%, #047857 100%)', fontSize: '1.05rem', padding: '1rem', gap: '0.6rem', boxShadow: ready ? '0 4px 14px rgba(5,150,105,0.35)' : 'none', marginTop: 0, opacity: !ready || isSubmitting ? 0.6 : 1 }}
+                    >
+                      {isSubmitting ? <SpinLoader /> : <span style={{ fontSize: '1.2rem' }}>💳</span>}
+                      <span>{isSubmitting ? 'Preparing Payment...' : `Pay ₹${calculateTotal()} Securely`}</span>
+                    </button>
+                    <p style={{ textAlign: 'center', fontSize: '0.7rem', color: '#a8a29e', margin: '0.4rem 0 0' }}>UPI · Cards · Net Banking · Wallets</p>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        </>
       ) : (
         <>
           <div style={s.header}>
@@ -1541,9 +1471,18 @@ function SmartGrocerApp() {
             <div style={{ backgroundColor: '#047857', height: '2rem', marginBottom: '-2rem' }}></div> 
             
             {/* Products */}
-            <div ref={productsRef} style={{ paddingTop: '2rem' }}>
-              <h3 style={s.sectionTitle}><span style={s.step}>1</span> Fresh Produce</h3>
-              <div>
+            <div style={{ paddingTop: '2rem' }}>
+              {!productsReady ? (
+                <div style={{ background: 'white', borderRadius: '14px', border: '1px solid #e7e5e4', padding: '3rem 1rem', textAlign: 'center' }}>
+                  <SpinLoader />
+                  <p style={{ margin: '0.75rem 0 0', fontSize: '0.85rem', color: '#a8a29e' }}>Loading products…</p>
+                </div>
+              ) : productsError ? (
+                <div style={{ textAlign: 'center', padding: '2rem 1rem', background: 'white', borderRadius: '14px', border: '1px solid #e7e5e4' }}>
+                  <p style={{ margin: '0 0 0.75rem', color: '#78716c', fontSize: '0.9rem' }}>Couldn't load the product list. Please check your connection and try again.</p>
+                  <button onClick={() => window.location.reload()} style={{ ...s.btn, ...s.btnPrimary, width: 'auto', padding: '0.5rem 1.5rem', marginTop: 0 }}>Retry</button>
+                </div>
+              ) : <div>
                 {CATEGORIES.map(cat => {
                   const catProducts = PRODUCTS.filter(p => p.cat === cat.key && !disabledProducts.includes(String(p.id)));
                   if (catProducts.length === 0) return null;
@@ -1586,62 +1525,17 @@ function SmartGrocerApp() {
                     </div>
                   );
                 })}
+              </div>}
+
+            </div>
+
+            {productsReady && (
+              <div style={{ textAlign: 'center', paddingBottom: '2rem', marginTop: '2rem' }}>
+                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', margin: 0 }}>For Enquiries</p>
+                <p style={{ fontWeight: 700, color: '#065f46', margin: '0.25rem 0 0' }}>Mani - 81790 68821</p>
+                <button onClick={() => setView('admin-login')} style={{ marginTop: '1rem', fontSize: '0.75rem', color: '#d6d3d1', background: 'none', border: 'none', cursor: 'pointer' }}>Admin</button>
               </div>
-            </div>
-
-            {/* Delivery */}
-            <div ref={deliveryRef}>
-              <h3 style={s.sectionTitle}><span style={s.step}>2</span> Delivery Details</h3>
-              <div style={s.card}>
-                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Select Location</p>
-                <select
-                  value={deliveryType}
-                  onChange={e => { setDeliveryType(e.target.value); setAptNumber(''); }}
-                  style={{ width: '100%', padding: '0.75rem 2.5rem 0.75rem 1rem', border: '1px solid #e7e5e4', borderRadius: '12px', fontSize: '1rem', boxSizing: 'border-box', outline: 'none', backgroundColor: 'white', color: deliveryType ? '#1c1917' : '#a8a29e', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2378716c\' stroke-width=\'2\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
-                >
-                  <option value="">— Choose a location —</option>
-                  {DELIVERY_OPTIONS.map(option => (
-                    <option key={option.id} value={option.id}>{option.label}</option>
-                  ))}
-                </select>
-
-                {DELIVERY_OPTIONS.find(d => d.id === deliveryType)?.requiresApt && (
-                  <div style={{ marginTop: '1rem' }}>
-                    <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Block & Flat Number</p>
-                    <input
-                      type="text"
-                      placeholder="e.g. A-101"
-                      value={aptNumber}
-                      onChange={e => setAptNumber(e.target.value.slice(0, 15))}
-                      maxLength={15}
-                      style={s.input}
-                    />
-                    <p style={{ fontSize: '0.7rem', color: '#a8a29e', marginTop: '0.25rem', textAlign: 'right' }}>{aptNumber.length}/15</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Info */}
-            <div ref={infoRef}>
-              <h3 style={s.sectionTitle}><span style={s.step}>3</span> Your Info</h3>
-              <div style={s.card}>
-                <div style={s.inputGroup}>
-                  <User style={s.iconPrefix} size={18} />
-                  <input type="text" placeholder="Full Name" value={customerName} onChange={e => setCustomerName(e.target.value)} style={s.input} />
-                </div>
-                <div style={{ ...s.inputGroup, marginBottom: 0 }}>
-                  <Phone style={s.iconPrefix} size={18} />
-                  <input type="tel" placeholder="Mobile Number" value={mobileNumber} onChange={e => { if(/^\d*$/.test(e.target.value)) setMobileNumber(e.target.value) }} style={s.input} />
-                </div>
-              </div>
-            </div>
-
-            <div style={{ textAlign: 'center', paddingBottom: '2rem', marginTop: '2rem' }}>
-               <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', margin: 0 }}>For Enquiries</p>
-               <p style={{ fontWeight: 700, color: '#065f46', margin: '0.25rem 0 0' }}>Mani - 81790 68821</p>
-               <button onClick={() => setView('admin-login')} style={{ marginTop: '1rem', fontSize: '0.75rem', color: '#d6d3d1', background: 'none', border: 'none', cursor: 'pointer' }}>Admin</button>
-            </div>
+            )}
           </div>
 
           {showScrollCue && (
@@ -1657,9 +1551,19 @@ function SmartGrocerApp() {
                 <p style={{ fontSize: '0.75rem', color: '#78716c', textTransform: 'uppercase', fontWeight: 700, margin: 0 }}>Total</p>
                 <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#064e3b', margin: 0 }}>₹{calculateTotal()}</p>
               </div>
-              <button onClick={handleSmartAction} style={{ ...s.btn, ...s.btnPrimary, width: 'auto', paddingLeft: '2rem', paddingRight: '2rem', marginTop: 0 }}>
-                {getButtonText().text} {getButtonText().icon}
-              </button>
+              {(() => {
+                const total = calculateTotal();
+                const itemCount = Object.values(cart).reduce((sum, q) => sum + q, 0);
+                return (
+                  <button
+                    onClick={() => { if (total > 0) setView('cart'); }}
+                    disabled={total === 0}
+                    style={{ ...s.btn, ...s.btnPrimary, width: 'auto', paddingLeft: '1.25rem', paddingRight: '1.25rem', marginTop: 0, opacity: total === 0 ? 0.5 : 1 }}
+                  >
+                    {total === 0 ? 'Add Items' : `View Cart (${itemCount})`} <ArrowRight size={18} />
+                  </button>
+                );
+              })()}
             </div>
           </div>
         </>
