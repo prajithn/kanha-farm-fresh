@@ -1270,8 +1270,14 @@ function SmartGrocerApp() {
                       <div style={{ backgroundColor: '#fafaf9', padding: '0.75rem', borderRadius: 8, fontSize: '0.875rem' }}>
                         <p style={{ margin: '0 0 0.25rem', fontWeight: 700 }}>Items:</p>
                         <p style={{ margin: 0 }}>{order.items}</p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid #e7e5e4', fontWeight: 700 }}>
-                          <span>Total:</span><span>₹{order.total}</span>
+                        <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid #e7e5e4' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                            <span>Total Amount:</span><span>₹{order.total}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.25rem', fontWeight: 700, color: order.amountReceived > 0 ? '#047857' : '#b45309' }}>
+                            <span>Amount Received:</span>
+                            <span>₹{order.amountReceived > 0 ? order.amountReceived : 0}</span>
+                          </div>
                         </div>
                       </div>
                       {order.status !== 'Done' && (

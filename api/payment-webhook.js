@@ -13,8 +13,9 @@ export default async function handler(req, res) {
   const txnid      = body.txnid      || '';
   const status     = body.status     || '';
   const paymentRef = body.easepayid  || body.mihpayid || '';
+  const amount     = body.amount     || '0';
 
-  console.log('Easebuzz webhook received:', { txnid, status, paymentRef });
+  console.log('Easebuzz webhook received:', { txnid, status, paymentRef, amount });
 
   if (txnid && status) {
     try {
@@ -24,6 +25,7 @@ export default async function handler(req, res) {
         `&txnid=${encodeURIComponent(txnid)}` +
         `&ref=${encodeURIComponent(paymentRef)}` +
         `&status=${encodeURIComponent(status)}` +
+        `&amount=${encodeURIComponent(amount)}` +
         `&cb=${Date.now()}`
       );
     } catch (e) {
