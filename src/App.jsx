@@ -582,12 +582,12 @@ const DELIVERY_OPTIONS = [
   { id: 'mtv', label: 'Maple Town Villas', requiresApt: true },
   { id: 'bhooja', label: 'My Home Bhooja', requiresApt: true },
   { id: 'krishe', label: 'My Home Krishe', requiresApt: true },
-
   { id: 'vihanga', label: 'My Home Vihanga', requiresApt: true },
   { id: 'atria', label: 'Rajapushpa Atria', requiresApt: true },
+  { id: 'vajra', label: 'Vajras Jasmine County', requiresApt: true },
+
 
   //  { id: 'phf', label: 'Prestige High Fields', requiresApt: true },
-//  { id: 'tranquil', label: 'Prestige Tranquil', requiresApt: true },
 //  { id: 'pbel', label: 'PBEL City', requiresApt: true },
 
 //  { id: 'aristos', label: 'Poulomi Aristos', requiresApt: true },
