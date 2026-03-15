@@ -1565,13 +1565,13 @@ function SmartGrocerApp() {
                 // ── ALL PRODUCTS DISABLED — Coming Soon ──
                 <>
                   <style>{`
-                    @keyframes sproutPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+                    @keyframes sproutPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.35); } }
                     @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                   `}</style>
                   <div style={{ background: 'linear-gradient(160deg, #f0fdf4 0%, #fafef7 100%)', border: '1px solid #bbf7d0', borderRadius: '18px', padding: '1.25rem 1.25rem 1.5rem', textAlign: 'center', margin: '0.25rem 0' }}>
 
                     {/* Bouncing leaf */}
-                    <div style={{ fontSize: '3rem', lineHeight: 1, animation: 'sproutPulse 2.4s ease-in-out infinite', marginBottom: '0.75rem' }}>🌱</div>
+                    <div style={{ fontSize: '4rem', lineHeight: 1, animation: 'sproutPulse 2.4s ease-in-out infinite', marginBottom: '0.75rem', filter: 'drop-shadow(0 4px 8px rgba(4,120,87,0.25))' }}>🌱</div>
 
                     <h2 style={{ fontWeight: 800, fontSize: '1.45rem', color: '#14532d', margin: '0 0 0.4rem', animation: 'fadeUp 0.5s ease both' }}>Harvest Coming Soon!</h2>
                     <p style={{ color: '#166534', fontSize: '0.875rem', lineHeight: 1.6, margin: '0 0 1.25rem', animation: 'fadeUp 0.5s 0.1s ease both', opacity: 0.8 }}>
