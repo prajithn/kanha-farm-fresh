@@ -578,7 +578,6 @@ const CATEGORIES = [
 
 const DELIVERY_OPTIONS = [
   { id: 'asblks', label: 'ASBL Lakeside', requiresApt: true },
-
   { id: 'mtv', label: 'Maple Town Villas', requiresApt: true },
   { id: 'bhooja', label: 'My Home Bhooja', requiresApt: true },
   { id: 'krishe', label: 'My Home Krishe', requiresApt: true },
@@ -1562,6 +1561,45 @@ function SmartGrocerApp() {
                   <p style={{ margin: '0 0 0.75rem', color: '#78716c', fontSize: '0.9rem' }}>Couldn't load the product list. Please check your connection and try again.</p>
                   <button onClick={() => window.location.reload()} style={{ ...s.btn, ...s.btnPrimary, width: 'auto', padding: '0.5rem 1.5rem', marginTop: 0 }}>Retry</button>
                 </div>
+              ) : PRODUCTS.every(p => disabledProducts.includes(String(p.id))) ? (
+                // ── ALL PRODUCTS DISABLED — Coming Soon ──
+                <>
+                  <style>{`
+                    @keyframes sproutPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+                    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+                  `}</style>
+                  <div style={{ background: 'linear-gradient(160deg, #f0fdf4 0%, #fafef7 100%)', border: '1px solid #bbf7d0', borderRadius: '18px', padding: '2rem 1.25rem 2rem', textAlign: 'center', margin: '0.25rem 0' }}>
+
+                    {/* Bouncing leaf */}
+                    <div style={{ fontSize: '4.5rem', lineHeight: 1, animation: 'sproutPulse 2.4s ease-in-out infinite', marginBottom: '1.25rem' }}>🌱</div>
+
+                    <h2 style={{ fontWeight: 800, fontSize: '1.45rem', color: '#14532d', margin: '0 0 0.625rem', animation: 'fadeUp 0.5s ease both' }}>Harvest Coming Soon!</h2>
+                    <p style={{ color: '#166534', fontSize: '0.875rem', lineHeight: 1.7, margin: '0 0 1.75rem', animation: 'fadeUp 0.5s 0.1s ease both', opacity: 0.8 }}>
+                      Our farmers are busy tending to the crops.<br />Fresh organic produce will be available here shortly — check back soon!
+                    </p>
+
+                    {/* Curated product icon strip — two staggered rows */}
+                    <div style={{ animation: 'fadeUp 0.5s 0.2s ease both' }}>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.625rem', marginBottom: '0.5rem' }}>
+                        {['🍓', '🍌', '🍈', '🥕', '🍅'].map((icon, i) => (
+                          <span key={i} style={{ fontSize: i === 2 ? '2.2rem' : '1.7rem', opacity: 0.3, filter: 'grayscale(40%)' }}>{icon}</span>
+                        ))}
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.625rem' }}>
+                        {['🧀', '🥬', '🌿', '🧊'].map((icon, i) => (
+                          <span key={i} style={{ fontSize: i === 1 ? '2.2rem' : '1.7rem', opacity: 0.3, filter: 'grayscale(40%)' }}>{icon}</span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Organic tagline */}
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1.5rem', animation: 'fadeUp 0.5s 0.3s ease both', flexWrap: 'wrap' }}>
+                      {['🌱 Farm Direct', '✨ 100% Organic', '🚫 Chemical-Free'].map((tag, i) => (
+                        <span key={i} style={{ fontSize: '0.7rem', fontWeight: 700, color: '#14532d', background: '#dcfce7', border: '1px solid #bbf7d0', borderRadius: '20px', padding: '0.25rem 0.625rem', opacity: 0.85 }}>{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                </>
               ) : <div>
                 {CATEGORIES.map(cat => {
                   const catProducts = PRODUCTS.filter(p => p.cat === cat.key && !disabledProducts.includes(String(p.id)));
@@ -1609,7 +1647,7 @@ function SmartGrocerApp() {
 
             </div>
 
-            {productsReady && (
+            {productsReady && !PRODUCTS.every(p => disabledProducts.includes(String(p.id))) && (
               <div style={{ textAlign: 'center', paddingBottom: '2rem', marginTop: '2rem' }}>
                 <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', margin: 0 }}>For Enquiries</p>
                 <p style={{ fontWeight: 700, color: '#065f46', margin: '0.25rem 0 0' }}>Mani - 81790 68821</p>
@@ -1618,7 +1656,7 @@ function SmartGrocerApp() {
             )}
           </div>
 
-          {showScrollCue && productsReady && !productsError && (
+          {showScrollCue && productsReady && !productsError && !PRODUCTS.every(p => disabledProducts.includes(String(p.id))) && (
             <>
               <style>{`@keyframes scrollBounce { 0%, 100% { transform: translateY(0); } 55% { transform: translateY(5px); } }`}</style>
               <div style={{ position: 'fixed', bottom: '6.25rem', left: '50%', transform: 'translateX(-50%)', pointerEvents: 'none', zIndex: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}>
@@ -1630,7 +1668,7 @@ function SmartGrocerApp() {
             </>
           )}
 
-          <div style={s.bottomBar}>
+          {!PRODUCTS.every(p => disabledProducts.includes(String(p.id))) && <div style={s.bottomBar}>
             <div style={{ maxWidth: '600px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <p style={{ fontSize: '0.75rem', color: '#78716c', textTransform: 'uppercase', fontWeight: 700, margin: 0 }}>Total</p>
@@ -1650,7 +1688,7 @@ function SmartGrocerApp() {
                 );
               })()}
             </div>
-          </div>
+          </div>}
         </>
       )}
     </div>
