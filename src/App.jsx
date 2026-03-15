@@ -924,7 +924,7 @@ function SmartGrocerApp() {
             </h1>
 
             <p style={{ color: '#a7f3d0', fontSize: '0.88rem', lineHeight: 1.75, margin: '0 0 0.5rem' }}>
-              Pure organic produce, grown without chemicals, nourished by <strong style={{ color: '#d1fae5' }}>biochar & vermicompost</strong> from Kanha Shantivanam.
+              Pure farm-grown produce, free of chemicals, nourished by <strong style={{ color: '#d1fae5' }}>biochar & vermicompost</strong> from Kanha Shantivanam.
             </p>
             <p style={{ color: '#6ee7b7', fontSize: '0.8rem', lineHeight: 1.6, margin: '0 0 2rem', fontWeight: 600 }}>
               Delivered fresh to your doorstep. 🚚
@@ -984,7 +984,7 @@ function SmartGrocerApp() {
             {[
               { icon: '🌱', title: 'Farm\nDirect', desc: 'No middlemen' },
               { icon: '🌾', title: 'Healthy\nSoil', desc: 'Biochar & vermicompost' },
-              { icon: '🌿', title: 'Fully\nOrganic', desc: 'Chemical-free' },
+              { icon: '🌿', title: 'Naturally\nGrown', desc: 'Chemical-free' },
             ].map(item => (
               <div key={item.title} style={{ background: 'white', border: '1px solid #e7e5e4', borderRadius: 14, padding: '1rem 0.6rem', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                 <div style={{ fontSize: '1.5rem', marginBottom: '0.35rem' }}>{item.icon}</div>
@@ -1000,7 +1000,7 @@ function SmartGrocerApp() {
           <p style={{ margin: '0 0 0.875rem', fontSize: '0.7rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', letterSpacing: '1px' }}>How it works</p>
           <div style={{ background: 'white', border: '1px solid #e7e5e4', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             {[
-              { step: '1', icon: '🛒', title: 'Browse & add to cart', desc: 'Pick from fresh, organic produce' },
+              { step: '1', icon: '🛒', title: 'Browse & add to cart', desc: 'Pick from fresh, naturally grown produce' },
               { step: '2', icon: '💳', title: 'Pay via UPI', desc: 'GPay, PhonePe, Paytm — one tap' },
               { step: '3', icon: '🚚', title: 'Delivered fresh', desc: 'To your door or pickup point' },
             ].map((item, i, arr) => (
@@ -1025,7 +1025,7 @@ function SmartGrocerApp() {
               <h2 style={{ margin: 0, fontWeight: 800, color: '#064e3b', fontSize: '0.95rem' }}>About Vanashanti</h2>
             </div>
             <p style={{ margin: '0 0 0.65rem', fontSize: '0.85rem', color: '#374151', lineHeight: 1.75 }}>
-              Vanashanti FPO is dedicated to <strong>restoring soil health</strong> through organic methods — helping farmers grow stronger, more resilient crops, naturally and sustainably.
+              Vanashanti FPO is dedicated to <strong>restoring soil health</strong> through natural methods — helping farmers grow stronger, more resilient crops, naturally and sustainably.
             </p>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#374151', lineHeight: 1.75 }}>
               Working with <strong>Kanha Shantivanam</strong>, we supply farmers with <strong>biochar and vermicompost</strong> that rebuild microbial activity and boost natural fertility. Better soil → better crops → better food for your family.
@@ -1079,7 +1079,7 @@ function SmartGrocerApp() {
           <p style={{ margin: '0 0 0.35rem', fontSize: '0.7rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', letterSpacing: '1px' }}>Have a question?</p>
           <p style={{ margin: '0 0 0.75rem', fontWeight: 800, color: '#064e3b', fontSize: '1rem' }}>Mani — 81790 68821</p>
           <p style={{ margin: 0, fontSize: '0.65rem', color: '#a8a29e', lineHeight: 1.6 }}>
-            Fresh · Organic · Direct from Kanha Village<br />
+            Fresh · Naturally Grown · Direct from Kanha Village<br />
             Vanashanti FPO, Kanha Village, Rangareddy
           </p>
         </div>
@@ -1541,7 +1541,7 @@ function SmartGrocerApp() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.25rem' }}>
                 <span style={{ fontSize: '0.65rem', color: '#6ee7b7', fontWeight: 700, letterSpacing: '0.3px' }}>Vanashanti FPO</span>
                 <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.55rem' }}>•</span>
-                <span style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.6)', letterSpacing: '0.3px' }}>100% Organic</span>
+                <span style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.6)', letterSpacing: '0.3px' }}>Chemical-Free</span>
               </div>
             </div>
           </div>
@@ -1575,7 +1575,7 @@ function SmartGrocerApp() {
 
                     <h2 style={{ fontWeight: 800, fontSize: '1.45rem', color: '#14532d', margin: '0 0 0.4rem', animation: 'fadeUp 0.5s ease both' }}>Harvest Coming Soon!</h2>
                     <p style={{ color: '#166534', fontSize: '0.875rem', lineHeight: 1.6, margin: '0 0 1.25rem', animation: 'fadeUp 0.5s 0.1s ease both', opacity: 0.8 }}>
-                      Our farmers are busy tending to the crops.<br />Fresh organic produce will be available here shortly — check back soon!
+                      Our farmers are busy tending to the crops.<br />Fresh produce will be available here shortly — check back soon!
                     </p>
 
                     {/* Curated product icon strip — single row, overflow hidden */}
