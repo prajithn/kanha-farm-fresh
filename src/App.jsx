@@ -1568,13 +1568,13 @@ function SmartGrocerApp() {
                     @keyframes sproutPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
                     @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                   `}</style>
-                  <div style={{ background: 'linear-gradient(160deg, #f0fdf4 0%, #fafef7 100%)', border: '1px solid #bbf7d0', borderRadius: '18px', padding: '2rem 1.25rem 2rem', textAlign: 'center', margin: '0.25rem 0' }}>
+                  <div style={{ background: 'linear-gradient(160deg, #f0fdf4 0%, #fafef7 100%)', border: '1px solid #bbf7d0', borderRadius: '18px', padding: '1.25rem 1.25rem 1.5rem', textAlign: 'center', margin: '0.25rem 0' }}>
 
                     {/* Bouncing leaf */}
-                    <div style={{ fontSize: '4.5rem', lineHeight: 1, animation: 'sproutPulse 2.4s ease-in-out infinite', marginBottom: '1.25rem' }}>🌱</div>
+                    <div style={{ fontSize: '3rem', lineHeight: 1, animation: 'sproutPulse 2.4s ease-in-out infinite', marginBottom: '0.75rem' }}>🌱</div>
 
-                    <h2 style={{ fontWeight: 800, fontSize: '1.45rem', color: '#14532d', margin: '0 0 0.625rem', animation: 'fadeUp 0.5s ease both' }}>Harvest Coming Soon!</h2>
-                    <p style={{ color: '#166534', fontSize: '0.875rem', lineHeight: 1.7, margin: '0 0 1.75rem', animation: 'fadeUp 0.5s 0.1s ease both', opacity: 0.8 }}>
+                    <h2 style={{ fontWeight: 800, fontSize: '1.45rem', color: '#14532d', margin: '0 0 0.4rem', animation: 'fadeUp 0.5s ease both' }}>Harvest Coming Soon!</h2>
+                    <p style={{ color: '#166534', fontSize: '0.875rem', lineHeight: 1.6, margin: '0 0 1.25rem', animation: 'fadeUp 0.5s 0.1s ease both', opacity: 0.8 }}>
                       Our farmers are busy tending to the crops.<br />Fresh organic produce will be available here shortly — check back soon!
                     </p>
 
@@ -1586,8 +1586,8 @@ function SmartGrocerApp() {
                     </div>
 
                     {/* Organic tagline */}
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1.5rem', animation: 'fadeUp 0.5s 0.3s ease both', flexWrap: 'wrap' }}>
-                      {['🌱 Farm Direct', '✨ 100% Organic', '🚫 Chemical-Free'].map((tag, i) => (
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1.1rem', animation: 'fadeUp 0.5s 0.3s ease both', flexWrap: 'wrap' }}>
+                      {['🌱 Farm Direct', '🚫 Chemical-Free', '✅ Residue-Free', '🌿 Naturally Grown'].map((tag, i) => (
                         <span key={i} style={{ fontSize: '0.7rem', fontWeight: 700, color: '#14532d', background: '#dcfce7', border: '1px solid #bbf7d0', borderRadius: '20px', padding: '0.25rem 0.625rem', opacity: 0.85 }}>{tag}</span>
                       ))}
                     </div>
