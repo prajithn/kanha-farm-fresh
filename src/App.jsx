@@ -1578,18 +1578,11 @@ function SmartGrocerApp() {
                       Our farmers are busy tending to the crops.<br />Fresh organic produce will be available here shortly — check back soon!
                     </p>
 
-                    {/* Curated product icon strip — two staggered rows */}
-                    <div style={{ animation: 'fadeUp 0.5s 0.2s ease both' }}>
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.625rem', marginBottom: '0.5rem' }}>
-                        {['🍓', '🍌', '🍈', '🥕', '🍅'].map((icon, i) => (
-                          <span key={i} style={{ fontSize: i === 2 ? '2.2rem' : '1.7rem', opacity: 0.3, filter: 'grayscale(40%)' }}>{icon}</span>
-                        ))}
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.625rem' }}>
-                        {['🧀', '🥬', '🌿', '🧊'].map((icon, i) => (
-                          <span key={i} style={{ fontSize: i === 1 ? '2.2rem' : '1.7rem', opacity: 0.3, filter: 'grayscale(40%)' }}>{icon}</span>
-                        ))}
-                      </div>
+                    {/* Curated product icon strip — single row, overflow hidden */}
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.625rem', overflow: 'hidden', animation: 'fadeUp 0.5s 0.2s ease both' }}>
+                      {['🍓', '🍌', '🍈', '🥕', '🍅', '🧀', '🥬', '🌿', '🧊'].map((icon, i) => (
+                        <span key={i} style={{ fontSize: '1.7rem', opacity: 0.3, filter: 'grayscale(40%)', flexShrink: 0 }}>{icon}</span>
+                      ))}
                     </div>
 
                     {/* Organic tagline */}
