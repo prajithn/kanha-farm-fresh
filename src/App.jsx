@@ -534,9 +534,6 @@ const PRODUCTS = [
   // cat: 'fruits'
   { id: 1, cat: 'fruits', name: 'Grapes (Green-Seedless) - 500gm',        unit: '500gm',        price: 100, icon: <span style={{ fontSize: '2rem', filter: 'hue-rotate(200deg) saturate(1.3)' }}>🍇</span>, desc: 'Crisp & Sweet' },
   { id: 2, cat: 'fruits', name: 'Grapes (Green-Seedless) - 1Kg',          unit: '1 Kg',         price: 200, icon: <span style={{ fontSize: '2rem', filter: 'hue-rotate(200deg) saturate(1.3)' }}>🍇</span>, desc: 'Crisp & Sweet' },
-  //{ id: 1,  cat: 'fruits', name: 'Strawberry - 200gm',                       unit: 'Box (200g)',   price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
-  //{ id: 2,  cat: 'fruits', name: 'Strawberry - 500gm',                       unit: 'Box (500g)',   price: 225, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
-  //{ id: 3,  cat: 'fruits', name: 'Strawberry - 1Kg',                         unit: 'Box (1Kg)',    price: 400, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
   { id: 4,  cat: 'fruits', name: 'Goldenberry - 150gm',                      unit: '150gm',        price: 100, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 5,  cat: 'fruits', name: 'Goldenberry - 250gm',                      unit: '250gm',        price: 150, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 6,  cat: 'fruits', name: 'Tender Coconut',                           unit: 'Piece',        price: 50,  icon: <TenderCoconutIcon />, desc: 'Refreshing' },
@@ -544,6 +541,10 @@ const PRODUCTS = [
   { id: 8,  cat: 'fruits', name: 'Banana - Karpooravalli',                   unit: '1 Kg',         price: 100, icon: <span style={{ fontSize: '2rem' }}>🍌</span>, desc: 'Rich & Aromatic' },
   { id: 9,  cat: 'fruits', name: 'Mulberry',                                 unit: '125gm',        price: 100, icon: <MulberryIcon />,        desc: 'Sweet & Juicy' },
   { id: 10, cat: 'fruits', name: 'Indian Raspberry',                        unit: '100gm',        price: 200, icon: <IndianRaspberryIcon />, desc: 'Tangy & Fresh' },
+  { id: 11,  cat: 'fruits', name: 'Strawberry - 200gm',                       unit: 'Box (200g)',   price: 100, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
+  { id: 12,  cat: 'fruits', name: 'Strawberry - 500gm',                       unit: 'Box (500g)',   price: 225, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
+  { id: 13,  cat: 'fruits', name: 'Strawberry - 1Kg',                         unit: 'Box (1Kg)',    price: 400, icon: <span style={{ fontSize: '2rem' }}>🍓</span>, desc: 'Sweet & Red' },
+
 
   // cat: 'vegs'
   { id: 21, cat: 'vegs',   name: 'Beetroot',                                 unit: '500gm',        price: 35,  icon: <BeetrootIcon />, desc: 'Earthy Root' },
