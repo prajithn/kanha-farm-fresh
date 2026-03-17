@@ -581,6 +581,7 @@ const CATEGORIES = [
 
 const DELIVERY_OPTIONS = [
   { id: 'asblks', label: 'ASBL Lakeside', requiresApt: true },
+  { id: 'jaynir', label: 'Jayabheri Nirvana', requiresApt: true },
   { id: 'mtv', label: 'Maple Town Villas', requiresApt: true },
   { id: 'bhooja', label: 'My Home Bhooja', requiresApt: true },
   { id: 'krishe', label: 'My Home Krishe', requiresApt: true },
