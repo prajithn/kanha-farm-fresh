@@ -547,6 +547,7 @@ const PRODUCTS = [
 
 
   // cat: 'vegs'
+  { id: 20, cat: 'vegs',   name: 'Baby/Vadu Mango for Pickle - 500gm',    unit: '500gm',        price: 200, icon: <span style={{ fontSize: '1.6rem' }}>🥭</span>, desc: 'Tangy & Fresh' },
   { id: 21, cat: 'vegs',   name: 'Beetroot',                                 unit: '500gm',        price: 35,  icon: <BeetrootIcon />, desc: 'Earthy Root' },
   { id: 22, cat: 'vegs',   name: 'Bitter Gourd',                             unit: '500gm',        price: 40,  icon: <BitterGourdIcon />, desc: 'Healthy' },
   { id: 23, cat: 'vegs',   name: 'Bottle Gourd',                             unit: '500gm',        price: 30,  icon: <BottleGourdIcon />, desc: 'Healthy' },
@@ -554,7 +555,7 @@ const PRODUCTS = [
   { id: 25, cat: 'vegs',   name: 'Ridge Gourd',                              unit: '500gm',        price: 40,  icon: <RidgeGourdIcon />, desc: 'Fibrous & Healthy' },
   { id: 26, cat: 'vegs',   name: 'Tomato',                                   unit: '1 Kg',         price: 60,  icon: <span style={{ fontSize: '2rem' }}>🍅</span>, desc: 'Fresh & Tangy' },
   { id: 27, cat: 'vegs',   name: 'Carrot',                                   unit: '1 Kg',         price: 60,  icon: <span style={{ fontSize: '2rem' }}>🥕</span>, desc: 'Crunchy & Sweet' },
-
+ 
 
   // cat: 'dairy'
   { id: 31, cat: 'dairy',  name: 'Plain Paneer',                             unit: '200g',         price: 119, icon: <span style={{ fontSize: '2rem' }}>🧀</span>, desc: 'Rich Protein' },
