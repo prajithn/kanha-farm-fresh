@@ -581,14 +581,17 @@ const CATEGORIES = [
 ];
 
 const DELIVERY_OPTIONS = [
+  { id: 'anuhar', label: 'Anuhar Art of Living', requiresApt: true },
   { id: 'asblks', label: 'ASBL Lakeside', requiresApt: true },
   { id: 'jaynir', label: 'Jayabheri Nirvana', requiresApt: true },
+  { id: 'jaypeak', label: 'Jayabheri The Peak', requiresApt: true },
   { id: 'mtv', label: 'Maple Town Villas', requiresApt: true },
   { id: 'bhooja', label: 'My Home Bhooja', requiresApt: true },
   { id: 'krishe', label: 'My Home Krishe', requiresApt: true },
   { id: 'vihanga', label: 'My Home Vihanga', requiresApt: true },
   { id: 'atria', label: 'Rajapushpa Atria', requiresApt: true },
   { id: 'vajra', label: 'Vajras Jasmine County', requiresApt: true },
+
 
 
   //  { id: 'phf', label: 'Prestige High Fields', requiresApt: true },
