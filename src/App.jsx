@@ -532,9 +532,9 @@ const PRODUCTS = [
 
 
   // cat: 'fruits'
-  { id: 1, cat: 'fruits', name: 'Grapes (Green-Seedless) - 500gm',        unit: '500gm',        price: 100, icon: <span style={{ fontSize: '2rem', filter: 'hue-rotate(200deg) saturate(1.3)' }}>🍇</span>, desc: 'Crisp & Sweet' },
+//  { id: 1, cat: 'fruits', name: 'Grapes (Green-Seedless) - 500gm',        unit: '500gm',        price: 100, icon: <span style={{ fontSize: '2rem', filter: 'hue-rotate(200deg) saturate(1.3)' }}>🍇</span>, desc: 'Crisp & Sweet' },
   { id: 2, cat: 'fruits', name: 'Grapes (Green-Seedless) - 1Kg',          unit: '1 Kg',         price: 200, icon: <span style={{ fontSize: '2rem', filter: 'hue-rotate(200deg) saturate(1.3)' }}>🍇</span>, desc: 'Crisp & Sweet' },
-  { id: 3, cat: 'fruits', name: 'Grapes (Green-Seedless) - 2Kg',          unit: '2 Kg',         price: 400, icon: <span style={{ fontSize: '2rem', filter: 'hue-rotate(200deg) saturate(1.3)' }}>🍇</span>, desc: 'Crisp & Sweet' },
+  { id: 3, cat: 'fruits', name: '🔥[Special Offer]🔥 Grapes (Green-Seedless) - 2Kg',          unit: '2 Kg',         price: 350, icon: <span style={{ fontSize: '2rem', filter: 'hue-rotate(200deg) saturate(1.3)' }}>🍇</span>, desc: 'Crisp & Sweet' },
   { id: 4,  cat: 'fruits', name: 'Goldenberry - 150gm',                      unit: '150gm',        price: 100, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 5,  cat: 'fruits', name: 'Goldenberry - 250gm',                      unit: '250gm',        price: 150, icon: <GoldenBerryIcon />, desc: 'Sweet & Zesty' },
   { id: 6,  cat: 'fruits', name: 'Tender Coconut',                           unit: 'Piece',        price: 50,  icon: <TenderCoconutIcon />, desc: 'Refreshing' },
