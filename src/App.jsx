@@ -585,7 +585,7 @@ const DELIVERY_OPTIONS = [
   { id: 'anuhar', label: 'Anuhar Art of Living', requiresApt: true },
 //  { id: 'asblks', label: 'ASBL Lakeside', requiresApt: true },
 //  { id: 'jaynir', label: 'Jayabheri Nirvana', requiresApt: true },
-  { id: 'jaypeak', label: 'Jayabheri The Peak', requiresApt: true },
+//  { id: 'jaypeak', label: 'Jayabheri The Peak', requiresApt: true },
 //  { id: 'lancohills', label: 'Lanco Hills', requiresApt: true },
   { id: 'mtv', label: 'Maple Town Villas', requiresApt: true },
   { id: 'bhooja', label: 'My Home Bhooja', requiresApt: true },
